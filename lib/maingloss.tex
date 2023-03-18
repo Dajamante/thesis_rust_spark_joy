@@ -1,0 +1,49 @@
+\newglossaryentry{CFI}{
+    type=fullg,
+    name={control flow integrity (CFI)},
+    description={CFI embeds within the software a control-flow policy, that guarantees that the programs follow a path decided ahead of time.}}
+    
+\newglossaryentry{foreign-function-interface}{
+    type=fullg,
+    name={foreign function interface (FFI)},
+    description={Foreign Function Interface (FFI) is a mechanism in computer programming that enables software written in one programming language to access and use functions or libraries written in another programming language. For systems programming languages such as Rust and Ada, both languages would use the C \gls{ABI}  that defines how data structures are represented in memory.}}
+    
+\newglossaryentry{memory-corruption}{
+    type=fullg,
+    name={memory corruption},
+    description={Memory corruption happens when memory is altered in a way that was not intended by the programmer. The source of memory corruption is usually programming errors in low-level languages.
+\\}}
+\newglossaryentry{memory-error}{
+    type=fullg,
+    name={memory error},
+    description={A memory error is common in C/C++ low level languages. It consists of two steps: 1. rendering a pointer unusable, 2. accessing this pointer. A pointer is made obsolete if it goes beyond its bounds or if the object is deallocated. A pointer to a deleted object is known as a dangling pointer. Accessing an out-of-bound pointer is called a spatial error, whereas accessing a dangling pointer is a temporal error.
+\\}}
+\newglossaryentry{memory-safety}{
+    type=fullg,
+    name={memory safety},
+    description={Memory safety is a programming language property, that controls how memory is used to ensure no bugs related to memory are introduced. Memory safety can be implemented in many different ways, for example, garbage collection, run time detection, or borrow-checker. It ensures memory should not be accessed in an unsafe way. This includes verifying that memory is allocated before usage or that memory is not accessed out-of-bounds.}}
+    
+\newglossaryentry{ownership}{
+    type=fullg,
+    name={ownership},
+    description={Ownership is a feature of a programming language that guarantees that a place in memory to hold a variable has only one owner. It is inspired by Linear Types (values that must be used exactly once) and Affine types (must be used at most once, \ie it can be ignored). Linear Types enable managing memory of mutable values without a garbage collector\,\cite{ferdowsi_usability_2023}.}}
+
+\newglossaryentry{safety-critical}{
+    type=fullg,
+    name={safety critical},
+    description={The safety-critical industry refers to products such as transportation (aircraft, automobile, railways), as well as medical devices, home appliances, or homes. For safety-critical devices, failure is unacceptable as failures put human life at risk.}}
+    
+\newglossaryentry{type-safety}{
+    type=fullg,
+    name={type safety},
+    description={Type safety is a feature of the programming language which ensures that variables are of the type they have been declared through the program. Type safety is enforced at compile-time.}}
+
+
+
+
+
+
+
+
+
+

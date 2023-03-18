@@ -1,0 +1,531 @@
+
+@misc{sreekanth_visualizing_2021,
+	title = {Visualizing memory layout of {Rust}'s data types},
+	url = {https://www.youtube.com/watch?v=rDoqT-a6UFg},
+	abstract = {Covers how a binary is executed, what segments are mapped to memory, the purpose/working of stack and heap memory, and how values of Rust's data types are laid out in memory. The data types that we cover here are integers, char, Vector, slice, String, string slice, structs, enums, smart pointers like Box, Rc, Arc, Trait object and Fn traits like FnOnce, FnMut and Fn.
+We also cover the difference between String and str types, Vector and slice types. Topics like fat pointers, optimizations done by the Rust compiler when you wrap a reference inside an Option are also covered.},
+	urldate = {2023-03-06},
+	author = {{Sreekanth}},
+	year = {2021},
+}
+
+@misc{noauthor_multi-language_nodate,
+	title = {Multi-{Language} {Development} — learn.adacore.com},
+	url = {https://learn.adacore.com/courses/intro-to-embedded-sys-prog/chapters/multi_language_development.html},
+	urldate = {2023-03-06},
+	keywords = {ada\_multilang\_dev},
+}
+
+@misc{noauthor_ffi_nodate,
+	title = {{FFI} - {The} {Rustonomicon}},
+	url = {https://doc.rust-lang.org/nomicon/ffi.html},
+	urldate = {2023-03-06},
+	keywords = {rustonomicon},
+}
+
+@book{gjengset_rust_2021,
+	title = {Rust for {Rustaceans}},
+	isbn = {978-1-71850-185-0},
+	url = {https://rust-for-rustaceans.com},
+	abstract = {For developers who’ve mastered the basics, this book is the next step on your way to professional-level programming in Rust. It covers everything you need to build and maintain larger code bases, write powerful and flexible applications and libraries, and confidently expand the scope and complexity},
+	language = {en},
+	urldate = {2023-03-06},
+	publisher = {no starch press},
+	author = {Gjengset, Jon},
+	month = nov,
+	year = {2021},
+}
+
+@misc{noauthor_miri_2023,
+	title = {Miri},
+	copyright = {Apache-2.0},
+	url = {https://github.com/rust-lang/miri},
+	abstract = {An interpreter for Rust's mid-level intermediate representation},
+	urldate = {2023-02-27},
+	publisher = {The Rust Programming Language},
+	month = feb,
+	year = {2023},
+	note = {original-date: 2015-11-12T21:51:25Z},
+}
+
+@misc{1400-1700_isoiec_2013,
+	title = {{ISO}/{IEC} 8652:2012},
+	shorttitle = {{ISO}/{IEC} 8652},
+	url = {https://www.iso.org/standard/61507.html},
+	abstract = {Information technology — Programming languages — Ada},
+	language = {en},
+	urldate = {2023-02-24},
+	journal = {ISO},
+	author = {{14:00-17:00}},
+	month = mar,
+	year = {2013},
+}
+
+@misc{ndss_symposium_ndss_2022,
+	title = {{NDSS} 2022 {Cross}-{Language} {Attacks}},
+	url = {https://www.youtube.com/watch?v=hLDzAo85Tlo},
+	urldate = {2023-02-21},
+	author = {{NDSS Symposium}},
+	month = aug,
+	year = {2022},
+}
+
+@article{abadi_control-flow_2009,
+	title = {Control-flow integrity principles, implementations, and applications},
+	volume = {13},
+	issn = {1094-9224, 1557-7406},
+	url = {https://dl.acm.org/doi/10.1145/1609956.1609960},
+	doi = {10.1145/1609956.1609960},
+	abstract = {Current software attacks often build on exploits that subvert machine-code execution. The enforcement of a basic safety property, control-flow integrity (CFI), can prevent such attacks from arbitrarily controlling program behavior. CFI enforcement is simple and its guarantees can be established formally, even with respect to powerful adversaries. Moreover, CFI enforcement is practical: It is compatible with existing software and can be done efficiently using software rewriting in commodity systems. Finally, CFI provides a useful foundation for enforcing further security policies, as we demonstrate with efficient software implementations of a protected shadow call stack and of access control for memory regions.},
+	number = {1},
+	urldate = {2023-02-21},
+	journal = {ACM Transactions on Information and System Security},
+	author = {Abadi, Martin and Budiu, Mihai and Erlingsson, Ulfar and Ligatti, Jay},
+	month = oct,
+	year = {2009},
+	pages = {1--40},
+}
+
+@misc{noauthor_notitle_nodate,
+	url = {https://archive.vsecurity.info/15487-s18/papers/Abadi%20et%20al._2005_Control%20Flow%20Integrity.pdf},
+	urldate = {2023-02-21},
+}
+
+@misc{noauthor_notitle_nodate-1,
+	url = {https://archive.vsecurity.info/15487-s18/papers/Abadi%20et%20al._2005_Control%20Flow%20Integrity.pdf},
+	urldate = {2023-02-21},
+}
+
+@misc{li_rust-ffi-checkertrophy-case_nodate,
+	title = {rust-ffi-checker/trophy-case at master · lizhuohua/rust-ffi-checker},
+	url = {https://github.com/lizhuohua/rust-ffi-checker},
+	abstract = {Contribute to lizhuohua/rust-ffi-checker development by creating an account on GitHub.},
+	language = {en},
+	urldate = {2023-02-21},
+	journal = {GitHub},
+	author = {Li, Zhuohua and Sun, Mingshen and Lui, John C. S. and Wang, Jincheng},
+	keywords = {trophy},
+}
+
+@inproceedings{chandra_physical_1999,
+	address = {Toulouse, France},
+	series = {{PASTE} '99},
+	title = {Physical {Type} {Checking} for {C}},
+	volume = {24},
+	isbn = {1-58113-137-2},
+	url = {https://doi.org/10.1145/316158.316183},
+	doi = {10.1145/316158.316183},
+	abstract = {The effectiveness of traditional type checking in C is limited by the presence of type conversions using type casts. Because the C standard allows arbitrary type conversions between pointer types, neither C compilers, nor tools such as lint, can guarantee type safety in the presence of such type conversions. In particular, by using casts involving pointers to structures (C structs), a programmer can interpret any memory region to be of any desired type, further compromising C's weak type system. Not only do type casts make a program vulnerable to type errors, they hinder program comprehension and maintenance by creating latent dependencies between seemingly independent pieces of code.},
+	language = {en},
+	booktitle = {Proceedings of the 1999 {ACM} {SIGPLAN}-{SIGSOFT} {Workshop} on {Program} {Analysis} for {Software} {Tools} and {Engineering}},
+	publisher = {Association for Computing Machinery},
+	author = {Chandra, Satish and Laboratories, Bell and Reps, Thomas},
+	year = {1999},
+	pages = {66--75},
+}
+
+@mastersthesis{poveda_ruiz_bounded_2019,
+	title = {Bounded generics over constants in {Rust}},
+	url = {https://repositorio.uniandes.edu.co/bitstream/handle/1992/44291/u827014.pdf},
+	abstract = {Rust is a language aiming to provide a way to write robust and performant code
+without using garbage collection or manual memory managment. Yet it lacks of a
+mechanism to abstract constants, forcing users to repeat code in cases where constants are involved. One of the challenges of developing this mechanism, is that
+it must be compatible with the language’s core principles of performance, reliability and productivity, putting it in contrast with well established languages such as
+C++, where the mechanism for constant abstraction is another source of unsafety.
+In order to provide such a mechanism, we propose and develop a symbolic execution engine for the Rust compiler. We explore the integration of the engine in the
+language’s trait solving and type inference mechanisms.},
+	language = {en},
+	school = {Universidad de Los Andes},
+	author = {Poveda Ruiz, Christian Nicanor},
+	year = {2019},
+}
+
+@misc{moy_when_2020,
+	title = {When testing is not enough. {Software} complexity drives technology {Leaders} to {Adopt} {Formal} {Methods}},
+	url = {https://issuu.com/rtcgroup/docs/cots-2007-july-web/s/10872490},
+	abstract = {The size and complexity of software in embedded systems are growing at an astonishing rate. From aircraft and automobiles to medical devices, home appliances, and our homes themselves, products that were once hardware-only are now cyber-physical: they rely on software for much of their functionality. And we rely on that software for the dependability of those systems, especially their safety and security.},
+	language = {en},
+	urldate = {2023-02-13},
+	journal = {COTS Journal},
+	author = {Moy, Yannick and Aiello, Anthony},
+	month = jul,
+	year = {2020},
+}
+
+@inproceedings{patterson_linking_2017,
+	address = {Dagstuhl, Germany},
+	series = {Leibniz {International} {Proceedings} in {Informatics} ({LIPIcs})},
+	title = {Linking {Types} for {Multi}-{Language} {Software}: {Have} {Your} {Cake} and {Eat} {It} {Too}},
+	volume = {71},
+	isbn = {978-3-95977-032-3},
+	shorttitle = {Linking {Types} for {Multi}-{Language} {Software}},
+	url = {https://drops.dagstuhl.de/opus/volltexte/2017/7125/},
+	doi = {10.4230/LIPIcs.SNAPL.2017.12},
+	abstract = {Software developers compose systems from components written in many different languages. A business-logic component may be written in Java or OCaml, a resource-intensive component in C or Rust, and a high-assurance component in Coq. In this multi-language world, program execution sends values from one linguistic context to another. This boundary-crossing exposes values to contexts with unforeseen behavior---that is, behavior that could not arise in the source language of the value. For example, a Rust function may end up being applied in an ML context that violates the memory usage policy enforced by Rust's type system. This leads to the question of how developers ought to reason about code in such a multi-language world where behavior inexpressible in one language is easily realized in another. This paper proposes the novel idea of linking types to address the problem of reasoning about single-language components in a multi-lingual setting. Specifically, linking types allow programmers to annotate where in a program they can link with components inexpressible in their unadulterated language. This enables developers to reason about (behavioral) equality using only their own language and the annotations, even though their code may be linked with code written in a language with more expressive power.},
+	booktitle = {2nd {Summit} on {Advances} in {Programming} {Languages} ({SNAPL} 2017)},
+	publisher = {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
+	author = {Patterson, Daniel and Ahmed, Amal},
+	month = nov,
+	year = {2017},
+	pages = {12:1--12:15},
+}
+
+@phdthesis{li_improving_2014,
+	type = {Doctoral dissertation},
+	title = {Improving {Quality} of {Soft} ware with {Foreign} {Function} {Interfaces} using {Static} {Analysis}},
+	url = {https://www.semanticscholar.org/paper/Improving-Quality-of-Soft-ware-with-Foreign-using-Preserve-Li/8d0b6db3858946c27657567d42f684a32d34e4f3},
+	abstract = {A Foreign Function Interface (FFI) is a mechanism that allows software written in one
+host programming language to directly use another foreign programming language by
+invoking function calls across language boundaries. Today’s software development
+often utilizes FFIs to reuse software components. Examples of such systems are the
+Java Development Kit (JDK), Android mobile OS, and Python packages in the Fedora
+LINUX operating systems. The use of FFIs, however, requires extreme care and can
+introduce undesired side effects that degrade software quality. In this thesis, we aim to
+improve several quality aspects of software composed of FFIs by applying static analy-
+sis.
+The thesis investigates several particular characteristics of FFIs and studies software
+bugs caused by the misuse of FFIs. We choose two FFIs, the Java Native Interface
+(JNI) and the Python/C interface, as the main subjects of this dissertation. To reduce
+software security vulnerabilities introduced by the JNI, we first propose definitions of
+new patterns of bugs caused by the improper exception handlings between Java and C.
+We then present the design and implement a bug finding system to uncover these bugs.
+To ensure software safety and reliability in multithreaded environment, we present a
+novel and efficient system that ensures atomicity in the JNI. Finally, to improve software
+performance and reliability, we design and develop a framework for finding errors in
+memory management in programs written with the Python/C interface. The framework
+is built by applying affine abstraction and affine analysis of reference-counts of Python
+objects. This dissertation offers a comprehensive study of FFIs and software composed
+of FFIs. The research findings make several contributions to the studies of static analysis
+and to the improvement of software quality.},
+	urldate = {2023-02-13},
+	school = {Lehigh University},
+	author = {Li, Siliang},
+	year = {2014},
+}
+
+@misc{noauthor_bindgen_2022,
+	title = {bindgen},
+	copyright = {BSD-3-Clause},
+	url = {https://github.com/rust-lang/rust-bindgen},
+	abstract = {Automatically generates Rust FFI bindings to C (and some C++) libraries.},
+	urldate = {2022-12-06},
+	publisher = {The Rust Programming Language},
+	month = dec,
+	year = {2022},
+	note = {original-date: 2016-06-22T15:05:51Z},
+	keywords = {bindgen, bindings, codegen, ffi},
+}
+
+@misc{chouteau_bbqueue_nodate,
+	title = {{BBQueue} {SPARK}},
+	copyright = {MIT},
+	url = {https://github.com/Fabien-Chouteau/bbqueue-spark},
+	abstract = {A SPARK implementation of James Munns' BBQueue},
+	urldate = {2022-12-05},
+	author = {Chouteau, Fabien},
+}
+
+@misc{munns_bbqueue_2022,
+	title = {{BBQueue}},
+	copyright = {Apache-2.0},
+	url = {https://github.com/jamesmunns/bbqueue},
+	abstract = {A SPSC, lockless, no\_std, thread safe, queue, based on BipBuffers},
+	urldate = {2022-12-05},
+	author = {Munns, James},
+	month = dec,
+	year = {2022},
+	note = {original-date: 2018-12-31T00:26:47Z},
+}
+
+@misc{kliemann_gpr-rust_nodate,
+	title = {gpr-rust},
+	url = {https://github.com/jklmnn/gpr-rust},
+	abstract = {Rust binding for gpr. Contribute to jklmnn/gpr-rust development by creating an account on GitHub.},
+	language = {en},
+	urldate = {2023-02-20},
+	journal = {GitHub},
+	author = {Kliemann, Johannes},
+}
+
+@misc{noauthor_spark_nodate,
+	title = {{SPARK} {Pro}},
+	url = {https://www.adacore.com/sparkpro},
+	abstract = {SPARK Pro is a language — a formally analyzable subset of Ada 2012 — and toolset that brings mathematics-based confidence to software verification.},
+	language = {en},
+	urldate = {2023-02-13},
+	journal = {AdaCore},
+	keywords = {sparkpro},
+}
+
+@misc{dross_using_2019,
+	title = {Using {Pointers} in {SPARK}},
+	url = {https://blog.adacore.com/using-pointers-in-spark},
+	abstract = {by Claire Dross – Jun 17, 2019. In this blog post, I will present one of the most interesting additions to the community 2019 version of SPARK: pointer support. One of the core assumption in SPARK has always been the absence of aliasing, so adding pointers without breaking this assumption was quite…},
+	language = {en},
+	urldate = {2023-02-13},
+	journal = {The AdaCore Blog},
+	author = {Dross, Claire},
+	year = {2019},
+}
+
+@inproceedings{li_detecting_2022,
+	address = {Berlin, Heidelberg},
+	title = {Detecting {Cross}-language {Memory} {Management} {Issues} in {Rust}},
+	isbn = {978-3-031-17142-0},
+	url = {https://doi.org/10.1007/978-3-031-17143-7},
+	doi = {10.1007/978-3-031-17143-7},
+	abstract = {Rust is a promising system-level programming language that can prevent memory corruption bugs using its strong type system and ownership-based memory management scheme. In practice, programmers usually write Rust code in conjunction with other languages such as C/C++ through Foreign Function Interface (FFI). For example, many notable projects are developed using Rust and other programming languages, such as Firefox, Google Fuchsia OS, and the Linux kernel. Although it is widely believed that gradually re-implementing security-critical components in Rust is a way of enhancing software security, however, using FFI is inherently unsafe. In this paper, we show that memory management across the FFI boundaries is error-prone. Any incorrect use of FFI may corrupt Rust’s ownership system, leading to memory safety issues. To tackle this problem, we design and build FFIChecker, an automated static analysis and bug detection tool dedicated to memory management issues across the Rust/C FFI. We evaluate our tool by checking 987 Rust packages crawled from the official package registry and reveal 34 bugs in 12 packages. Our experiments show that FFIChecker is a useful tool to detect real-world cross-language memory management issues with a reasonable amount of computational resources.},
+	urldate = {2023-02-13},
+	booktitle = {Computer {Security} – {ESORICS} 2022: 27th {European} {Symposium} on {Research} in {Computer} {Security}, {Copenhagen}, {Denmark}, {September} 26–30, 2022, {Proceedings}, {Part} {III}},
+	publisher = {Springer-Verlag},
+	author = {Li, Zhuohua and Wang, Jincheng and Sun, Mingshen and Lui, John C. S.},
+	month = sep,
+	year = {2022},
+	keywords = {Bug detection, Rust, Static analysis},
+	pages = {680--700},
+}
+
+@misc{noauthor_cwe_nodate,
+	title = {{CWE} - 2022 {CWE} {Top} 25 {Most} {Dangerous} {Software} {Weaknesses}},
+	url = {https://cwe.mitre.org/top25/archive/2022/2022_cwe_top25.html},
+	urldate = {2023-02-13},
+}
+
+@inproceedings{mergendahl_cross-language_2022,
+	address = {San Diego, CA, USA},
+	title = {Cross-{Language} {Attacks}},
+	isbn = {978-1-891562-74-7},
+	url = {https://www.ndss-symposium.org/wp-content/uploads/2022-78-paper.pdf},
+	doi = {10.14722/ndss.2022.24078},
+	abstract = {Memory corruption attacks against unsafe programming languages like C/C++ have been a major threat to computer systems for multiple decades. Various sanitizers and runtime exploit mitigation techniques have been shown to only provide partial protection at best. Recently developed ‘safe’ programming languages such as Rust and Go hold the promise to change this paradigm by preventing memory corruption bugs using a strong type system and proper compile-time and runtime checks. Gradual deployment of these languages has been touted as a way of improving the security of existing applications before entire applications can be developed in safe languages. This is notable in popular applications such as Firefox and Tor. In this paper, we systematically analyze the security of multi-language applications. We show that because language safety checks in safe languages and exploit mitigation techniques applied to unsafe languages (e.g., Control-Flow Integrity) break different stages of an exploit to prevent control hijacking attacks, an attacker can carefully maneuver between the languages to mount a successful attack. In essence, we illustrate that the incompatible set of assumptions made in various languages enables attacks that are not possible in each language alone. We study different variants of these attacks and analyze Firefox to illustrate the feasibility and extent of this problem. Our ﬁndings show that gradual deployment of safe programming languages, if not done with extreme care, can indeed be detrimental to security.},
+	language = {en},
+	urldate = {2022-11-29},
+	booktitle = {Proceedings 2022 {Network} and {Distributed} {System} {Security} {Symposium}},
+	publisher = {Internet Society},
+	author = {Mergendahl, Samuel and Burow, Nathan and Okhravi, Hamed},
+	year = {2022},
+}
+
+@misc{noauthor_about_nodate,
+	title = {About {SPARK}},
+	url = {https://www.adacore.com/about-spark},
+	abstract = {SPARK is a software development technology specifically designed for engineering high-reliability applications.},
+	language = {en},
+	urldate = {2023-02-13},
+	journal = {AdaCore},
+}
+
+@misc{chapman_adacore_2018,
+	title = {{AdaCore} {Technologies} for {Cybersecurity}},
+	url = {https://www.adacore.com/books/adacore-tech-for-cyber-security},
+	abstract = {This book is intended for those who are involved with software at any level who would like to learn how to address software and security challenges.},
+	language = {en},
+	urldate = {2022-11-29},
+	journal = {AdaCore},
+	author = {Chapman, Roderick and Moy, Yannick},
+	year = {2018},
+}
+
+@inproceedings{regehr_efficient_2006,
+	address = {San Jose California},
+	title = {Efficient type and memory safety for tiny embedded systems},
+	isbn = {978-1-59593-577-9},
+	url = {https://dl.acm.org/doi/10.1145/1215995.1216001},
+	doi = {10.1145/1215995.1216001},
+	abstract = {We report our experience in implementing type and memory safety in an efﬁcient manner for sensor network nodes running TinyOS: tiny embedded systems running legacy, C-like code. A compiler for a safe language must often insert dynamic checks into the programs it produces; these generally make programs both larger and slower. In this paper, we describe our novel compiler toolchain, which uses a family of techniques to minimize or avoid these run-time costs. Our results show that safety can in fact be implemented cheaply on low-end 8-bit microcontrollers.},
+	language = {en},
+	urldate = {2023-02-15},
+	booktitle = {Proceedings of the 3rd workshop on {Programming} languages and operating systems: linguistic support for modern operating systems},
+	publisher = {ACM},
+	author = {Regehr, John and Cooprider, Nathan and Archer, Will and Eide, Eric},
+	month = oct,
+	year = {2006},
+	pages = {6},
+}
+
+@misc{scherer_engineering_2021,
+	title = {Engineering of {Reliable} and {Secure} {Software} via {Customizable} {Integrated} {Compilation} {Systems}},
+	url = {https://publikationen.bibliothek.kit.edu/1000134165},
+	abstract = {Lack of software quality can cause enormous unpredictable costs. Many strategies exist to prevent or detect defects as early in the development process as possible and can generally be separated into proactive and reactive measures. Proactive measures in this context are schemes where defects are avoided by planning a project in a way that reduces the probability of mistakes. They are expensive upfront without providing a directly visible benefit, have low acceptance by developers or don't scale with the project. On the other hand, purely reactive measures only fix bugs as they are found and thus do not yield any guarantees about the correctness of the project. In this thesis, a new method is introduced, which allows focusing on the project specific issues and decreases the discrepancies between the abstract system model and the final software product. The first component of this method is a system that allows any developer in a project to implement new static analyses and integrate them into the project. The integration is done in a manner that automatically prevents any other project developer from accidentally violating the rule that the new static analysis checks. The second component is a way to directly integrate system models (e.g. from UML) into the project by treating the model as a direct input to the compiler, just like any other source code. These two components together allow developers to handle complex situations that are only relevant to the given project. The entire project gets analyzed for the correct usage of nontrivial APIs or other hazards which either are bugs or are likely to turn into bugs in future refactorings. Thus, the new method permits the incremental introduction of formal analysis without forcing a project's developers to change to unfamiliar habits or styles. At the same time, it allows preventing classes of defects automatically, yielding immediate gains from the first usage of the new method.},
+	language = {de},
+	urldate = {2023-02-13},
+	author = {Scherer, Oliver},
+	year = {2021},
+	doi = {10.5445/IR/1000134165},
+}
+
+@inproceedings{evans_is_2020,
+	title = {Is {Rust} {Used} {Safely} by {Software} {Developers}?},
+	url = {http://arxiv.org/abs/2007.00752},
+	doi = {10.1145/3377811.3380413},
+	abstract = {Rust, an emerging programming language with explosive growth, provides a robust type system that enables programmers to write memory-safe and data-race free code. To allow access to a machine's hardware and to support low-level performance optimizations, a second language, Unsafe Rust, is embedded in Rust. It contains support for operations that are difficult to statically check, such as C-style pointers for access to arbitrary memory locations and mutable global variables. When a program uses these features, the compiler is unable to statically guarantee the safety properties Rust promotes. In this work, we perform a large-scale empirical study to explore how software developers are using Unsafe Rust in real-world Rust libraries and applications. Our results indicate that software engineers use the keyword unsafe in less than 30\% of Rust libraries, but more than half cannot be entirely statically checked by the Rust compiler because of Unsafe Rust hidden somewhere in a library's call chain. We conclude that although the use of the keyword unsafe is limited, the propagation of unsafeness offers a challenge to the claim of Rust as a memory-safe language. Furthermore, we recommend changes to the Rust compiler and to the central Rust repository's interface to help Rust software developers be aware of when their Rust code is unsafe.},
+	urldate = {2023-02-13},
+	booktitle = {Proceedings of the {ACM}/{IEEE} 42nd {International} {Conference} on {Software} {Engineering}},
+	author = {Evans, Ana Nora and Campbell, Bradford and Soffa, Mary Lou},
+	month = jun,
+	year = {2020},
+	note = {arXiv:2007.00752 [cs]},
+	keywords = {Computer Science - Software Engineering},
+	pages = {246--257},
+}
+
+@misc{noauthor_ferrocene_2023,
+	title = {Ferrocene {Language} {Specification}},
+	url = {https://github.com/ferrocene/specification},
+	abstract = {Ferrocene Language Specification},
+	urldate = {2023-02-13},
+	publisher = {Ferrocene},
+	month = feb,
+	year = {2023},
+	note = {original-date: 2022-05-11T07:23:37Z},
+}
+
+@article{pal_memory_2016,
+	title = {Memory {Corruption}-{Basic} {Attacks} and {Counter} {Measures}},
+	volume = {6},
+	abstract = {Memory corruption techniques are one of the oldest forms of vulnerabilities to be exploited by attackers. It had been under constant research and scrutiny for a very long time. Th is paper covers the basics of the types of memory corruptions and focuses on the detailed analysis of stack-based buffer overflow exploitation using local variables. Some real-life exploits and scenarios are presented and some of the popular mitigation techniques are discussed.},
+	journal = {International Journal of Engineering Science and Computing},
+	author = {Pal, Manajit and Dey, Prashant and Dokania, Vaibhav},
+	month = nov,
+	year = {2016},
+	pages = {3511},
+}
+
+@misc{xu_memory-safety_2021,
+	title = {Memory-{Safety} {Challenge} {Considered} {Solved}? {An} {In}-{Depth} {Study} with {All} {Rust} {CVEs}},
+	shorttitle = {Memory-{Safety} {Challenge} {Considered} {Solved}?},
+	url = {http://arxiv.org/abs/2003.03296},
+	abstract = {Rust is an emerging programing language that aims at preventing memory-safety bugs without sacrificing much efficiency. The claimed property is very attractive to developers, and many projects start using the language. However, can Rust achieve the memory-safety promise? This paper studies the question by surveying 186 real-world bug reports collected from several origins which contain all existing Rust CVEs (common vulnerability and exposures) of memory-safety issues by 2020-12-31. We manually analyze each bug and extract their culprit patterns. Our analysis result shows that Rust can keep its promise that all memory-safety bugs require unsafe code, and many memory-safety bugs in our dataset are mild soundness issues that only leave a possibility to write memory-safety bugs without unsafe code. Furthermore, we summarize three typical categories of memory-safety bugs, including automatic memory reclaim, unsound function, and unsound generic or trait. While automatic memory claim bugs are related to the side effect of Rust newly-adopted ownership-based resource management scheme, unsound function reveals the essential challenge of Rust development for avoiding unsound code, and unsound generic or trait intensifies the risk of introducing unsoundness. Based on these findings, we propose two promising directions towards improving the security of Rust development, including several best practices of using specific APIs and methods to detect particular bugs involving unsafe code. Our work intends to raise more discussions regarding the memory-safety issues of Rust and facilitate the maturity of the language.},
+	urldate = {2022-11-29},
+	publisher = {arXiv},
+	author = {Xu, Hui and Chen, Zhuangbin and Sun, Mingshen and Zhou, Yangfan and Lyu, Michael},
+	month = feb,
+	year = {2021},
+	note = {Number: arXiv:2003.03296
+arXiv:2003.03296 [cs]},
+	keywords = {Computer Science - Cryptography and Security, Computer Science - Programming Languages, Computer Science - Software Engineering},
+}
+
+@misc{jaloyan_safe_2017,
+	title = {Safe {Pointers} in {SPARK} 2014},
+	url = {http://arxiv.org/abs/1710.07047},
+	doi = {10.48550/arXiv.1710.07047},
+	abstract = {In the context of deductive software verification, programs with pointers present a major challenge due to pointer aliasing. In this paper, we introduce pointers to SPARK, a well-defined subset of the Ada language, intended for formal verification of mission-critical software. Our solution is based on static alias analysis inspired by Rust's borrow-checker and affine types, and enforces the Concurrent Read, Exclusive Write principle. This analysis has been implemented in the GNAT Ada compiler and tested against a number of challenging examples including parts of real-life applications. Our tests show that only minor changes in the source code are required to fit the idiomatic Ada code into SPARK extended with pointers, which is a significant improvement upon the previous state of the art. The proposed extension has been approved by the Language Design Committee for SPARK for inclusion in a future version of SPARK, and is being discussed by the Ada Rapporteur Group for inclusion in the next version of Ada. In the report, we give a formal presentation of the analysis rules for a miniature version of SPARK and prove their soundness. We discuss the implementation and the case studies, and compare our solution with Rust.},
+	urldate = {2023-02-13},
+	publisher = {arXiv},
+	author = {Jaloyan, Georges-Axel},
+	month = oct,
+	year = {2017},
+	note = {arXiv:1710.07047 [cs]},
+	keywords = {Computer Science - Programming Languages},
+}
+
+@inproceedings{szekeres_sok_2013,
+	address = {Berkeley, CA},
+	title = {{SoK}: {Eternal} {War} in {Memory}},
+	isbn = {978-0-7695-4977-4 978-1-4673-6166-8},
+	shorttitle = {{SoK}},
+	url = {http://ieeexplore.ieee.org/document/6547101/},
+	doi = {10.1109/SP.2013.13},
+	abstract = {Memory corruption bugs in software written in low-level languages like C or C++ are one of the oldest problems in computer security. The lack of safety in these languages allows attackers to alter the program’s behavior or take full control over it by hijacking its control ﬂow. This problem has existed for more than 30 years and a vast number of potential solutions have been proposed, yet memory corruption attacks continue to pose a serious threat. Real world exploits show that all currently deployed protections can be defeated.},
+	language = {en},
+	urldate = {2023-02-13},
+	booktitle = {2013 {IEEE} {Symposium} on {Security} and {Privacy}},
+	publisher = {IEEE},
+	author = {Szekeres, L. and Payer, M. and {Tao Wei} and Song, Dawn},
+	month = may,
+	year = {2013},
+	pages = {48--62},
+}
+
+@misc{noauthor_nsa_2022,
+	title = {{NSA} {Releases} {Guidance} on {How} to {Protect} {Against} {Software} {Memory} {Safety} {Issues}},
+	url = {https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3215760/nsa-releases-guidance-on-how-to-protect-against-software-memory-safety-issues},
+	abstract = {The National Security Agency (NSA) published guidance today to help software developers and operators prevent and mitigate software memory safety issues, which account for a large portion of},
+	language = {en-US},
+	urldate = {2023-02-13},
+	journal = {National Security Agency/Central Security Service},
+	year = {2022},
+}
+
+@misc{noauthor_rust_nodate,
+	title = {Rust {Programming} {Language}},
+	url = {https://www.rust-lang.org/},
+	abstract = {A language empowering everyone to build reliable and efficient software.},
+	language = {en-US},
+	urldate = {2023-02-15},
+}
+
+@article{jung_rustbelt_2018,
+	title = {{RustBelt}: securing the foundations of the {Rust} programming language},
+	volume = {2},
+	issn = {2475-1421},
+	shorttitle = {{RustBelt}},
+	url = {https://dl.acm.org/doi/10.1145/3158154},
+	doi = {10.1145/3158154},
+	abstract = {Rust is a new systems programming language that promises to overcome the seemingly fundamental tradeoff between high-level safety guarantees and low-level control over resource management. Unfortunately, none of Rust's safety claims have been formally proven, and there is good reason to question whether they actually hold. Specifically, Rust employs a strong, ownership-based type system, but then extends the expressive power of this core type system through libraries that internally use unsafe features. In this paper, we give the first formal (and machine-checked) safety proof for a language representing a realistic subset of Rust. Our proof is extensible in the sense that, for each new Rust library that uses unsafe features, we can say what verification condition it must satisfy in order for it to be deemed a safe extension to the language. We have carried out this verification for some of the most important libraries that are used throughout the Rust ecosystem.},
+	language = {en},
+	number = {POPL},
+	urldate = {2023-02-13},
+	journal = {Proceedings of the ACM on Programming Languages},
+	author = {Jung, Ralf and Jourdan, Jacques-Henri and Krebbers, Robbert and Dreyer, Derek},
+	month = jan,
+	year = {2018},
+	pages = {1--34},
+}
+
+@inproceedings{carre_spark_1990,
+	address = {New York, NY, USA},
+	series = {{TRI}-{Ada} '90},
+	title = {{SPARK} an annotated {Ada} subset for safety-critical programming},
+	isbn = {978-0-89791-409-3},
+	url = {https://doi.org/10.1145/255471.255563},
+	doi = {10.1145/255471.255563},
+	urldate = {2023-02-15},
+	booktitle = {Proceedings of the conference on {TRI}-{ADA} '90},
+	publisher = {Association for Computing Machinery},
+	author = {Carré, Bernard and Garnsworthy, Jonathan},
+	month = dec,
+	year = {1990},
+	pages = {392--402},
+}
+
+@misc{ferdowsi_usability_2023,
+	title = {The {Usability} of {Advanced} {Type} {Systems}: {Rust} as a {Case} {Study}},
+	shorttitle = {The {Usability} of {Advanced} {Type} {Systems}},
+	url = {http://arxiv.org/abs/2301.02308},
+	doi = {10.48550/arXiv.2301.02308},
+	abstract = {Advanced type systems that enforce various correctness and safety guarantees--such as linear and ownership types--have a long history in the Programming Languages research community. Despite this history, a human-centered evaluation of these type systems and their usability was all but absent, with empirical evaluations limited to testing their expressiveness in programs written by experts, i.e. the creators of the type system. In the past few years, this has begun to change with the adoption of a version of affine types and ownership in the popular Rust programming language. With the increase in Rust's popularity, various studies have begun empirically evaluating the usability of Rust's Ownership and Lifetime rules, providing a breadth of qualitative and quantitative information on the usability of such type systems. They found that despite Rust's general success in achieving its promise of safety and performance, these rules come with a steep learning curve and have been repeatedly cited as a barrier to adopting Rust. In this report, I provide a brief history of linear types and region-based memory management, which directly inspired Rust's type system. I then introduce Rust's Ownership and Lifetime rules, and present the state-of-the-art in academic research into their usability. I discuss both theoretical arguments and empirical evidence for why these rules are difficult to learn and apply, and survey existing work on addressing some of these difficulties. I also draw from broader works in the HCI and CS Education communities to recommend future work in this area.},
+	urldate = {2023-02-13},
+	publisher = {arXiv},
+	author = {Ferdowsi, Kasra},
+	month = jan,
+	year = {2023},
+	note = {arXiv:2301.02308 [cs]},
+	keywords = {Computer Science - Human-Computer Interaction, Computer Science - Programming Languages},
+}
+
+@misc{gaynor_what_2020,
+	title = {What science can tell us about {C} and {C}++'s security · {Alex} {Gaynor}},
+	url = {https://alexgaynor.net/2020/may/27/science-on-memory-unsafety-and-security/},
+	urldate = {2023-02-13},
+	journal = {alexgaynor.net/},
+	author = {Gaynor, Alex},
+	year = {2020},
+}
+
+@article{dullien_weird_2020,
+	title = {Weird {Machines}, {Exploitability}, and {Provable} {Unexploitability}},
+	volume = {8},
+	issn = {2168-6750},
+	doi = {10.1109/TETC.2017.2785299},
+	abstract = {The concept of exploit is central to computer security, particularly in the context of memory corruptions. Yet, in spite of the centrality of the concept and voluminous descriptions of various exploitation techniques or countermeasures, a good theoretical framework for describing and reasoning about exploitation has not yet been put forward. A body of concepts and folk theorems exists in the community of exploitation practitioners; unfortunately, these concepts are rarely written down or made sufficiently precise for people outside of this community to benefit from them. This paper clarifies a number of these concepts, provides a clear definition of exploit, a clear definition of the concept of a weird machine, and how programming of a weird machine leads to exploitation. The papers also shows, somewhat counterintuitively, that it is feasible to design some software in a way that even powerful attackers-with the ability to corrupt memory once-cannot gain an advantage. The approach in this paper is focused on memory corruptions. While it can be applied to many security vulnerabilities introduced by other programming mistakes, it does not address side channel attacks, protocol weaknesses, or security problems that are present by design.},
+	number = {2},
+	journal = {IEEE Transactions on Emerging Topics in Computing},
+	author = {Dullien, Thomas},
+	month = apr,
+	year = {2020},
+	note = {Conference Name: IEEE Transactions on Emerging Topics in Computing},
+	keywords = {Complexity theory, Computer security, Concrete, Cryptography, Programming, Software, Transducers, computation theory, computer hacking, information security, language-theoretic security},
+	pages = {391--403},
+}

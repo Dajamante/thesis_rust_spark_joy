@@ -1,0 +1,2513 @@
+
+%%
+%% forked from https://gits-15.sys.kth.se/giampi/kthlatex kthlatex-0.2rc4 on 2020-02-13
+%% expanded upon by Gerald Q. Maguire Jr.
+%% This template has been adapted by Anders Sjögren to the University
+%% Engineering Program in Computer Science at KTH ICT. This adaptation was to
+%% translation of English headings into Swedish as the addition of Swedish.
+%% Many thanks to others who have provided constructive input regarding the template.
+
+% Make it possible to conditionally depend on the TeX engine used
+\RequirePackage{ifxetex}
+\RequirePackage{ifluatex}
+\newif\ifxeorlua
+\ifxetex\xeorluatrue\fi
+\ifluatex\xeorluatrue\fi
+
+\ifxeorlua
+% The following is to ensure that the PDF uses a recent version rather than the typical PDF 1-5
+%  This same version of PDF should be set as an option for hyperef
+
+\RequirePackage{expl3}
+\ExplSyntaxOn
+%pdf_version_gset:n{2.0}
+%\pdf_version_gset:n{1.5}
+
+%\DocumentMetadata
+%{
+%% testphase = phase-I, % tagging without paragraph tagging
+%% testphase = phase-II % tagging with paragraph tagging and other new stuff.
+%pdfversion = 2.0 % pdfversion must be set here.
+%}
+
+% Optionally, you can set the uncompress flag to make it easier to examine the PDF
+%\pdf_uncompress: % to check the pdf
+\ExplSyntaxOff
+\else
+\RequirePackage{expl3}
+\ExplSyntaxOn
+%\pdf_version_gset:n{2.0}
+\pdf_version_gset:n{1.5}
+\ExplSyntaxOff
+\fi
+
+
+%% The template is designed to handle a thesis in English or Swedish
+% set the default language to english or swedish by passing an option to the documentclass - this handles the inside tile page
+% To optimize for digital output (this changes the color palette add the option: digitaloutput
+% To use \ifnomenclature add the option nomenclature
+% To use bibtex or biblatex - include one of these as an option
+\documentclass[nomenclature, english, bibtex]{kththesis}
+%\documentclass[swedish, biblatex]{kththesis}
+% if pdflatex \usepackage[utf8]{inputenc}
+
+%% Conventions for todo notes:
+% Informational
+%% \generalExpl{Comments/directions/... in English}
+\newcommand*{\generalExpl}[1]{\todo[inline]{#1}}                
+
+% Language-specific information (currently in English or Swedish)
+\newcommand*{\engExpl}[1]{\todo[inline, backgroundcolor=kth-lightgreen40]{#1}} %% \engExpl{English descriptions about formatting}
+\newcommand*{\sweExpl}[1]{\todo[inline, backgroundcolor=kth-lightblue40]{#1}}  %% % \sweExpl{Text på svenska}
+\newcommand{\inlinecode}[1]{\texttt{#1}}
+
+% warnings
+\newcommand*{\warningExpl}[1]{\todo[inline, backgroundcolor=kth-lightred40]{#1}} %% \warningExpl{warnings}
+
+% Uncomment to hide specific comments, to hide **all** ToDos add `final` to
+% document class
+% \renewcommand\warningExpl[1]{}
+% \renewcommand\generalExpl[1]{}
+% \renewcommand\engExpl[1]{}
+% For example uncommenting the following line hides the Swedish language explanations
+% \renewcommand\sweExpl[1]{}
+
+
+% \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+\ifbiblatex
+    %\usepackage[language=english,bibstyle=authoryear,citestyle=authoryear, maxbibnames=99]{biblatex}
+    % alternatively you might use another style, such as IEEE and use citestyle=numeric-comp  to put multiple citations in a single pair of square brackets
+    %\usepackage[style=ieee,citestyle=numeric-comp]{biblatex}
+    \addbibresource{references.bib}
+    %\DeclareLanguageMapping{norsk}{norwegian}
+\else
+    % The line(s) below are for BibTeX
+    \bibliographystyle{bibstyle/myIEEEtran}
+    %\bibliographystyle{apalike}
+\fi
+
+
+% include a variety of packages that are useful
+\input{lib/includes}
+\input{lib/kthcolors}
+
+%\glsdisablehyper
+%\makeglossaries
+%\makenoidxglossaries
+%\input{lib/acronyms}                %load the acronyms file
+
+\input{lib/defines}  % load some additional definitions to make writing more consistent
+
+% The following is needed in conjunction with generating the DiVA data with abstracts and keywords using the scontents package and a modified listings environment
+%\usepackage{listings}   %  already included
+\ExplSyntaxOn
+\newcommand\typestoredx[2]{\expandafter\__scontents_typestored_internal:nn\expandafter{#1} {#2}}
+\ExplSyntaxOff
+\makeatletter
+\let\verbatimsc\@undefined
+\let\endverbatimsc\@undefined
+\lst@AddToHook{Init}{\hyphenpenalty=50\relax}
+\makeatother
+
+
+\lstnewenvironment{verbatimsc}
+    {
+    \lstset{%
+        basicstyle=\ttfamily\tiny,
+        backgroundcolor=\color{white},
+        %basicstyle=\tiny,
+        %columns=fullflexible,
+        columns=[l]fixed,
+        language=[LaTeX]TeX,
+        %numbers=left,
+        %numberstyle=\tiny\color{gray},
+        keywordstyle=\color{red},
+        breaklines=true,                 % sets automatic line breaking
+        breakatwhitespace=true,          % sets if automatic breaks should only happen at whitespace
+        %keepspaces=false,
+        breakindent=0em,
+        %fancyvrb=true,
+        frame=none,                     % turn off any box
+        postbreak={}                    % turn off any hook arrow for continuation lines
+    }
+}{}
+
+%% Add some more keywords to bring out the structure more
+\lstdefinestyle{[LaTeX]TeX}{
+morekeywords={begin, todo, textbf, textit, texttt}
+}
+
+%% definition of new command for bytefield package
+\newcommand{\colorbitbox}[3]{%
+	\rlap{\bitbox{#2}{\color{#1}\rule{\width}{\height}}}%
+	\bitbox{#2}{#3}}
+
+
+
+
+% define a left aligned table cell that is ragged right
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+% Because backref is not compatible with biblatex
+\ifbiblatex
+    \usepackage[plainpages=false]{hyperref}
+\else
+    \usepackage[
+    backref=page,
+    pagebackref=false,
+    plainpages=false,
+                            % PDF related options
+    unicode=true,           % Unicode encoded PDF strings
+    bookmarks=true,         % generate bookmarks in PDF files
+    bookmarksopen=false,    % Do not automatically open the bookmarks in the PDF reading program
+    pdfpagemode=UseNone,    % None, UseOutlines, UseThumbs, or FullScreen
+    destlabel,              % better naming of destinations
+    pdfencoding=auto,       % for unicode in 
+    ]{hyperref}
+    \makeatletter
+    \ltx@ifpackageloaded{attachfile2}{
+    % cannot use backref if one is using attachfile
+    }
+    {\usepackage{backref}
+    %
+    % Customize list of backreferences.
+    % From https://tex.stackexchange.com/a/183735/1340
+    \renewcommand*{\backref}[1]{}
+    \renewcommand*{\backrefalt}[4]{%
+    \ifcase #1%
+          \or [Page~#2.]%
+          \else [Pages~#2.]%
+    \fi%
+    }
+    }
+    \makeatother
+
+\fi
+\usepackage[all]{hypcap}	%% prevents an issue related to hyperref and caption linking
+
+%% Acronyms
+% note that nonumberlist - removes the cross references to the pages where the acronym appears
+% note that super  sets the descriptions text aligned
+% note that nomain - does not produce a main glossary, thus only acronyms is in the glossary
+% note that nopostdot -  prevents there being a period at the end of each entry
+\usepackage[acronym, style=super, section=section, nonumberlist, nomain,
+nopostdot]{glossaries}
+%\newglossarystyle{myglossary}{
+%  \setglossarystyle{list} % Use the list style as a base
+%  \renewcommand*{\glossaryentryfield}[5]{%
+%    \item[\glsentryitem{##1}\glstarget{##1}{##2}] %
+%    \hspace{1em} % Add some space between the name and description columns
+%   \parbox[t]{\glsdescwidth}{##3} % Set the width of the description column
+%    \space ##5 % Add the symbol
+%    \glspostdescription % Add any post-description formatting
+%    \space ##4 % Add the page number
+%    \par
+%  }
+%}
+\setlength{\glsdescwidth}{0.8\textwidth}
+\usepackage[]{glossaries-extra}
+\ifinswedish
+    %\usepackage{glossaries-swedish}
+\fi
+
+%% For use with the README_notes
+% Define a new type of glossary so that the acronyms defined in the README_notes document can be distinct from those in the thesis template
+% the tlg, tld, and dn are the file extensions used for this glossary
+\newglossary[tlg]{readme}{tld}{tdn}{README acronyms}
+
+%% For use with the Aïssata's glossary
+% Define a new type of glossary distinct from those in the thesis template
+% the flg, fld, and fdn are the file extensions used for this glossary
+\newglossary[flg]{fullg}{fld}{fdn}{Glossary}
+\input{lib/includes-after-hyperref}
+
+% For the intro glossary
+\newglossary[ilg]{introductiongloss}{ild}{idn}{Introduction Glossary}
+
+%\glsdisablehyper
+\makeglossaries
+%\makenoidxglossaries
+
+% The following bit of ugliness is because of the problems PDFLaTeX has handling a non-breaking hyphen
+% unless it is converted to UTF-8 encoding.
+% If you do not use such characters in your acronyms, this could be simplified to just include the acronyms file.
+\ifxeorlua
+\input{lib/acronyms}    
+\else
+\input{lib/acronyms-for-pdflatex}
+\fi
+
+\input{lib/maingloss}
+\input{lib/introductiongloss}  
+
+% insert the configuration information with author(s), examiner, supervisor(s), ...
+\input{custom_configuration}
+
+\title{Does Rust SPARK joy?}
+\subtitle{Recommendations for safe cross-language bindings between Rust and SPARK}
+
+% give the alternative title - i.e., if the thesis is in English, then give a Swedish title
+\alttitle{Does Rust SPARK joy?}
+\altsubtitle{Detta är den svenska översättningen av undertiteln}
+% alternative, if the thesis is in Swedish, then give an English title
+%\alttitle{This is the English translation of the title}
+%\altsubtitle{This is the English translation of the subtitle}
+
+% Enter the English and Swedish keywords here for use in the PDF meta data _and_ for later use
+% following the respective abstract.
+% Try to put the words in the same order in both languages to facilitate matching. For example:
+\EnglishKeywords{Rust, Ada, SPARK, Foreign Function Interface (FFI), memory safety, type safety, ownership}
+\SwedishKeywords{Canvas Lärplattform, Dockerbehållare, Prestandajustering}
+
+%%%%% For the oral presentation
+%% Add this information once your examiner has scheduled your oral presentation
+\presentationDateAndTimeISO{2022-03-15 13:00}
+\presentationLanguage{eng}
+\presentationRoom{via Zoom https://kth-se.zoom.us/j/ddddddddddd}
+\presentationAddress{Isafjordsgatan 22 (Kistagången 16)}
+\presentationCity{Stockholm}
+
+% When there are multiple opponents, separate their names with '\&'
+% Opponent's information
+\opponentsNames{A. B. Normal \& A. X. E. Normalè}
+
+% Once a thesis is approved by the examiner, add the TRITA number
+% The TRITA number for a thesis consists of two parts a series (unique to each school)
+% and the number in the series which is formatted as the year followed by a colon and
+% then a unique series number for the thesis - starting with 1 each year.
+\trita{TRITA-EECS-EX}{2023:0000}
+
+% Put the title, author, and keyword information into the PDF meta information
+\input{lib/pdf_related_includes}
+
+
+% the custom colors and the commands are defined in defines.tex    
+\hypersetup{
+	colorlinks  = true,
+	breaklinks  = true,
+	linkcolor   = \linkscolor,
+	urlcolor    = \urlscolor,
+	citecolor   = \refscolor,
+	anchorcolor = black
+}
+
+\ifnomenclature
+% The following lines make the page numbers and equations hyperlinks in the Nomenclature list
+\renewcommand*{\pagedeclaration}[1]{\unskip, \dotfill\hyperlink{page.#1}{page\nobreakspace#1}}
+% The following does not work correctly, as the name of the cross-reference is incorrect
+%\renewcommand*{\eqdeclaration}[1]{, see equation\nobreakspace(\hyperlink{equation.#1}{#1})}
+
+% You can also change the page heading for the nomenclature
+\renewcommand{\nomname}{List of Symbols Used}
+
+% You can even add customization text before the list
+\renewcommand{\nompreamble}{The following symbols are  later used within the body of the thesis.}
+\makenomenclature
+\fi
+
+%
+% The commands below are to configure JSON listings
+% 
+% format for JSON listings
+\colorlet{punct}{red!60!black}
+\definecolor{delim}{RGB}{20,105,176}
+\definecolor{numb}{RGB}{106, 109, 32}
+\definecolor{string}{RGB}{0, 0, 0}
+
+\lstdefinelanguage{json}{
+    numbers=none,
+    numberstyle=\small,
+    frame=none,
+    rulecolor=\color{black},
+    showspaces=false,
+    showtabs=false,
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{gray}\hookrightarrow\space}},
+    breakatwhitespace=true,
+    basicstyle=\ttfamily\small,
+    extendedchars=false,
+    upquote=true,
+    morestring=[b]",
+    stringstyle=\color{string},
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1}
+      {’}{{\char13}}1,
+}
+
+\lstdefinelanguage{XML}
+{
+  basicstyle=\ttfamily\color{blue}\bfseries\small,
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{blue},
+  keywordstyle=\color{cyan},
+  breaklines=true,
+  postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{gray}\hookrightarrow\space}},
+  breakatwhitespace=true,
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+
+
+% In case you use both listings and lstlistings - this makes them both use the same counter
+\makeatletter
+\AtBeginDocument{\let\c@listing\c@lstlisting}
+\makeatother
+\usepackage{subfiles}
+
+% To have Creative Commons (CC) license and logos use the doclicense package
+% Note that the lowercase version of the license has to be used in the modifier
+% i.e., one of by, by-nc, by-nd, by-nc-nd, by-sa, by-nc-sa, zero.
+% For background see:
+% https://www.kb.se/samverkan-och-utveckling/oppen-tillgang-och-bibsamkonsortiet/open-access-and-bibsam-consortium/open-access/creative-commons-faq-for-researchers.html
+% https://kib.ki.se/en/publish-analyse/publish-your-article-open-access/open-licence-your-publication-cc
+\usepackage[
+    type={CC},
+    %modifier={by-nc-nd},
+    %version={4.0},
+    modifier={by-nc},
+    imagemodifier={-eu-88x31},  % to get Euro symbol rather than Dollar sign
+    hyphenation={RaggedRight},
+    version={4.0},
+    %modifier={zero},
+    %version={1.0},
+]{doclicense}
+
+
+\begin{document}
+%\selectlanguage{swedish}
+%
+\selectlanguage{english}
+
+%%% Set the numbering for the title page to a numbering series not in the preface or body
+\pagenumbering{alph}
+\kthcover
+\clearpage\thispagestyle{empty}\mbox{} % empty back of front cover
+\titlepage
+
+% If you do not want to have a bookinfo page, comment out the line saying \bookinfopage and add a \cleardoublepage
+% If you want a bookinfo page: you get a copyright notice, unless you have used the doclicense package in which case you  get a Creative Commons license. To include the doclicense package, uncomment the configuration of this package above and configure it with your choice of license.
+\bookinfopage
+
+% Frontmatter includes the abstracts and table-of-contents
+\frontmatter
+\setcounter{page}{1}
+\begin{abstract}
+% The first abstract should be in the language of the thesis.
+% Abstract fungerar på svenska också.
+  \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+eng
+\end{scontents}
+%%% The contents of the abstract (between the begin and end of scontents) are saved in LaTeX format
+%%% and output on the page(s) at the end of the thesis with information for DiVA facilitating the correct
+%%% entry of the meta data for your thesis.
+%%% These page(s) are removed before the thesis is inserted into DiVA.
+%\engExpl{All theses at KTH are \textbf{required} to have an abstract in both \textit{English} and \textit{Swedish}.}
+
+%\engExpl{Exchange students may want to include one or more abstracts in the language(s) used in their home institutions to avoid the need to write another thesis when returning to their home institution.}
+
+
+
+\begin{scontents}[store-env=abstracts,print-env=true]
+%\generalExpl{Enter your abstract here!}
+%Write an abstract that is about 250 and 350 words (1/2 A4-page)  with the following components:
+% key parts of the abstract
+
+\begin{comment}   
+\begin{itemize}
+  \item What is the topic area? (optional) Introduces the subject area for the project.
+  \item Short problem statement
+  \item Why was this problem worth a Bachelor's/Master’s thesis project? (\ie, why is the problem both significant and of a suitable degree of difficulty for a Bachelor's/Master’s thesis project? Why has no one else solved it yet?)
+  \item How did you solve the problem? What was your method/insight?
+  \item Results/Conclusions/Consequences/Impact: What are your key results/\linebreak[4]conclusions? What are others do based on your results? What can be done now that you have finished - that could not be done before your thesis project was completed?
+\end{itemize}
+\end{comment}
+
+This thesis aims to explore the challenges of combining memory-safe programming languages Rust and SPARK.
+
+SPARK is a subset of Ada, a programming language with a long-standing track record in the safety-critical industry. Rust is a multi-paradigm language that has gained significant popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
+
+Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, macOS, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK which were designed with safety in mind. 
+
+Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical\ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and analyzing how they are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems, which is implemented in both languages. The identified best practices can be used for safe bindings and for automated tools/code generation. 
+
+This thesis fills a gap in existing research, which has largely focused on the combination of safe and unsafe languages and provides a valuable contribution to the field of software security and safety-critical systems.
+
+\end{scontents}
+%\engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
+%Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textbackslash texttt:  \textit{x}, \textbf{x}, and \texttt{x}.
+
+%Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
+
+%Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example, 
+%the copyright symbol: \textbackslash textcopyright Maguire 2022 results in \textcopyright Maguire 2022. Additionally, here are some examples of text superscripts (which can be combined with some symbols): \textbackslash textsuperscript\{99m\}Tc, A\textbackslash textsuperscript\{*\}, A\textbackslash textsuperscript\{\textbackslash textregistered\}, and A\textbackslash texttrademark resulting in \textsuperscript{99m}Tc, A\textsuperscript{*}, A\textsuperscript{\textregistered}, and A\texttrademark. Two examples of subscripts are: H\textbackslash textsubscript\{2\}O and CO\textbackslash textsubscript\{2\} which produce  H\textsubscript{2}O and CO\textsubscript{2}.
+
+%You can use simple environments with begin and end: itemize and enumerate and within these use instances of \textbackslash item.
+
+%The following commands can be used: \textbackslash eg, \textbackslash Eg, \textbackslash ie, \textbackslash Ie, \textbackslash etc, and \textbackslash etal: \eg, \Eg, \ie, \Ie, \etc, and \etal.
+
+%The following commands for numbering with lowercase Roman numerals: \textbackslash first, \textbackslash Second, \textbackslash third, \textbackslash fourth, \textbackslash fifth, \textbackslash sixth, \textbackslash seventh, and \textbackslash eighth: \first, \Second, \third, \fourth, \fifth, \sixth, \seventh, and \eighth. Note that the second case is set with a capital 'S' to avoid conflicts with the use of second of as a unit in the \texttt{siunitx} package.
+
+%Equations using \textbackslash( xxxx \textbackslash) or \textbackslash[ xxxx \textbackslash] can be used in the abstract. For example: \( (C_5O_2H_8)_n \)
+%or \[ \int_{a}^{b} x^2 \,dx \]
+%Note that you \textbf{cannot} use an equation between dollar signs.
+
+%Even LaTeX comments can be handled, for example: \% comment.
+%Note that one can include percentages, such as: 51\% or \SI{51}{\percent}.
+
+\subsection*{Keywords}
+\begin{scontents}[store-env=keywords,print-env=true]
+% If you set the EnglishKeywords earlier, you can retrieve them with:
+\InsertKeywords{english}
+% If you did not set the EnglishKeywords earlier then simply enter the keywords here:
+% comma separate keywords, such as: Canvas Learning Management System, Docker containers, Performance tuning
+\end{scontents}
+%\engExpl{\textbf{Choosing good keywords can help others to locate your paper, thesis, dissertation, \ldots and related work.}}
+%Choose the most specific keyword from those used in your domain, see for example: the ACM Computing Classification System ({\small \url{https://www.acm.org/publications/computing-classification-system/how-to-use})},
+%the IEEE Taxonomy ({\small \url{https://www.ieee.org/publications/services/thesaurus-thank-you.html}}), PhySH (Physics Subject Headings)\linebreak[4] ({\small \url{https://physh.aps.org/}}), \ldots or keyword selection tools such as the  National Library of Medicine's Medical Subject Headings (MeSH)  ({\small \url{https://www.nlm.nih.gov/mesh/authors.html}}) or Google's Keyword Tool ({\small \url{https://keywordtool.io/}})\\
+
+%\textbf{Formatting the keywords}:
+%\begin{itemize}
+%  \item The first letter of a keyword should be set with a capital letter and proper names should be capitalized as usual.
+%  \item Spell out acronyms and abbreviations.
+%  \item Avoid "stop words" - as they generally carry little or no information.
+%  \item List your keywords separated by commas (",").
+%\end{itemize}    
+%Since you should have both English and Swedish keywords - you might think of ordering them in corresponding order (\ie, so that the n\textsuperscript{th} word in each list correspond) - this makes it easier to mechanically find matching keywords.
+\end{abstract}
+\cleardoublepage
+\babelpolyLangStart{swedish}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+swe
+\end{scontents}
+\warningExpl{Inside the following scontents environment, you cannot use a \textbackslash include{filename} as it does not end up in the for diva information. Additionally, you should not use a straight double quote character in the abstracts or keywords, use two single quote characters instead.}
+\begin{scontents}[store-env=abstracts,print-env=true]
+\generalExpl{Enter your Swedish abstract or summary here!}
+%\sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
+%Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
+
+\engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
+or Swedish abstract and English summary need not be literal translations of each other.}
+
+
+\engExpl{The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow}
+\end{scontents}
+\subsection*{Nyckelord}
+\begin{scontents}[store-env=keywords,print-env=true]
+% SwedishKeywords were set earlier, hence we can use alternative 2
+\InsertKeywords{swedish}
+\end{scontents}
+\sweExpl{Nyckelord som beskriver innehållet i uppsatsen eller rapporten}
+\end{abstract}
+\babelpolyLangStop{swedish}
+
+\cleardoublepage
+
+\begin{comment}
+%\selectlanguage{french}
+\generalExpl{
+If you are fluent in other languages, feel free to add the abstracts in one or more of them.}
+\engExpl{Note that you may need to augment the set of languages used in \texttt{polyglossia} or
+\texttt{babel} (see the file \texttt{kththesis.cls}). The following languages include those languages that were used in theses at KTH in 2018-2019, except for one in Chinese.\\
+Remove those versions of abstracts that you do not need.\\
+If you add a new language, when specifying the language for the abstract, use the three-letter ISO 639-2 Code – specifically the "B" (bibliographic) variant of these codes (note that this is the same language code used in DiVA).}
+
+\babelpolyLangStart{french}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+fre
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Résumé en français.
+\end{scontents}
+\subsection*{Mots-clés}
+\begin{scontents}[store-env=keywords,print-env=true]
+% In languages other than Swedish and English, you simply enter the relevant keywords in this subsection
+5-6 mots-clés
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{french}
+\cleardoublepage
+\babelpolyLangStart{spanish}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+spa
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Résumé en espagnol.
+\end{scontents}
+\subsection*{Palabras claves}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 Palabras claves
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{spanish}
+\cleardoublepage
+\babelpolyLangStart{italian}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+ita
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Sommario in italiano.
+\end{scontents}
+\subsection*{parole chiave}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 parole chiave
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{italian}
+\cleardoublepage
+% note that a command is used to avoid Overleaf parsing problems
+\babelpolyLangStart{norsk}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+nor
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Sammendrag på norsk.
+\end{scontents}
+\subsection*{Nøkkelord}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 nøkkelord
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{norsk}
+\cleardoublepage
+% note that a command is used to avoid Overleaf parsing problems
+\babelpolyLangStart{ngerman}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+ger
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Zusammenfassung in Deutsch.
+\end{scontents}
+\subsection*{Schlüsselwörter}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 Schlüsselwörter
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{ngerman}
+\cleardoublepage
+\babelpolyLangStart{danish}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+dan
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Abstrakt på dansk.
+\end{scontents}
+\subsection*{Søgeord}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 Søgeord
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{danish}
+\cleardoublepage
+\babelpolyLangStart{dutch}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+dut
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Samenvatting in het Nederlands.
+\end{scontents}
+\subsection*{Trefwoorden}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 trefwoorden
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{dutch}
+\cleardoublepage
+\babelpolyLangStart{estonian}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+est
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Eesti keeles kokkuvõte.
+\end{scontents}
+\subsection*{Märksõnad}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 Märksõnad
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{estonian}
+\cleardoublepage
+\end{comment}
+\section*{Acknowledgments}
+\markboth{Acknowledgments}{}
+\sweExpl{Författarnas tack}
+
+\engExpl{It is nice to acknowledge the people that have helped you. It is
+  also necessary to acknowledge any special permissions that you have gotten –
+  for example, getting permission from the copyright owner to reproduce a
+  figure. In this case, you should acknowledge them and this permission here
+  and in the figure’s caption. \\
+  Note: If you do \textbf{not} have the copyright owner’s permission, then you \textbf{cannot} use any copyrighted figures/tables/\ldots . Unless stated otherwise all figures/tables/\ldots are generally copyrighted.
+}
+\sweExpl{I detta kapitel kan du ev nämna något om
+  din bakgrund om det påverkar rapporten på något sätt. Har du t ex inte
+  möjlighet att skriva perfekt svenska för att du är nyanländ till landet kan
+  det vara på sin plats att nämna detta här. OBS, detta får dock inte vara en
+  ursäkt för att lämna in en rapport med undermåligt språk, undermålig grammatik och
+  stavning (t ex får fel som en automatisk stavningskontroll och
+  grammatikkontroll kan upptäcka inte förekomma)\\
+En dualism som måste hanteras i hela rapporten och projektet
+}
+
+I would like to thank Cyrille for accepting to be my supervisor in the current penury of supervisors, and Chip for infinite patience, and Yannick and Flo for stuff (yes, this is going to be rewritten). And Johannes you are great!
+
+
+\acknowlegmentssignature
+
+\fancypagestyle{plain}{}
+\renewcommand{\chaptermark}[1]{ \markboth{#1}{}} 
+\tableofcontents
+  \markboth{\contentsname}{}
+
+\cleardoublepage
+\listoffigures
+
+\cleardoublepage
+
+\listoftables
+\cleardoublepage
+%\lstlistoflistings
+ \listoflistings
+ 
+%\engExpl{If you have listings in your thesis. If not, then remove this preface page.}
+\cleardoublepage
+
+
+% Align the text expansion of the glossary entries
+\newglossarystyle{mylong}{%
+  \setglossarystyle{long}%
+  \renewenvironment{theglossary}%
+     {\begin{longtable}[l]{@{}p{\dimexpr 3cm-\tabcolsep}p{0.8\hsize}}}% <-- change the value here
+     {\end{longtable}}%
+ }
+%\glsaddall
+%\printglossaries[type=\acronymtype, title={List of acronyms}]
+\printglossary[style=mylong, type=\acronymtype, title={List of acronyms and abbreviations}]
+%\printglossary[type=\acronymtype, title={List of acronyms and abbreviations}]
+%\printnoidxglossary[style=mylong, title={List of acronyms and abbreviations}]
+\engExpl{The list of acronyms and abbreviations should be in alphabetical order based on the spelling of the acronym or abbreviation.
+}
+
+\cleardoublepage
+%\glsaddall
+\newglossarystyle{mydefs}{%
+  \setglossarystyle{long}%
+  \renewenvironment{theglossary}%
+     {\begin{longtable}[l]{@{}>{\bfseries}>{\bfseries}>{\raggedright}p{3.5cm} p{0.85
+     \hsize}}}% <-- change the value here
+     {\end{longtable}}%
+ }
+%\printglossary[type=fullg,toctitle={Glossary}, style=myglossary, title={Full glossary}, nonumberlist]
+\newgeometry{left=2cm,right=3cm,top=2cm,bottom=2cm}
+\printglossary[type=fullg, style=mydefs, toctitle={Glossary}, title={Full glossary}]
+%\setlength{\glsdescwidth}{0.9\hsize}
+\restoregeometry
+
+% if the nomenclature option was specified, then include the nomenclature page(s)
+\ifnomenclature
+    \cleardoublepage
+    % Output the nomenclature list
+    \printnomenclature
+\fi
+
+%% The following label is essential to know the page number of the last page of the preface
+%% It is used to compute the data for the "For DIVA" pages
+\label{pg:lastPageofPreface}
+% Mainmatter is where the actual contents of the thesis goes
+\mainmatter
+\glsresetall
+
+%% add all of the entries that are in glss.tex
+%\glsaddall[types={fullg}]
+
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\selectlanguage{english}
+\chapter{Introduction}
+\label{ch:introduction}
+%\sweExpl{svensk: Introduktion}
+
+
+%\sweExpl{Ofta kommer problemet och problemägaren från industrin där man önskar en specifik lösning på ett specifikt problem. Detta är ofta ”för smalt” definierat och ger ofta en ”för smal” lösning för att resultatet skall vara intressant ur ett mer allmänt ingenjörsperspektiv och med ”nya” erfarenheter som resultat. Fundera tillsammans med projektets intressenter (student, problemägare och akademi) hur man skulle kunna använda det aktuella problemet/förslaget för att undersöka någon ingenjörsaspekt och vars resultat kan ge ny eller kompletterande erfarenhet till ingenjörssamfundet och vetenskapen.\\slöser man en del eller hela delen av det ursprungliga problemet.\\Erfarenheten kommer ur en frågeställning som man i examensarbetet försöker besvara med tidigare och andras erfarenhet, egna eller modifierade metoder som ger ett resultat vilket kan användas för att diskutera ett svar på undersökningsfrågan.\\Detta stycke skall alltså, förutom det ursprungliga ”smala” problemet, innehålla  vad som skall undersökas för att skapa ny ingenjörserfarenhet och/eller vetenskap.}
+
+%\engExpl{The first paragraph after a heading is not indented, all of the subsequent paragraphs have their first line indented.}
+  
+%This chapter describes the specific problem that this thesis addresses, the context of the problem, thegoals of this thesis project, and outlines the structure of the thesis.\\
+
+%\generalExpl{Give a general introduction to the area. (Remember to use appropriate references in this and all other sections.)}
+
+% One can use either biblatex or bibtex - set as the option for the document at the top of this file
+%\ifbiblatex
+%\engExpl{We use the \emph{biblatex} package to handle our references.  We
+%use the command \texttt{parencite} to get a reference in parenthesis, like
+%this \textbackslash parencite\{heisenberg2015\} resulting in \parencite{heisenberg2015}.  It is also possible to include the author as part of the sentence using \texttt{textcite}, like talking about the work of \textbackslash textcite\{einstein2016\} resulting in \textcite{einstein2016}.\\
+%This also means that you have to change the include files to include biblatex and change the way that the \texttt{reference.bib} file is included.}
+%\else
+%\engExpl{We use the \emph{bibtex} package to handle our references.  We, therefore,
+%use the command \textbackslash cite\{farshin\_make\_2019\}. For example, Farshin, \etal described how to improve LLC cache performance in in the context of links running
+%at \qty{200}{Gbps}.}
+%\fi
+
+%\newpage
+At the time of writing, Rust is still a relatively new programming language with a growing community (12 years old in 2023). Ada and SPARK have an established reputation in the safety-critical industry. Both languages provide \gls{memory-safety} guarantees through their \gls{ownership}-based paradigm. While there exist many frameworks and guidelines to combine both safe languages with C/C++ through \gls{foreign-function-interface}, there is little research or framework on how to effectively combine those two memory-safe languages to fully benefit from their strength and avoid pitfalls that can happen when using \glsxtrshort{FFI}. As our world becomes more interconnected, exploring the challenges of combining Rust and SPARK to provide clear recommendations for safe bindings is a timely and valuable contribution to the field of software security, systems programming, embedded and \gls{IoT}, and \gls{safety-critical} systems.
+
+All of the terms used in this introduction can be found in \Cref{sec:introductiongloss} on page \pageref{sec:introductiongloss}.
+
+\section{Background}
+\label{sec:background}
+\todo[inline]{There should be text here to introduce the subsections}
+
+%\generalExpl{Present the background for the area. Set the context for your project – so that your reader can understand both your project and this thesis. (Give detailed background information in Chapter 2 - together with related work.)
+%Sometimes it is useful to insert a system diagram here so that the reader knows what are the different elements and their relationship to each other. This also introduces the names/terms/… that you are going to use throughout your thesis (be consistent). This figure  also help you later delimit what you are going to do and what others have done or  do.}
+
+%\subsection{How sizeable is the problem when it comes to memory unsafe software?}
+\subsection{How bad is memory-unsafe software?}
+\label{sec:sizeOfProblem}
+
+% Introduction glossary
+% Maybe here?
+%\newgeometry{left=3cm,right=3cm,top=2cm,bottom=2cm}
+
+%\restoregeometry
+
+This thesis mainly studies memory: its vulnerabilities in unsafe (typically C/C++) vs safe languages, and memory vulnerabilities, and how they are addressed respectively.  
+
+Attacks on memory in the literature and professional blogs list many exploits of software written in C/C++. The MITRE \glspl{CWE}\,\cite{noauthor_cwe_nodate} lists \gls{memory-safety} exploitation high on the list in parallel with improper input validation --- with examples, such as Out-of-bounds Write (1\textsuperscript{st}), Out-of-bounds Read (5\textsuperscript{th}) and use after free (7\textsuperscript{th}).
+
+In a very widely cited blog article on memory safety issues in large code bases (million \gls{LOC}) written in C/C++, Alex Gaynor reports that 65\% of security vulnerabilities are caused by the unsafe language itself\,\cite{gaynor_what_2020}. Gaynor cites code bases such as Android (use-after-free, double-free, and heap buffer overflows representing over 65\% of bugs in Chrome and Android); Apple's iOS and macOS (between 66.3\% and 71.5\% memory safety bugs); Microsoft (70\%  memory safety issues); and the Ubuntu Linux kernel (65\% of Ubuntu security updates).
+
+Gaynor provides other examples; however, the range of 65 to 70\% is consistent with academic literature\,\cite{mergendahl_cross-language_2022,scherer_engineering_2021, li_improving_2014}) and security blogs, such as the \gls{NSA} Software Memory Safety report published in 2022\,\cite{noauthor_nsa_2022}, or security white papers and software security books, such as~\cite{chapman_adacore_2018}.
+
+Although some protections are deployed in common systems, such as ``\gls{ig:stack-cookie}, \gls{ig:EHV}, \gls{ig:DEP} and \gls{ig:ASLR}" -- several attack vectors are still effective"\,\cite{szekeres_sok_2013}, and it is impossible to make C/C++ code safe \emph{retroactively}. 
+
+\subsection{Challenges to designing secure software}
+
+Several authors have explained why designing secure software is extremely challenging. While the best solution would be to avoid writing software in C/C++ altogether, this is impractical and impossible\,\cite{szekeres_sok_2013}. Other sources recommend safe languages for new projects\,\cite{scherer_engineering_2021}. But for many reasons (especially, cost and not reinventing the wheel when well-tested libraries exist), replacing unsafe languages is not on the map for most developers.
+
+Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to rely on software for their functionality and move from hardware-only to the cyber-physical space, they become vulnerable, which rings especially true for the \gls{safety-critical} industry. Furthermore, they warn that software complexity is increasing (see \Cref{fig:complexity}), aggravating challenges to software security.
+
+ 
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=1\textwidth]{figures/complexity.png}
+  \end{center}
+  \caption{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
+  \label{fig:complexity}
+\end{figure}
+
+
+Moy and Aiello\,\cite{moy_when_2020} report security incidents which brought down AT\&T (at a cost of US\$60 million and long-lasting damage to the company's reputation), the \gls{FDA} warned against almost 500 thousand cardiac devices that put the patients in pain or at risk of death, and the infamous WannaCry ransomware attack that encrypted 200 thousand computers in 150 countries with a reported cost of US\$8 billion.
+
+Scherer\,\cite{scherer_engineering_2021} reports successful attacks against ``train schedule systems, entire energy grids, hospital networks, vehicular control software, and even critical aircraft systems". Scherer notes that security needs to be built into the software development process instead of being an add-on or an afterthought. Scherer also notes the ``continuously increasing rate of bugs with increasing project size amongst other factors in long-lived projects" and ``a slow turnaround time" for software improvement (1 to 10 years) causes problems to pile up.
+
+\subsection{Exploitation: Not if, but when}
+\label{sec:exploitationwhen}
+
+In addition to complexity, Chapman and Moy\,\cite{chapman_adacore_2018} remind us that we evolve in a malicious environment. Writing secure software is equivalent to ``Programming Satan’s computer", as coined by Anderson and Needham: Satan’s computer is rumored to fail intelligently, in the worst possible way and time, and in manners that the programmer does not yet know about. Exploitation techniques are well-known and constantly applied\,\cite{pal_memory_2016}.
+
+When it comes to security, the software developer faces a series of asymmetries\,\cite{chapman_adacore_2018}. An asymmetry of capability, meaning that the malicious actors' capabilities do not grow in a predictable and linear way. An asymmetry of effort: while the programmer has to secure all possible security, the malicious actor needs to find just one to breach the system. Asymmetry of knowledge, which is self-explanatory in the context of the rapid progress of knowledge and technical support. And lastly, an asymmetry of impact, as the impact and destructive impact of a security failure is in principle unpredictable. 
+
+Scherer notes that a defect is guaranteed to be exploited when discovered as malicious actors systematically screen for defects. As a result, ``the chance for a defect to be discovered by the attacker is significantly higher than the randomized detection happening during testing"\,\cite{scherer_engineering_2021}.
+
+
+\subsection{Can we reach memory safety by using safe languages?}
+\label{sec:CanMemorySafety}
+
+Unfortunately, the current answer to the question: Can we reach memory safety by using safe languages? Is ``Yes, but\ldots".
+
+While Mergendahl \etal\,\cite{mergendahl_cross-language_2022}) and organizations such as the \glsxtrfull{NSA}\,\cite{noauthor_nsa_2022} tout safe languages are ``as the solution" and Scherer\,\cite{scherer_engineering_2021} and Evans \etal\,\cite{evans_is_2020} state that language choice has a significant impact on project success and defect rates, as well as reliability, safety, and correctness,  and Skezeres \etal\,\cite{szekeres_sok_2013} recommend avoiding C/C++ for new projects, the current state of software development remains dependent on C/C++ for many reasons (legacy, dependencies, effectiveness, not reinventing the wheel for widely tested libraries, cost, \ldots\  ). But this is an effort in the right direction.
+
+
+\section{Problem}
+\label{sec:problem}
+%\sweExpl{svensk: Problemdefinition eller Frågeställning\\
+%Lyft fram det ursprungliga problemet om det finns något och definiera därefter den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur projektet. }
+
+Research and technical blogs recommend that programmers use memory-safe languages for new projects. They also recommend being extremely careful when using \glsxtrfull{FFI} as the boundary between two programming languages, as assumptions on both sides may not hold. 
+
+\textbf{While frameworks and guidelines exist for C/C++, how is this implemented practically when programmers or organizations want to combine two well-known memory-safe languages?}
+
+\subsection{Assignment provider and objective}
+
+The research project is conducted with in cooperation between Ferrous Systems and AdaCore. Both companies are engaged in an effort to provide a certified version of the Rust compiler through the Ferrocene initiative\,\cite{noauthor_ferrocene_2023}. This initiative would greatly benefit the \gls{safety-critical} industry by bringing Rust guarantees to software that \emph{should never} fail.
+
+% Research Question
+\subsection{Research question}
+\label{sec:researchQuestion}
+
+What are the best practices for secure bindings between Rust and SPARK code?
+
+Sub questions: How can we ensure that 1. \gls{memory-safety}, 2. \gls{type-safety}, and 3. \gls{ownership} are maintained in these bindings?
+
+\subsection{Hypothesis}
+We make the hypothesis that the internal coherency of both languages can be maintained if we can provide recommendations for the safe use of combined Rust/SPARK code.
+
+\subsection{Objectives}
+The tasks must be fulfilled to answer the research question:
+\begin{enumerate}
+    \item Write a series of control study programs that examine the memory safety, type safety, and ownership of Rust and SPARK code when combined.
+    \item Use a circular buffer library, which is implemented in both Rust and SPARK\,\cite{munns_bbqueue_2022,chouteau_bbqueue_nodate}, as a larger code base to experiment with bindings between the two languages
+    \item Use the information gathered from the control study programs and the BBqueue library to identify good practices for bindings between Rust and SPARK code.
+\end{enumerate}
+
+
+\section{Purpose}
+%\sweExpl{Syfte}
+%\sweExpl{Skilj på syfte och mål! Syfte är att förändra något till det bättre. I examensarbetet finns ofta två aspekter på detta. Dels vill problemägaren (företaget) få sitt problem löst till det bättre men akademin och ingenjörssamfundet vill också få nya erfarenheter och vetskap. Beskriv ett syfte som tillfredställer båda dessa aspekter.\\
+%Det finns även ett syfte till som kan vara värt att beakta och det är att du som student skall ta examen och att du måste bevisa, i ditt examensarbete, att du uppfyller examensmålen. Dessa mål sammanfaller med kursmålen för examensarbetskursen. 
+%}
+%\generalExpl{State the purpose  of your thesis and the purpose of your degree project.\\
+%Describe who benefits and how they benefit if you achieve your goals. Include anticipated ethical, sustainability, social issues, etc. related to your project. (Return to these in your reflections in Section~\ref{sec:reflections}.)}
+
+The purpose is to provide safe and practical recommendations that could be used by organizations or individual programmers, that are orienting themselves toward memory-safe languages.
+
+\section{Goals}
+%\sweExpl{Mål}
+%\sweExpl{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
+
+%\generalExpl{State the goal/goals of this degree project.}
+
+The goal of this project is XXX. This has been divided into the following three sub-goals:
+
+\begin{enumerate}
+\item Subgoal 1 \sweExpl{för att tillfredsställa problemägaren – industrin?}
+\item Subgoal 2\sweExpl{för att tillfredsställa ingenjörssamfundet och vetenskapen – akademin) }
+\item Subgoal 3\sweExpl{eventuellt, för att uppfylla kursmålen – du som student}
+\end{enumerate}
+
+%\generalExpl{In addition to presenting the goal(s), you might also state what the deliverables and results of the project are.}
+
+\section{Research Methodology
+%\sweExpl{Undersökningsmetod}
+%\sweExpl{Här anger du vilken vilken övergripande undersökningsstrategi eller metod du skall använda för att försöka besvara den akademiska frågeställning och samtidigt lösa det e v ursprungliga problemet. Ofta kan man använda ”lösandet av ursprungsproblemet” som en fallstudie kring en akademisk frågeställning. Du undersöker någon intressant fråga i ”skarpt” läge och samlar resultat och erfarenhet ur detta.\\
+%Tänk på att företaget ibland måste stå tillbaka i sin önskan och förväntan på projektets resultat till förmån för ny eller kompletterande ingenjörserfarenhet och vetenskap (ditt examensarbete). Det är du som student som bestämmer och löser fördelningen mellan dessa två intressen men se till att alla är informerade. 
+}
+%\generalExpl{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen should be in methods. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
+%In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
+
+Choice of methods:
+- combine basic blocs that are building blocks of bigger programs (every program uses Integers, Strings, arrays \, etc), find possible errors and discrepancies with regards to the memory and type safety, and how ownership is maintained or transferred.
+
+- apply those learning to a database that is not trivial and of used in the embedded systems community and low-level programming.
+
+\section{Delimitations}\sweExpl{Avgränsningar}
+%\generalExpl{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This  helps you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
+
+This thesis covers manual bindings for basic types. This thesis does not implement an automated tool.
+
+\section{Structure of the thesis}
+%\sweExpl{ Rapportens disposition}
+~\Cref{ch:background} presents relevant background information about Rust and SPARK, and talks more about memory safety.  
+~\Cref{ch:relatedworks} discuss related works when it comes to \gls{FFI}.  \Cref{ch:methods} presents the methodology and method used to solve the problem. …
+
+\section{Terms in the introduction}\label{sec:introductiongloss}
+%\setglossarysection{section}
+% The following line removes the glossary title.
+\renewcommand{\glossarysection}[2][]{}
+% Add every thing from this glossary
+%\glsaddall[types={introductiongloss}] 
+\printglossary[type=introductiongloss, style=mydefs, 
+%toctitle={Terms in the introduction}, 
+%title={Terms in the introduction}
+]
+
+\cleardoublepage\chapter{Background}
+\label{ch:background}
+
+This thesis covers the interaction of Rust and SPARK and which safety guarantees are retained when both languages are combined. Both languages implement \gls{memory-safety} but combining them in the same program requires clear recommendations. 
+
+The background is composed of two parts. 
+In Part 1, we present a 
+high-level description of Rust and SPARK(\Cref{sec:rust_and_spark}), and what makes them desirable programming languages in terms of memory safety, \gls{type-safety}, as well as the concept of \gls{ownership} they both implement.
+
+In Part 2, we discuss (\Cref{sec:software_safety}) \gls{memory-safety} in software and why the industry and researchers believe safe languages are considered to be a solution to common \gls{memory-error}s and attacks. In this part, historical memory errors and attacks are discussed to understand the protection offered by safe languages. 
+
+\section{Background: Rust and SPARK}
+\label{sec:rust_and_spark}
+
+This section covers Rust and SPARK and describes what makes them memory safe according to the literature and their official documentation. This section explains why those two languages are relevant for \gls{safety-critical} industries and for software safety.
+
+
+\subsection{Rust}
+
+Rust was designed as a systems programming language\,\cite{mergendahl_cross-language_2022}, to interact with other low-level languages. Rust focuses on speed, \gls{memory-safety}, and concurrency. Thus, Rust is multi-paradigm and combines features from imperative \textit{and} functional programming. It is fully open-source and has a six-week release cycle, with backward compatibility guaranteed\,\cite{poveda_ruiz_bounded_2019,noauthor_rust_nodate}. Rust is characterized by its ``strong performance and safety properties". In addition, the language combines a strong type system enforced at compile-time, and other compile-time checks, to prevent ``large classes of memory bugs"\,\cite{mergendahl_cross-language_2022}. Furthermore, Rust ensures spatial safety by performing compile-time checks for statically-sized objects. For dynamically sized objects, instructions are passed to the binary, to delay those checks until runtime.
+
+For temporal safety, Rust relies on its concept of ownership --- a concept shared by SPARK. As described by Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, Scherer\,\cite{scherer_engineering_2021}, and Poveda Ruiz\,\cite{poveda_ruiz_bounded_2019} as well as the official documentation\,\cite{noauthor_rust_nodate}, a unique owner for a value can exist at a time and the value is destroyed when the unique owner goes out of scope.  This implies that when a value is destroyed, the reference is nullified, without the need for garbage collection. The Rust compiler adds lifetimes to all values, which is a ``tag" guaranteeing the value is still valid. The borrow checker ensures that no value outlives its lifetime.
+
+To relax this strictness, Rust can temporarily transfer ownership, known as borrowing. More importantly, Rust allows one mutable reference \inlinecode{\& mut T} or multiple immutable references to co-exist \inlinecode{\&T} simultaneously --- these two scenarios are exclusive. This  protects against type-related errors at compile-time, as rustc (the rust compiler) warns of any error. An example of code\footnote{A note on special syntax: \texttt{!} is used to use a macro, here is a \texttt{Vector}. \texttt{\{:?\}} is used to print variables in \texttt{Debug} format.} that shifts ownership is shown in \Cref{lst:rust_ownership}.
+
+\begin{listing}[!ht]
+\begin{minted}[fontsize=\footnotesize]{rust}
+// a is a vector, it is heap-allocated
+let a = vec![1, 2, 3]; 
+// ownership of a is moved to b
+let b = a;             
+println!("b: {:?}", a);
+\end{minted}
+\caption[Rust code showing ownership]{Rust code showing ownership}
+\label{lst:rust_ownership}
+\end{listing}
+\FloatBarrier
+
+In addition, Rust’s type system statically rules out data races. At its heart, the Rust type-system has the concept of ownership. In the Rust ownership system, many aliases can exist to a place in memory, but only one alias can give mutable access, that the capacity to write to this place in memory. If ownership is shared between many aliases, then those aliases can only read the contents of this place in memory. The restrictions linked to borrowing ensure that a value is unable to exist in memory without an owning variable in the same scope, and it is impossible to modify a variable from different threads, preventing data-races\,\cite{poveda_ruiz_bounded_2019,noauthor_rust_nodate}\footnote{There are of course ways to implement thread safety such as channels or atomic reference counters (\texttt{Arc} in Rust terminology) but this is a general overview.}. 
+
+The system of ownership is not applied to simple types for which the compiler knows their size at compile-time. Those types are known to implement the \texttt{Copy trait}. This trait means that the compiler can copy those types \emph{without} needing to transfer ownership. Some simple types implementing the copy traits are integers, for example, ``i32" or ``u64".
+
+Rust allows unsafe operations that are fenced by the keyword ``\texttt{unsafe\{\}}". Inside unsafe brackets, operations such as raw pointer manipulation, or initialization of unsafe objects are possible, under the programmer's responsibility. Unsafe blocks are used mainly to interact with low-level code.
+
+Rust does not implement exceptions, but has an error management system, distinguishing between recoverable and unrecoverable errors. Recoverable errors can be managed by the program, while unrecoverable errors make the program stop and unwind the stack --- resulting in a so-called \texttt{panic}. The programmer decides when an error is handled gracefully and when the program should panic.
+
+In the somewhat contrived  example shown in \Cref{lstlisting:data_race}, we see that the compiler does not accept modification of a global variable from different threads. The compiler warns about aliasing violations or potential data races that cause undefined behavior.
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+linenos
+]{rust}
+static mut SHARED: i32 = 0; // Global scope
+fn main() {
+   let cls = thread::spawn(move || {
+        for _ in 0..10000 {
+        // aliasing violation happens here!
+            SHARED += 1;
+        }
+   });
+   for _ in 0..10000 {
+      SHARED += 1;
+   }
+}
+\end{minted}
+\caption[Rust code showing aliasing violations]{Rust code showing aliasing violations}
+\label{lstlisting:data_race}
+\end{listing}
+\FloatBarrier
+
+
+In contrast, if we frame the variable ``SHARED" inside \texttt{unsafe} blocks, the program compiles and runs, and prints all possible results between 100000 and 200000, as expected from a data race. This is an example of what \texttt{unsafe} allows the programmer to do: more freedom but it makes Rust as memory-safe as any C/C++ program.
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+linenos
+]{rust}
+    let cls = thread::spawn(move || {
+        for _ in 0..100000 {
+            unsafe {
+                SHARED += 1;
+            }
+    // ...
+        unsafe {
+            SHARED += 1;
+        }
+    //...
+    unsafe {
+        print!("Shared {shared}");
+    }
+}
+\end{minted}
+%\label{lst:data_race2}
+\caption[Rust code showing a data race]{Rust code showing a data race }
+\label{lstlisting:data_race2}
+\end{listing}
+\FloatBarrier
+
+
+
+\subsection{Ada}
+
+Ada is a high-level programming language, designed for long-term applications that should not be dependent on software updates -typically the safety-critical industry. It was developed in the early 1980s and has a syntax inspired by the Pascal language family.
+Chapman and Moy\,\cite{chapman_adacore_2018} list some of Ada's advantages. First, its syntax protects from assignment and comparison (a well-known C problem!) as well as the unintentional use of \texttt{NULL} or the dangling else problem. In addition, there is no explicit use of pointers and its strong typing system prevents confusion or abusive type promotion. Furthermore, it has many features for concurrency.
+
+Ada has strong type safety as in Rust. Additional constraints can be imposed with subtypes or bounds. This ensures at compile-time that data is only used in ways that are consistent with its declared type and that type-safety is not violated.
+
+ \begin{listing}[!ht]
+    \begin{minted}[
+        frame=lines,
+        framesep=2mm,
+        baselinestretch=1.2,
+        fontsize=\footnotesize,
+        linenos
+    ]{ada}
+    -- those are not the same type, and it is impossible
+    -- to assign those interchangeably.
+    type My_int is range -1 .. 20;
+    type My_int2 is range -1 .. 20;
+   
+   -- same here!
+   subtype MyInteger1 is Integer range 0..10;
+   subtype MyInteger2 is Integer range 5..15;
+\end{minted}
+\caption[Ada/SPARK code showing type guarantees]{Ada/SPARK code showing type guarantees}
+\label{lstlisting:spark_datatypes}
+ \end{listing}
+
+\subsection{SPARK}
+
+%\gls{safety-critical}
+
+SPARK refers to a set of tools for verification as well as the language name.
+SPARK allows formal verification of code to provide guarantees that would not be achieved otherwise at multiple levels of assurance, which can be integrated into development processes (Moy, in direct conversation). The language was designed to be the largest subset of Ada that was ``still amenable to simple specification and sound verification", and as such, the use of pointers (which permits aliasing!) was not a part of the language until fairly recently \footnote{at the time of writing, 2014}\,\cite{jaloyan_safe_2017, dross_using_2019}.
+
+ SPARK supports, amongst other features, basic data, control flow analysis, ineffective assignments, and exhaustive detection of uninitialized variables. To ensure the safety and security of software systems, SPARK provides support for mathematical proofs. These proofs can be used to demonstrate the absence of runtime exceptions, verify the fulfillment of security and safety properties, or establish that the software follows its specifications and has the required behavior\,\cite{noauthor_spark_nodate}.
+ 
+Carré and Garnsworthy\,\cite{carre_spark_1990} describe the rationale behind the design of SPARK, highlighting a number of key requirements that the language must meet to be effective in safety-critical programming contexts. These include being logically sound and free of ambiguities, having a simple and formal definition, maintaining expressive power to support rigorous program development and faithful representation of abstractions, prioritizing security and reliability to ensure that errors are not tolerated in safety-critical contexts, and finally, the ability to be verifiable.
+
+SPARK is compiled with the Ada compiler, (GNAT is used in the experiments in this thesis) but it has in addition the SPARK checker. SPARK verifies contracts are always upheld, insuring no runtime error, proving for example that no division by zero is possible or that the result of an increment is always bigger than the number sent to the program. In addition, SPARK ensures thread safety via synchronized objects (Scherer\,\cite{scherer_engineering_2021}, SPARK resources\,\cite{noauthor_spark_nodate}).
+
+As an example from AdaCore documentation (\Cref{lstlisting:spark_illegal_transfer}), this program is legal in Ada but illegal in SPARK, as the operation on \texttt{X} is not benign, meaning that we are trying to make an assignment to the contents of a pointer whose \gls{ownership} has been moved to \texttt{Y}. Once \texttt{Y} has ownership of the data contained in \texttt{X}, it becomes impossible to manipulate \texttt{X}.
+
+\begin{listing}[!ht]
+    \begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    fontsize=\footnotesize,
+    linenos
+    ]{ada}
+    procedure Ownership_Transfer is
+       type Int_Ptr is access Integer;
+       X     : Int_Ptr;
+       Y     : Int_Ptr;
+       Dummy : Integer;
+    begin
+       X     := new Integer'(1);
+       X.all := X.all + 1;
+       Y     := X;
+       -- legal, ownership pertains to Y
+       Y.all := Y.all + 1;  
+       -- illegal, trying to access a variable through X,
+       -- which was moved. No further operations, 
+       -- assignment and transfer are possible.
+       X.all := X.all + 1;  
+       X.all := 1;          
+       Dummy := X.all;      
+    end Ownership_Transfer;
+    \end{minted}
+    \caption[Illegal ownership transfer in SPARK]{Illegal ownership transfer in SPARK}
+    \label{lstlisting:spark_illegal_transfer}
+\end{listing}
+
+
+Ownership in SPARK is different from ownership in Rust. In SPARK, only read aliasing is allowed, when both names are only used to read the data. Assignment between access (access is the Ada pointer type) operates as a transfer of ownership, where the source object loses permission to the underlying object.
+
+SPARK 2014 has pointers inspired by Rust\,\cite{dross_using_2019}: there is single ownership for pointers, as we can see in the example \Cref{lstlisting:spark_illegal_transfer}. Once ownership is transferred, the original owner is not valid. This effectively avoids aliasing.
+SPARK allows beginning aliasing (the possibility to read) that it calls \textit{observability}.
+
+\subsection{Summary on Rust and SPARK}
+
+The concept of type safety and ownership, and why these traits are considered desirable in safe programming languages like Rust and SPARK, have been covered in detail. Those traits are their use of strong \gls{type-safety} and ensuring \gls{memory-safety} through \gls{ownership}. This reduces the probability of \gls{memory-safety} errors as SPARK does not fail at runtime and the Rust compiler maintains its guarantees as long as the programmer does not use \texttt{unsafe} wrongly.
+
+\newpage
+
+\section{Background: Software Safety}
+\label{sec:software_safety}
+
+The literature around the state of software security does  generally agree about the threats caused by memory-safety issues and the underlying reasons for those threats, namely unsafe languages. 
+
+\subsection{Memory safety}
+
+Skezeres \etal\,\cite{szekeres_sok_2013} (in ``SoK: Eternal War in Memory") and Pal \etal\,\cite{pal_memory_2016} (in ``Memory Corruption-Basic Attacks and Counter Measures") define \gls{memory-safety} in terms of protection against \gls{memory-error}s. 
+In the C++ standard, writing out-of-bounds of an array, dereferencing null pointers, or reading uninitialized variables results in undefined behavior. Buffer overflows (writing outside of the allocated space in memory), double-frees (freeing the memory twice), and use after free (accessing a memory that has been freed before) are very common errors\,\cite{szekeres_sok_2013,scherer_engineering_2021}. 
+These errors can be leveraged into full-fledged attacks, as ``every exploit starts by triggering a memory error"\,\cite{szekeres_sok_2013}. The attack process is two-fold. The first is to make a pointer invalid, and the second is dereferencing this invalid pointer. Attackers can exploit either dangling pointers (\ie temporal errors) or an out-of-bound pointer (\ie a spatial error). These attack techniques can be combined and chained for successful exploitation, as illustrated in detail in \Cref{fig:sok}.
+
+\subsection{The Memory Wars}.
+
+C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom they give to the programmer. Szekeres \etal\,\cite{szekeres_sok_2013} call the \gls{memory-corruption} bugs in low-level languages ``one of the oldest problems" in security. Memory errors have been exploited for 30 years, while real-world exploits prove that protections can always be defeated. The authors established that not only does a completely secure system not exist, but protection mechanisms never achieve wide adoption by the software engineering community. The reason is that protection mechanisms present a significant overhead, in terms of performance (\eg garbage collectors are costly in systems relying on speed, not even to mention changing the programming language, and the trade-off is not worth the benefit of the protection) or more simply the cost of replacing billions of lines of existing C/C++ is too expensive. According to Skezeres \etal\,\cite{szekeres_sok_2013} the issues may be that the protection is not robust enough or there exist problems of incompatibility with legacy code and dependencies.
+
+\begin{sidewaysfigure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{figures/sok.png}
+    %\includesvg{figures/sok.svg}
+  \end{center}
+  \caption{Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,\cite{szekeres_sok_2013}  \textcopyright2013 IEEE}
+  \label{fig:sok}
+\end{sidewaysfigure}
+
+To mitigate these problems, various tools have been introduced\,\cite{mergendahl_cross-language_2022}. Dynamic analysis tools observe the program while it is running, while static analysis tools analyze the source code. Such tools are for example Valgrind, sanitizers (dynamic analysis), or the Clang static analyzer. Even if writing analysis tools is, to say the least, ``non-trivial"\,\cite{scherer_engineering_2021}, some authors studied in the frame of this thesis wrote their own (FFIChecker by Li \etal\,\cite{li_detecting_2022} and Scherer who participated to the project Miri\,\cite{noauthor_miri_2023}). Tools have limitations: dynamic analysis tools are time-consuming and specific to the input, and static analysis tools have false positives\,\cite{li_improving_2014}.
+Unfortunately, those tools provide very limited protection, in part because the software engineering community is facing professionalization and an increase in complexity from the attacking side\,\cite{scherer_engineering_2021, chapman_adacore_2018}. 
+According to Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, ``sanitizers suffer from coverage limitations", with many missed bugs as a consequence, while ``enforcement-based exploit mitigation techniques" can still allow attacks that do not violate their policies as they are ``relaxed enough", and randomization techniques remain susceptible to information leakage.
+
+\subsection{The monopoly of C/C++}
+
+Both C/C++ are considered as building bricks of modern software, in systems programming and embedded because of the performance they offer, as argued by Mergendahl \etal and Scherer \,\cite{mergendahl_cross-language_2022, scherer_engineering_2021}. Both C/C++ are also prevalent in embedded systems (Moy and Aiello\,\cite{moy_when_2020} Chapman and Moy\,\cite{chapman_adacore_2018}). Renouncing C/C++ is equivalent to renouncing performance and losing the fine-grained control necessary to work with low-level systems.
+C/C++ are by nature unsafe languages. They are designed for direct interaction with memory and can modify it without any restriction. Mergendahl \etal state that the underlying root of all evil, \gls{memory-corruption}, comes from the error-prone process of delegating all security checks to the programmer. As a consequence, developer errors introduce both spatial and temporal errors.
+
+The inherent unsafely of C/C++ affects safe languages. By design, Rust and Ada (and its subset SPARK) were designed to interact with existing low-level applications written in C/C++, and use dependencies written in unsafe languages. 
+
+\section[FFI in software engineering]{FFI in software engineering}
+
+\glsxtrshort{FFI} is commonly used in systems programming languages. 
+To write software with FFI in general, as well as in this thesis, it is important to follow existing guidelines\,\cite{gjengset_rust_2021, noauthor_ffi_nodate, noauthor_multi-language_nodate}. 
+Those guidelines cover important points such as calling conventions (that is to say, the data representation that the compiler is expect) or symbols, which must be deterministically generated. Error management is critical, as unwinding an error through an FFI barrier is considered undefined behavior. Type matching is also an important consideration, as one language possesses no information on the representation of complicated types in another language. We consider memory management (when to keep and release ownership) which most of the time must be returned to the appropriate allocator according to guidelines\,\cite{gjengset_rust_2021}. 
+
+In ``Improving Quality of Software with Foreign Function Interfaces using Static Analysis", Li\,\cite{li_improving_2014} covers the reason for FFI prevalence in modern software. FFI is a gluing layer that allows the connection of software written in different languages. Multi-language software seems ``prevalent and necessary"\,\cite{li_detecting_2022}: different languages have different strengths due to design choices, or rich ecosystems, or have a specific use for ``performance-critical scenarios" in a time where software development requires faster processes, higher quality, and faster time to market.
+
+Some problems arise only in multi-language contexts as failures can be caused by wrong assumptions. ``Rust’s automatic memory management relies on it being the only entity controlling the allocation status of memory"\,\cite{mergendahl_cross-language_2022} --- but this may not be the case. Rust uses \texttt{malloc()} and shares a heap with other components of multi-language applications. So, ``Rust’s spatial memory safety can rely on bounds stored in memory which is only safe if the entire application is memory safe"\,\cite{mergendahl_cross-language_2022}.
+
+\glsxtrfull{CLA} show, counter-intuitively, that multi-language applications are weakened by the very assumption the programmer has about combining different languages' strengths. Instead, it is each language's \emph{weakness} that threatens to become the weakest link of the application.
+For example, hardened C through \gls{CFI}, prevents control-flow hijacking by checking the validity of pointers. The Rust side provides protection against the same attacks by enforcing memory safety. However, this does not make the C side memory safe, and Rust does not validate the code pointers --- it just assumes \gls{memory-safety} in the whole memory space. The attacker can take advantage of the C language weaknesses to combine memory corruption and non-validated pointers in Rust. 
+
+Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, insist that the problem is much deeper than what meets the eye. They could demonstrate control-flow hijacking, but the ``weakest link principle holds for any element of an application’s threat model that varies across languages". If one part of the code introduces code signing and validation (on the Rust side), but another part of the code does not (C libraries), then the cross-language application remains completely vulnerable to supply chain attacks.
+
+Finally, the authors introduce the most ``insidious case of multi-language applications". The component languages can have eliminated a threat but use different assumptions. The result is that ``the combination of two safe languages itself being unsafe", a theory that is of the utmost interest in the frame of this thesis --- as both Rust and SPARK are safe languages.
+
+The authors also underline that the cost of writing such attacks is relatively simple: while attacks on single-language code require ``new primitives", \glsxtrshort{CLA} opens a new avenue of attack reusing old vulnerabilities ``brought back to life" ---the attack that we surveyed in \Cref{sec:software_safety}, in addition to CLA specific vulnerabilities. The authors call those attacks ``revenant vulnerabilities"\,\cite{mergendahl_cross-language_2022}. 
+
+\section{Summary}
+
+Memory safety is a primary concern in low-level and systems programming, with constant research for its improvement (\Cref{sec:software_safety}). Ameliorating the state of affairs is challenging, in terms of cost and trade-offs.
+
+\cleardoublepage
+
+%\chapter[Related works: Foreign Function Interface]{Related works: Foreign\linebreak[4] Function Interface}
+\chapter{Related works}
+\label{ch:relatedworks}
+
+Related works examine dependencies, language formalization, and studies around \glsxtrfull{FFI}.
+
+\section{Dependencies}
+\label{subsec:dependencies}
+
+Safe systems programming languages can be dependent on libraries written in unsafe languages. Even if those dependencies were well tested, they still represent a safety risk. As a result, the inherent unsafely of C/C++ can affect safe languages. Rust was designed to interact with existing low-level applications written in C/C++ but can also depend on libraries written in C/C++. This is different from SPARK, which only depends on Ada, even if programmers can interface with C/C++ as any system programming language.
+
+While the consensus is that the Rust language is excellent in reducing memory-safety issues, Evans \etal examined the actual usage of Rust by developers in their paper ``Is Rust Used Safely by Software Developers?"\,\cite{evans_is_2020} and their conclusions are somehow different. They note that \texttt{unsafe\{\}} --- a Rust keyword to do memory operations not authorized by the compiler \footnote{See more details in \Cref{sec:rust_and_spark}} is used in one-third of dependencies which are impossible to check. They believe ``propagation of unsafeness offers a challenge to the claim of Rust as a memory-safe language". In this case, Evans \etal recommend changes to the rust compiler to raise awareness in programmers when their code is rendered unsafe through dependencies. 
+
+But Evans \etal do not quantify their findings. Li \etal (in ``Detecting Cross-Language Memory Management Issues in Rust"\,\cite{li_detecting_2022}), analyzed whether  Rust could realize its promised guarantees and found that more than 70\% of packages on \texttt{crates.io} have at least one unsafe binding. This result is based upon their looking at approximately 77,000 packages. Finally, Li \etal built a \gls{FFI}-checker tool that found only 34 bugs in 12 packages out of a sample of 984 packages. The authors consider this result of great significance (probably because of Rust's memory safety reputation) as the bugs were previously unknown and were subsequently reported by the authors in a GitHub trophy case \,\cite{li_rust-ffi-checkertrophy-case_nodate}. The relatively low number of bugs seems to strengthen the consensus around safety guarantees provided by Rust.
+
+\section{Formalization}
+
+Rust is an open-source project without formal specifications, contrasting with Ada and SPARK. But there are many efforts ongoing to formalize Rust. The Rust Belt\,\cite{jung_rustbelt_2018} project aims ``to equip Rust programmers with the first formal tools for verifying safe encapsulation of unsafe code". Rust Belt defines a set of rules to model Rust programs and uses those rules to prove the security of those programs mathematically. Rust Belt has demonstrated the safety of basic typing and that there is no undefined behavior in well-typed Rust \,\cite{xu_memory-safety_2021}. 
+
+The Ferrocene language specification (a collaboration between Ferrous Systems and AdaCore\,\cite{noauthor_ferrocene_2023}) aims to document the behavior of the Rust compiler in a standardized form. The goal is to qualify a version of the Rust compiler for use by safety-critical industries.
+
+SPARK is built upon the Ada standard ISO/IEC 8652:2012\,\cite{1400-1700_isoiec_2013}, which defines the form and meaning of programs to ensure the portability of Ada code. Specifically, SPARK Pro is a group of static analysis tools which use formal methods to verify SPARK deductively. This tool can meet several high-assurance standards, including DO-178B/C (and the Formal Methods supplement DO-333), CENELEC 50128, IEC 61508, and DEFSTAN 00-56\,\cite{jaloyan_safe_2017}.
+
+\section{Software written with FFI}
+
+Previous publications have found many issues when combining safe and unsafe languages, making the multi-language program weaker than the sum of their part. But even a combination of safe languages can be expected to be unsafe.
+
+With this goal in mind, we set aside discussions on \gls{memory-safety} in single-language applications (such as Regehr \etal and Chandra \etal focusing on C\,\cite{regehr_efficient_2006,chandra_physical_1999}), and papers too tightly centered around security (such as the work on the formalization on exploits by Dullien\,\cite{dullien_weird_2020}). 
+
+In this part, we review again the work of Mergendahl \etal\,\cite{mergendahl_cross-language_2022} whose paper was an inspiration for this thesis, Li's work on improving FFI software safety\,\cite{li_improving_2014}, Scherer work on software safety\,\cite{scherer_engineering_2021} and Li \etal\,\cite{li_detecting_2022}, who built on Mergendahl \etal work. For a formal expression of the need for linking type, we can refer to the work of Patterson and Ahmed\,\cite{patterson_linking_2017} on using richer types available in other languages and linking those types modeled in abstract compilers.
+
+Software built with FFI layers can be listed easily\,\cite{li_improving_2014,li_detecting_2022,mergendahl_cross-language_2022}: the \gls{JNI} which glues together the \gls{JDK} and it's core systems libraries written in C and C++, the Android mobile \gls{OS} which includes a Java \glsxtrfull{VM} and a C/C++ kernel; Firefox --- studied extensively by Mergendhal \etal which is also a well-known example. The Linux kernel is integrating Rust as a core language\footnote{At the time of writing this thesis.}. The Tor project, Microsoft Windows \gls{OS}, and Google Fuchsia can also be named.
+
+\subsection{How to evaluate quality in FFI bindings}
+
+Li distinguishes four software quality issues caused by \glsxtrshort{FFI}: security, reliability, safety, and performance\,\cite{li_improving_2014}.
+
+\begin{description}[labelwidth=\widthof{\textbf{Memory safety}}, leftmargin = !]
+\item[\textbf{Security}] implies that an attacker is not in a position to exploit the FFI layer for security attacks. 
+\item[\textbf{Reliability}]implies that the system should not behave unexpectedly because of its FFI layer(s).
+\item[\textbf{Safety}] implies that multi-threaded execution is safe. This property has been studied extensively but only for uni-language systems and is not relevant for FFI. Commonly, safety issues involve deadlocks and race conditions, synchronization in threads, and data integrity. While the present thesis does not investigate multi-threading, it is important to stress that it is a core issue in FFI safety.
+\item[\textbf{Performance}] Performance issues are mostly related to poor memory management (memory leaks, dangling pointers...)
+\end{description}
+
+However, independently of quality metrics, calling external code is inherently dangerous (Mergendahl \etal\,\cite{mergendahl_cross-language_2022} and Li \etal\,\cite{li_detecting_2022}). Intuitively, calling foreign code that does not present the same guarantees as a safe language should be considered dangerous. But according to the existing literature, simply the fact that our code \textbf{is} multi-language makes it dangerous, independently of which languages are bound together, even if called languages offer many guarantees. It depends on the assumption.
+
+\subsection{A new cross-language paradigm for the programmer}
+
+Li\,\cite{li_improving_2014} stresses why using \glsxtrshort{FFI} is an error-prone process for the programmer. From the human perspective, it is not only expected to reason in their own language but across different languages. Some differences are straightforward, such as  type system, semantics, and syntax while some are more subtle, such as exceptions or error handling, or memory management. All of a sudden, the programmer needs to understand the nuances and complex inter-connectivity of programming languages, as well as the context that allows the apparition of specific bugs.
+
+In a safe language such as Rust, programmers may misuse the \texttt{unsafe} abilities that are provided to them (Li \etal\,\cite{li_detecting_2022}), while any mistake at the FFI layer may corrupt Rust safety, an issue stressed by Evans \etal\,\cite{evans_is_2020}.
+
+In other words, FFI are challenging, not only when it comes to identifying bug patterns but also in establishing solutions. In addition, programmers (and researchers) must now reason about single-language components in a multi-language context. 
+For example, Java programmers tend to avoid reasoning about code interleaving and can consider native methods as black boxes\,\cite{li_improving_2014}. 
+The complexity is accrued by the general lack of experience in FFI and the lack of empirical or experimental research. From the programmer and researcher side, it requires keen knowledge and comfort with both the foreign and host languages, in particular within exception and error handling, memory, type system, and thread models, as well as a deep understanding FFI interactions and the 
+impact that the technique itself may have during those interactions.  In other words, FFI errors are one of the most significant causes behind memory-safety bugs in existing code bases\,\cite{li_improving_2014, patterson_linking_2017}.
+
+\subsection{Issues from the compiler perspective}
+
+While managing \glsxtrshort{FFI} is challenging from the human perspective, it is also not trivial for a compiler. While writing code, programmers add annotations that are an additional source for the compiler. Richer linking types are beneficial as a source of information\,\cite{patterson_linking_2017}. Mergendahl \etal\,\cite{mergendahl_cross-language_2022} also illustrate how it is inherently unsafe to use FFI in Rust. Even if Rust has rules, such as a warning that the programmer should avoid using dynamically-sized types, it still authorizes sending arbitrary data and pointers across the language barrier \footnote{just to be clear, this rule is not forcefully implemented. The compiler warns but does not prevent compilation. Sending dynamically-sized data is de facto possible}. 
+And when communicating with C, this requires the \texttt{unsafe} keyword, which indicates to the compiler that the programmer is taking responsibility from the compiler to ensure that this part of the code is correct.
+
+Additionally, Mergendahl \etal stress another aspect, namely the difference between intended/unintended interactions. Their work focuses on intended interactions, but they remind us that unintended interactions are also possible within multi-language applications sharing a heap and an address space. In other words, a new class of bugs not yet discovered await the unsuspecting programmer, which the authors leave as future work\,\cite{mergendahl_cross-language_2022}.
+
+\subsection{FFI introduces a new class of bugs}
+
+Bugs introduced by \glsxtrshort{FFI} are not straightforward (Li\,\cite{li_improving_2014}). They are subtle, and the lack of previous experience and tools introduces additional complexity. There is very little empirical or experimental research systematically identifying FFI bugs\footnote{At the time of writing in 2014, but other authors do not mention a strong body of research.}.
+
+On the contrary, Li insists that the search for bug patterns particular to FFI has just begun. This search focuses on a small set of problems that concern a minority of software quality issues --- while some bugs are completely unique. This is also a point confirmed by Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, as well as Li \etal\,\cite{li_detecting_2022}.
+
+Work on Rust FFI is closely related to research done on \glsxtrshort{JNI} (Mergendahl \etal\,\cite{mergendahl_cross-language_2022}). Without entering into too many details unrelated to this thesis, one pattern causing vulnerabilities is the mishandled Java exceptions. At the time of writing (2014), this bug pattern was considered unique (Li\,\cite{li_improving_2014}), but not unique to JNI. This pattern concerned any language which allowed exceptions thrown by native components\,\cite{li_improving_2014}. Rust is known for its rich error handling management (distinguishing recoverable vs. unrecoverable errors, error propagation) and how Rust errors can be propagated to SPARK through FFI is a relevant question in the frame of this thesis. 
+\subsection{Cross-Language Attacks}
+
+When going further from \emph{mere} memory unsafety to the actual act of exploitation, Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, emphasize how incompatible assumptions on different sides of the \glsxtrshort{FFI} permit attacks that are impossible in a single language context. The authors mean that the gradual integration of additional safe languages in an unsafe code base, which was assumed to improve the code base safety was in fact a problem. By doing so, the authors add a new vector of attack to the current knowledge on security, the \gls{CLA} vector. They demonstrate that the mere idea of ``incrementally hardening memory unsafe code with memory safe code can have serious flaws—beyond C/C++ hardening bypasses—if not handled properly"\,\cite{mergendahl_cross-language_2022}.
+
+Although Rust and other safe programming languages, such as Go and Swift, are announced as being the best chance for safe software Mergendahl \etal show several examples of how exploitation is possible because of the combination of safe and unsafe languages. Furthermore, since exploitation in unsafe languages without protection are ``trivial"\,\cite{mergendahl_cross-language_2022}, the authors focus on the case where  \glsxtrshort{FFI} is bridging unsafe code with \textit{some} protection, and safe code. 
+
+
+In Mergendahl \etal model \glsxtrshort{CLA} starts in a safe language (Rust), where memory safety is guaranteed. The control flow is transferred to the unsafe language to proceed to the memory corruption (where hardened C with \gls{CFI} ensures that control-flow hijacking is made impossible). The application transfer back to the safe language to execute the gadget. In summary, the unsafe language assumes [\ldots\ ] hardening (control flow integrity), which prevents control hijacking, while the safe language assumes the program is free of corruption.
+
+The authors insist that their model while focusing on Rust and C++ for simplicity, can generalize to other safe languages. It is natural to wonder how it can generalize between safe languages such as SPARK and Rust. In their conclusions, Mergendahl \etal note that they believe their model applies to Rust and Go. Those two safe languages have different strategies around memory safety --- that is lifetime management and garbage collection. If a system combining both disagree, double frees and use after frees are still possible, which opens the door to other non-obvious vulnerabilities\,\cite{mergendahl_cross-language_2022}.
+
+Mergendahl \etal successfully illustrate that any FFI established without ``extreme care"\cite{mergendahl_cross-language_2022} can lead to artfully crafted exploits, where the classic control-flow hijacking was impossible before. They show that the thread model for a multi-language application is the ``union of the threat models of the constituent languages"\cite{mergendahl_cross-language_2022}. Does this bring the state of knowledge to where we were with C/C++, where the programmer was responsible for securing the program?
+
+\section{Summary}
+
+Ensuring software security can be challenging, even in languages with strong safety guarantees. One reason is that dependencies can introduce potential vulnerabilities, and another reason is that programmers can still call unsafe code. However, the SPARK is formally verified, and the Rust community is actively working towards formal verification as well. Adhering to established guidelines and specifications is the first step to ensuring security.
+
+Multi-language applications with \glsxtrshort{FFI} open new vectors of attacks and resuscitate old vulnerabilities. This is still true when combining two safe languages with different memory assumptions. 
+There is ongoing research around FFI, as it is a complicated subject for the programmer and the compiler. In addition, debugging FFI software is a complex and uncharted territory. The most effective tool is static analysis\,\cite{li_improving_2014}, which requires expertise from the programmer.
+This reinforces the need for safe guidelines when building multi-language applications.
+
+
+\cleardoublepage
+\chapter{Method}
+\todoinline{Choose possible title later, for example, "Method: Experiments and Real-world implementation"}
+
+\label{ch:methods}
+%\sweExpl{Metod eller Metodval}
+%\generalExpl{This chapter is about Engineering-related  content, Methodologies and Methods.  Use a self-explaining title.\\The  contents and structure of this chapter change with your choice of  methodology and methods.}
+
+
+%\generalExpl{Describe the engineering-related contents (preferably with models) and the research methodology and methods that are used in the degree project.\\
+%Give a theoretical description of the scientific or engineering methodology  you are going to use and why have you chosen this method. What other methods did you consider and why did you reject them?\\
+%In this chapter, you describe what engineering-related and scientific skills you are going to apply, such as modeling, analyzing, developing, and evaluating engineering-related and scientific content. The choice of these methods should be appropriate for the problem. Additionally, you should be conscious of aspects relating to society and ethics (if applicable). The choices should also reflect your goals and what you (or someone else) should be able to do as a result of your solution --- which could not be done well before you started.}
+
+
+\begin{comment}
+(1) Vilken process skall användas för konstruktion av lösningen och vilken process skall kopplas till denna för att svara på undersökningsfrågan?\\
+(2) Hur och vilket resultat (storheter) skall presenteras både för att redovisa svar på undersökningsfrågan (resultatkapitlet i denna rapport) och redovisa resultat av problemlösningen (prototypen, ofta dokument som bilagor men vilka dokument och varför?).\\
+(3) Vilken teori/teknik skall väljas och användas både för undersökningen (taxonomi, matematik, grafer, storheter mm)  och  problemlösning (UML, UseCases, Java mm) och varför?\\
+(4) Vad behöver du som student leverera för att uppnå hög kvaliet (minimikrav) eller mycket hög kvalitet på examensarbetet?\\
+(5) Frågorna kopplar till de följande underkapitlen.\\
+(6) Resonemanget bygger på att studenter på hing-programmet ofta skall konstruera något åt problemägaren och att man till detta måste koppla en intressant ingenjörsfråga. Det finns hela tiden en dualism mellan dessa aspekter i exjobbet.
+\end{comment}
+
+This chapter provides an overview of the research and experimentation method. Section~\ref{sec:researchProcess} describes the research process. Section~\ref{sec:researchParadigm} details the research paradigm. 
+Section~\ref{sec:dataCollection} explains the selection of data types for the control studies. Section~\ref{sec:experimentalDesign}
+describes the experimental design. Finally, Section~\ref{sec:systemDocumentation}
+describes the system to ensure reproducibility.
+\todoinline{I will need to add a section to detail the experiments on BBQueue later when it comes to that.}
+\section{Research Process}
+\label{sec:researchProcess}
+
+Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project. 
+
+%https://tex.stackexchange.com/questions/116621/tikz-flow-chart-questions
+
+\begin{figure}[ht!]
+    \centering
+    \begin{tikzpicture}
+    [node distance=.8cm,
+    start chain=going below,
+    tuborg/.style={decorate, decoration={brace, amplitude=3pt}, line width=1mm},
+    tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
+    ]
+    % group 1
+         \node[punktchain, join, draw=black, fill=red!40!white
+         %fill=black!15
+         ] (lit){Litterature study};
+         \node[punktchain, join, draw=black, 
+         fill=red!40!white
+         %fill=black!15
+         ] (consult){Consultation with experts};
+         \node[punktchain, join, draw=black, 
+         %fill=black!15
+         fill=red!40!white
+         ] (scope){Scope limitation};  
+    % group 2
+         \node[punktchain, join, draw=black, 
+         %fill=black!25
+         fill=yellow!50!white
+         ] (typselec){Type selection};
+         \node[punktchain, join, draw=black, 
+         %fill=black!25
+         fill=yellow!50!white
+         ] (stats){Statistics};
+    % group 3
+         \node[punktchain, join, draw=black, 
+         %fill=black!35
+         fill=brown!50!white
+         ] (cs){Control studies};
+         \node[punktchain, join, draw=black, 
+         %fill=black!35
+         fill=brown!50!white
+         ] (analys){Analysis};   
+         \node[punktchain, join, draw=black, 
+         %fill=black!35
+         fill=brown!50!white
+         ] (memver){Verification of correctness};   
+    % group 4
+         \node[punktchain, join, draw=black, 
+         %fill=black!45
+         fill=orange
+         ] (bbq){BBQueue implementation};
+    %% No. 1
+    \draw[tuborg, decoration={brace}] let \p1=(lit.north), \p2=(scope.south) in
+        ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Preparation};
+    %% No. 2
+    \draw[tuborg, decoration={brace}] let \p1=(typselec.north), \p2=(stats.south) in
+        ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Types selection};
+    %% No. 3
+    \draw[tuborg, decoration={brace}] let \p1=(cs.north), \p2=(memver.south) in
+        ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Control studies};
+    %% No. 4
+    \draw[tuborg, decoration={brace}] let \p1=(bbq.north), \p2=(bbq.south) in
+        ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Real-world \\ implementation};
+    \end{tikzpicture}
+  \caption{Research Process}
+  \label{fig:researchprocess}
+\end{figure}
+\FloatBarrier
+
+The process is constituted of four steps:
+
+\begin{enumerate}[leftmargin=*, label=\textbf{Step \arabic*}, ref=Step \arabic*] %labelindent=1em for indent
+    \itemsep0em
+    \item \label{x:s1} Preparation: planning the experiments and delimiting the scope, including setting all appropriate tooling and environment for both Rust and SPARK ecosystems,
+    \item \label{x:s2} Type selection: choosing data types for control studies,
+    \item \label{x:s3} Control studies: perform the control studies, and
+    \item \label{x:s4} Application: apply the learning from the control studies in a real-world setting.
+\end{enumerate}
+
+
+\section{Research Paradigm}
+\label{sec:researchParadigm}
+
+Three paradigms are used. 
+
+Firstly, this project is hypothesis-driven. The hypothesis is that the internal coherency of both languages can be maintained if we can provide
+recommendations for the safe use of combined Rust/SPARK code, and this is a hypothesis that we strive to confirm.
+
+
+Secondly, the qualitative research paradigm is applied when carefully selecting data types that allow the exploration of safe bindings.
+
+
+Thirdly, the empirical research paradigm is also used. After guidelines are established through control studies, an applied experiment consists of following said guidelines to a larger code base. This step is appropriate as this is an experiment with real-life setting, and bugs and errors are expected to arise. This experiment is relevant as it is a first step in reproducibility and generalization.
+
+\todoinline{Add a short discussion on the sustainability of code, use the AWS source that speaks of Rust as an example.}
+
+\section{Choice of datatypes for control studies}
+\label{sec:dataCollection}
+
+The data types selected are series of stack and heap objects. 
+
+The choice can be justified with a statistical tool that shows which types are widely used in Rust and SPARK projects (\cref{sec:stats}).
+
+\subsection{Statistic tool}
+\label{sec:stats}
+We created a program analyzing 17 code bases in Rust, including the Rust compiler, and three open-source code bases in SPARK. 
+%\inlinecode{x=2}
+
+
+\todoinline{make a friendly README for the stat repo and link it, link it also at the end}
+
+\todoinline{new research question: how can we select useful types? 
+possible reply: it seems to be scalar types and pointers are widely used in both languages}
+
+The program counts occurrences of different patterns with Regex in the code bases, including numbers, arrays, references, strings, and various heap-allocated types. 
+
+\texttt{cloc 1.9} counted 26,137 Rust files (1,792 k\gls{LOC}) in popular and qualitative Rust repositories.
+
+It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
+
+\subsection{Reliability and validity of the statistics}
+
+The data is collected via file parsing and \texttt{Regex} patterns. 
+
+One source of error can be that some data types can be in comments instead of code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
+
+When it comes to Rust mutable and immutable references, and admittedly references can point at any data structure. But in the experiments references are used to study how ownership is transmitted, rather than a data type in its own rights. The presence of many \inlinecode{\&mut T} and \inlinecode{\&T}, as well as \inlinecode{Access} types in SPARK, shows that we need to study references and pointers.
+
+The most significant threat to the validity of the statistics is that large SPARK code bases are proprietary, forcing us to operate statistical analysis on small OSS projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). Besides, SPARK has a long industrial track record. It is used in many industrial
+applications, including air traffic, avionics, railways \etc. It is based on Ada, which is general-purpose and based on the classical stack model. Being used in industrial applications, one can assume safely that effectivity is a concern to SPARK programmers\,\cite{chapman_adacore_2018}.
+\subsection{Rust}
+
+Rust is an open-source project with open crates (libraries). To perform the statistics below, the most popular crates were selected on Rust's official pages for crates, \href{crates.io}{crates.io}. Those crates are mostly used in the compiler, and for this reason, we selected popular projects on \href{lib.rs}{lib.rs} to analyze what programmers are actively using in production\footnote{Lib.rs utilizes a ranking algorithm that offers more qualitative information than crates.io, filtering away spam and poor-quality projects. The crate popularity is measured by downloads, direct and reverse dependencies, the usage trend, quality of README, tests, comments documentation, examples, and whether the crate is actively maintained}.
+Thirdly, the compiler, with a code base over 5 times bigger than the two projects above, was also deemed relevant for statistics.
+
+
+\begin{table}[htbp]
+\centering
+\caption{crates.io}
+\label{tab:crates_io}
+\begin{tabular}{ |m{3cm}|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\hline
+\rowcolor{brown!50!white}
+\multicolumn{4}{|c|}{Most popular crates.io projects 171 kLOC} \\
+\hline
+\hline
+\rowcolor{orange!50}
+Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time (in millions)\\
+\hline
+libc & Raw FFI bindings to platform libraries like libc & v0.2 (5,200) & 177 \\
+\hline
+syn & Parser for Rust source code & v1.0 (5,501) & 191 \\
+\hline
+rand and rand-core & Random number generators and other randomness functionality & v0.8 (9,892) & 183 \\
+\hline
+quote & Macro for turning Rust syntax tree data structures into tokens of source code & v1.0 (5,498) & 177 \\
+\hline
+cfg\-if & Ergonomically defines an item depending on a large number of \#[cfg]  & v1.0 (1,147) & 175 \\
+\hline
+procmacro2 & A substitute implementation of the compiler's proc\_macro API & v1.0 (4,538) & 176 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{Most popular projects on lib.rs 102 kLOC}
+\label{tab:lib}
+\begin{tabular}{ |m{3cm}|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\hline
+\rowcolor{brown!50!white}
+\multicolumn{4}{|c|}{lib.rs} \\
+\hline
+\hline
+\rowcolor{orange!50}
+Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time (in millions)\\
+\hline
+    serde & Framework for serializing and deserializing & v1.0 (24,754) & 151  \\
+    \hline
+    serde-json &  A JSON serialization file format  & v1.0 (16,488) & 126   \\
+    \hline
+    clap & Command line args parser & v4.1 (10,201) & 106  \\ 
+    \hline
+    log &  A lightweight logging facade for Rust  & v0.4 (12,158) &  135  \\ 
+    \hline
+    thiserror &  Error handler  & v1.0 (9,010) &   83  \\ 
+    \hline
+    tokio &  Non-blocking platform for asynchronous I/O backed applications & v1.26 (11,583) & 89 \\
+\hline
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\subsection{Results}
+
+When looking at types per project, we can see that the rust compiler is much bigger \cref{fig:barplottypesrust}, for comparison, we have 102 k\gls{LOC} for lib.rs,  171 kLOC for crates.io and 1,518 kLOC in the rust compiler, but the repartition is quite similar with a domination of numbers \cref{fig:barplottypesrustpercent}. 
+
+But as we can see, numbers (Integers and Float) dominate the statistics \cref{fig:repartitionrust}. 
+
+Their size is known at compile time, they are expressive and protected against overflow\footnote{The compiler will warn against risks of overflow}. 
+
+This confirms that Rust is used as a low-level, systems programming language. 
+
+Coming second are \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system and are used in a fourth of the cases. Logically, heap types account for a minority of types.
+
+\pgfplotstableread{
+Rust_type rustc crates_io lib_rs
+Numbers 299472 44688 12680
+Refs 137439 12662 7140
+Arrays 9266 1893 130
+Vec 14254 397 977
+Enum 14890 602 1162
+Struct 48106 4704 2428
+String 18540 445 1140
+}\EXPDATA 
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            %title={Rust data types per project},
+            cycle list name=rustcolors,
+            xtick=data,
+            symbolic x coords={Numbers,Struct,String,Refs, Arrays,Vec,Enum},
+            ybar,
+            legend style={at={(0.5,-0.2)},anchor=north},
+            ymajorgrids=true,
+            grid style=dashed,
+            ymode=log,
+            width=1\textwidth,
+            ylabel=Absolut number of types,
+            ]
+          \addplot table [x=Rust_type, y=rustc]{\EXPDATA} ;
+          \addplot table [x=Rust_type, y=crates_io]{\EXPDATA} ;
+          \addplot table [x=Rust_type, y=lib_rs]{\EXPDATA} ;
+        \legend{rustc (1518 kLOC), crates.io (171 kLOC), lib.rs (102 kLOC)}
+        \end{axis}  
+    \end{tikzpicture}
+\caption{Rust data types per project}
+\label{fig:barplottypesrust}
+\end{figure}
+%https://tex.stackexchange.com/questions/188147/how-to-put-legend-below-the-chart
+
+\pgfplotstableread{
+Rust_type rustc crates_io lib_rs
+Numbers 54.56 68.17 49.17
+Refs 25.04 19.32 27.69
+Struct 8.76 9.42 7.18
+}\PERCENTDATA
+
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            %title={Rust data types per project},
+            cycle list name=rustcolors,
+            xtick=data,
+            symbolic x coords={Numbers,Refs, Struct},
+            ybar,
+            legend style={at={(0.5,-0.2)},anchor=north},
+            ymajorgrids=true,
+            grid style=dashed,
+            ylabel=Percentage,
+            ]
+          \addplot table [x=Rust_type, y=rustc]{\PERCENTDATA} ;
+          \addplot table [x=Rust_type, y=crates_io]{\PERCENTDATA} ;
+          \addplot table [x=Rust_type, y=lib_rs]{\PERCENTDATA} ;
+        \legend{rustc, crates.io, lib.rs}
+        \end{axis}  
+    \end{tikzpicture}
+\caption{Rust types repartition for the compilers, crates.io and lib.rs (percentage)}
+\label{fig:barplottypesrustpercent}
+\end{figure}
+\makeatletter
+\let\stripatpt\strip@pt
+\makeatother
+\begin{figure}[ht!]
+  \centering
+\begin{tikzpicture}[scale=3]
+\centering    
+
+%Total number of types: 646633
+%key : Number, value : 361986, percentage 0.5598
+%key : Array, value : 11314, percentage 0.0175
+%key : Struct, value : 56087, percentage 0.0867
+%key : &T or &mut T, value : 157332, percentage 0.2433
+%key : Box/Rc/Arc, value : 7260, percentage 0.0112
+%key : String, value : 20198, percentage 0.0312
+%key : Vec, value : 15652, percentage 0.0242
+%key : Enum, value : 16804, percentage 0.0260
+
+\newlength\lena
+\newlength\lenb
+  {black,fill=gray,mark=none}
+\foreach \p/\t/\c in {56.0/Numbers/red!40!white, 24.3/ Refs/yellow!50!white, 11.3/Struct\&Enum/brown!50!white, 8.38/others (heap)/orange}
+  {
+    \global\lena=\lenb
+    \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
+
+    \edef\numbera{\stripatpt\lena}
+    \edef\numberb{\stripatpt\lenb}
+
+    \slice{\numbera/100*360}
+          {\numberb/100*360}
+          {\p\%}{\t}
+          {\c}
+          %{black!\p}
+  }
+\end{tikzpicture}
+  \caption{Rust types repartition for all Rust projects}
+  \label{fig:repartitionrust}
+\end{figure}
+\FloatBarrier
+
+%\begin{table}[ht!]
+%  \centering
+%  \caption{Rust Types Data}
+%    \begin{tabular}{|l|r|r|}
+%   \hline
+%    Rust Type & Frequency of Use & Percentage \\
+%    \hline
+%    Numbers & 362,648 & 56.20\% \\
+%    \&mut T or \&T & 155,911 & 24.16\% \\
+%    struct & 55,716 & 8.68\% \\
+%    enum & 16,677 & 2.58\% \\
+%    Vec & 15,613 & 2.46\% \\
+%    Array & 11,418 & 1.77\% \\
+%    String & 20,012 & 3.10\% \\
+%    Box/Arc/Rc & 7,217 & 1.12\% \\
+%    \hline
+%    Total & 654,124 & 100.00\% \\
+%    \hline
+%    \end{tabular}%
+%  \label{tab:rust_types}%
+%\end{table}%
+\FloatBarrier
+
+\subsection{SPARK}
+
+
+Most SPARK large code bases are proprietary. It is therefore difficult to run statistics on a representative code base. From expert opinion (Moy, in direct conversation) and our statistics, similar types to Rust types are appropriate for the control studies, as SPARK and Rust are used in similar contexts.
+
+The statistics were made on three open-source repositories. 
+We checked a total number of 504 files and a total of 27 k\gls{LOC}.
+
+
+\begin{itemize}
+    \item \textbf{SPARKNaCl}, a cryptography library that implements the same functionality as the NaCl (a networking crypto library), which aims to provide a completely automated static proof of type-safety.
+    \item \textbf{EwoK}, a secure microkernel designed for micro-controllers and embedded systems that enforces strict isolation between tasks and device drivers, and provides strong access control to physical resources. 
+    \item \textbf{SPARK by example}, a repository with exercises to practice the language
+\end{itemize}
+
+
+\begin{figure}[ht!]
+  \centering
+\begin{tikzpicture}[scale=3]
+\centering    
+
+%Total number of types : 2695
+%key : Record, value : 310, percentage 0.1150
+%key : Number, value : 1397, percentage 0.5184
+%key : Enum, value : 86, percentage 0.0319
+%key : Unconstrained array, value : 28, percentage 0.0104
+%key : Access, value : 873, percentage 0.3239
+%key : Unbounded strings, value : 1, percentage 0.0004
+
+\foreach \p/\t\c in {51.8/Numbers/red!40!white, 32.4/Access/yellow!50!white, 14.6/Record\&Enum/brown!50!white, 1.6/others(1.6\%)/orange}
+  {
+   \pgfmathtruncatemacro\intp{\p}
+
+    \global\lena=\lenb
+    \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
+
+    \edef\numbera{\stripatpt\lena}
+    \edef\numberb{\stripatpt\lenb}
+
+    \ifthenelse{\intp<2}{
+    \slice{\numbera/100*360}
+          {\numberb/100*360}
+          {}{\t}
+          {\c}
+          %{black!\p}
+   }{
+    \slice{\numbera/100*360}
+          {\numberb/100*360}
+          {\p\%}{\t}
+          {\c}
+          %{black!\p}
+    }
+  }
+\end{tikzpicture}
+  \caption{SPARK types repartition}
+  \label{fig:repartition_spark}
+\end{figure}
+\FloatBarrier
+
+
+
+\section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
+\label{sec:experimentalDesign}
+The control studies will be centered around:
+\begin{itemize}
+    \item Stack objects and scalars: numbers, arrays, enums, and structs (with objects size known at compile time).
+    \item Heap objects: dynamic types such as Vec.
+\end{itemize}
+
+The focus will be on \texttt{\&mut T} and \texttt{\&T}, as well as the \texttt{Access} types, to keep or transmit ownership.
+
+\todoinline{Describe more the BBQueue test when we come to that}
+
+\subsection{Environment}
+
+\todoinline{Describe briefly the Dockerfile and link to the repo}
+
+\subsection{Hardware/Software to be used}
+
+\todoinline{Describe my settings}
+
+
+\subsection{Validity of method}
+\label{sec:validtyOfMethod}
+
+The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that are applicable to an automated tool for bindings on the model of \texttt{bindgen}\,\cite{noauthor_bindgen_2022}. 
+
+As a reminder, bindgen is a binding tool that generates bindings between Rust and C. The languages analyzed in this thesis have richer types than C, and the goal is to learn to take full advantage of their expressivity.
+
+The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. It is necessary to establish that ownership, type safety, and memory safety are conserved for a binding to be considered correct.
+
+This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
+Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
+Control study programs can provide a foundation for automatic tooling.
+
+When the control studies are performed, an additional experiment is executed with a library that exists in both languages.
+
+
+\subsection{Software Tools}
+%\label{sec:softwareTools}
+%\sweExpl{Mjukvaruverktyg}
+
+Linking is always a major problem in this kind of project.
+
+From SPARK to rust I used direct linking with memory sanitizer at the gcc level or rustc level.
+From Rust to SPARK I was lucky enough to use a more advanced tool that has its own build script.
+
+\todoinline{Describe the above}
+
+
+\todoinline{Add valgring and flags}
+\section{System documentation}
+\label{sec:systemDocumentation}
+%\sweExpl{Systemdokumentation\\
+%Med vilka dokument och hur skall en konstruerad prototyp dokumenteras? Detta blir ofta bilagor till rapporten och det som problemägaren till det ursprungliga problemet (industrin) ofta vill ha.\\
+%Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
+%\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
+
+\todoinline{Link to the different github repos with description of what they do including stats, do the README to be more friendly}
+
+%gpr-rust
+
+%statistic code
+
+%control study
+\cleardoublepage
+\chapter{What you did}\engExpl{Choose your own chapter title to describe this}
+\label{ch:whatYouDid}
+\sweExpl{[Vad gjorde du? Hur gick det till? – Välj lämplig rubrik (“Genomförande”, “Konstruktion”, ”Utveckling”  eller annat]}
+
+
+\engExpl{What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?}
+\sweExpl{Vad du har gjort? Hur gjorde du det? Vilka designval gjorde du?\\
+Hur kom det du hjälpte dig att uppnå dina mål?}
+
+% the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
+\section[Hardware/Software design \ldots\ /Model/Simulation model \& parameters/\ldots]{Hardware/Software design\ldots\ /Model/Simulation model \& parameters \ldots}
+\sweExpl{Hårdvara / Mjukvarudesign \ldots\  / modell / Simuleringsmodell och parametrar / \ldots\ }
+
+Figure~\ref{fig:homepageicon} shows a simple icon for a home page. The time
+to access this page when served is quantified in a series of
+experiments. The configurations that have been tested in the test bed are
+listed in Table~\ref{tab:configstested}. In \SI{7.0}{\percent} of cases, there was an error indicating xxxxx.
+
+\sweExpl{Figur~\ref{fig:homepageicon}  visar en enkel ikon för en hemsida. Tiden för att få tillgång till den här sidan när den laddas kommer att kvantifieras i en serie experiment. De konfigurationer som har testats i provbänk listas ini tabell~\ref{tab:configstested}.\\
+Vad du har gjort? Hur gjorde du det? Vilka designval gjorde du?}
+ 
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.25\textwidth]{figures/Homepage-icon.png}
+  \end{center}
+  \caption{Homepage icon}
+  \label{fig:homepageicon}
+\end{figure}
+
+\begin{table}[!ht]
+  \begin{center}
+    \caption{Configurations tested}
+    \label{tab:configstested}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{l|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Configuration} & \textbf{Description} \\
+      \hline
+      1 & Simple test with one server\\
+      2 & Simple test with one server\\
+    \end{tabular}
+    }
+  \end{center}
+\end{table}
+\sweExpl{Testade konfigurationer}
+\section{Numbers analysis}
+
+
+What are the strong and weak points of Rust and Ada and how do we work around them:
+
+
+Rust
+Sized types u64 etc
+
+Ada
+Modular type
+Bounded types
+
+
+SwapAda
+	Description: swapping two integers in a Rust library
+Adder	
+	Description: Adding to integers in a Swap program
+
+List of assumptions and discussion:
+Assumptions of the Rust program for Ada
+1. It is going to be an i32 integer --> Integer on the Ada side
+2. We don't know the size of the Integer in Ada. `usize` and `isize` (that used to be called int, dependent on the machine) may be `Integer` in ada? Needs to be clarified
+3. We are not using `usize` and `isize` as ``The size of this primitive is how many bytes it takes to reference any location in memory." --> they are not meant for calculation but for indexing
+4. In Rust we should use sized type for calculation, but semantically = Integer\_ada are machine dependent numbers// Rust they are not machine dependent
+5. We should always use specific type sizes. Are there Ada libraries that give you scoped sizes? Like `u64`?
+6. Remember it was a huge problem before: for example C's is using machine-dependent types
+That was a huge problem before, Ada has 32 bits integers! The legality rules say that the Ada Integer size is between Min and Max of what the machine supports\url{https://ada-lang.io/docs/arm/AA-3/AA-3.5/#legality-rules-1}: 
+
+From that, we see that GNAT provides also some references\url{https://docs.adacore.com/live/wave/gnat_rm/html/gnat_rm/gnat_rm/implementation_defined_characteristics.html#implementation-defined-characteristics}
+
+7. What is happening
+
+8. What can happen:
+
+
+9. Recommendations:
+I expect the GNAT compiler to be used
+I expect that sized types to be used
+For constrained Integers the following must be done: …
+For modular Integers the following must be done: …
+
+
+
+\section{Implementation \ldots\ /Modeling/Simulation/\ldots\ }
+\label{sec:implementationDetails}
+\sweExpl{Implementering \ldots\  / modellering / simulering / \ldots\ }
+
+Two commonly used simulators are:
+\begin{description}[labelwidth =\widthof{\textbf{ns-2 or ns-3 simulator}}, leftmargin = !]
+    \item[\textbf{Mininet}] This simulator uses traffic control (\texttt{tc}) to simulate network devices connected by links with specific bandwidth, packet loss rates, qdisc methods, etc.
+    
+    
+    \item[\textbf{ns-2 or ns-3 simulator}] These simulators are very useful for simulating wireless communication links between moving devices. You can specify the mobility patterns of the nodes.
+\end{description}
+
+\subsection{Some examples of coding}
+%\engExpl{This section is simply to show some example of how you can include code in your thesis - this is not a section you would have in your thesis.}
+%\sweExpl{Det här avsnittet är helt enkelt för att visa ett exempel på hur du kan inkludera kod i ditt examensarbete - det här är inte ett avsnitt du skulle ha i ditt examensarbete.}
+
+
+
+
+In contrast, Listing~\ref{lst:programmes} is an example of code in Python to
+get a list of all of the programs at KTH.
+
+\lstset{extendedchars=true}  %% This allows characters codes in the range 128-255
+\begin{lstlisting}[language={Python}, caption={Using a python program to
+    access the KTH API to get all of the programs at KTH}, label=lst:programmes]
+KOPPSbaseUrl = 'https://www.kth.se'
+
+def v1_get_programmes():
+    global Verbose_Flag
+    #
+    # Use the KOPPS API to get the data
+    # note that this returns XML
+    url = "{0}/api/kopps/v1/programme".format(KOPPSbaseUrl)
+    if Verbose_Flag:
+        print("url: " + url)
+    #
+    r = requests.get(url)
+    if Verbose_Flag:
+        print("result of getting v1 programme: {}".format(r.text))
+    #
+    if r.status_code == requests.codes.ok:
+        return r.text           # simply return the XML
+    #
+    return None
+\end{lstlisting}
+\FloatBarrier
+
+\subsection{Some examples of figures in tikz}
+%\engExpl{This section is simply to show some example of how you can draw your own figures for in your thesis - this is not a section you would have in your thesis.}
+\sweExpl{Det här avsnittet är helt enkelt för att visa ett exempel på hur du kan rita dina egna figurer i ditt examensarbete – det här är inte ett avsnitt du skulle ha i ditt examensarbete.}
+
+These figures are just some examples to show that you can draw your own figures for in your thesis. This has two advantages: \first you do not have to worry about copyrights -- as these are your own figures and \Second the text is now readable and not simply a picture of text -- so screen readers can read the figure's contents to someone who is listening to the contents of your thesis.
+
+\subsubsection{Azure's Form Recognizer}
+\Cref{fig:processAnInvoice} shows the processing of key-value extraction from a PDF document using Azure's Form Recognizer. 
+
+\tikzset{
+    processBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, font=\sffamily, draw=black, fill=red!20},
+    largeBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=4cm,text centered, draw=black}
+}
+\begin{figure}[!ht]
+\resizebox{1.1\textwidth}{!}{%
+\begin{tikzpicture}
+[align=left,node distance=2cm]
+
+\node (document) [tape,tape bend top=none,draw,font=\sffamily] {PDF\\Document};
+\node (GDM) [processBox,  right=0.5cm of document] {OCR};
+\node (OCRoutput) [largeBox, right=1cm of GDM] {OCR output};
+
+\node (kvp) [tape,tape bend top=none,draw,font=\sffamily, below=0.25cm of OCRoutput.north] {key-value\\pairs};
+\node (entities) [tape,tape bend top=none,draw,font=\sffamily, above=0.35cm of OCRoutput.south] {Entities};
+\node (Manual) [processBox, right=1cm of kvp] {Analyze the extracted\\key-value pairs};
+\draw [-latex](document) --  (GDM);
+\draw [-latex](kvp) --  (Manual);
+\path[ draw
+     , -latex'] let \p1=(GDM.east), \p2=(kvp.west) in (GDM.east) -- +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x2-0.5*\x1, \y2) -- (kvp.west);
+\path[ draw
+     , -latex'] let \p1=(GDM.east), \p2=(kvp.west), \p3=(entities.west) in (GDM.east) --  +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x3-0.5*\x1, \y3) -- (entities.west);
+\end{tikzpicture}
+}
+\caption{The processing of key-value extraction from a PDF document using Azure's Form Recognizer}
+  \label{fig:processAnInvoice}
+\end{figure}
+\FloatBarrier
+\subsubsection{Hyper-V with Containers}
+ \Cref{fig:hyperVcontainers} shows how Hyper-V deals with containers.
+ 
+ \tikzset{
+    container/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
+    containerization/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
+    hypervisor/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=red!20},
+    os/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
+    guestos/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=orange!40},
+    infrastructure/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=green!20},
+    hos/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
+    kernel/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=purple!20},
+    services/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=pink!20]}
+}
+
+\begin{figure}[ht!]
+    \centering
+\resizebox{1\textwidth}{!}{%
+\begin{tikzpicture}
+[align=center,node distance=2cm]
+
+\node (Infrastructure) [infrastructure, text width=13cm, text centered] {Infrastructure};
+\node (OS1) [hos, anchor=north west, align=left, above=1.5cm of Infrastructure.north west, anchor=north west, text width=6cm, text centered] {Host OS};
+
+\node (OS2) [hos, anchor= west, align=left, right=0.5cm of OS1.east, text width=6cm, anchor= west, text centered] {Host OS};
+
+\node (Kernel1) [kernel, anchor=north west, align=left, above=1.5cm of OS1.north east, anchor=north east, text width=3cm, text centered] {Kernel};
+
+\node (Kernel2) [kernel, anchor=north west, align=left, above=1.5cm of OS2.north east, anchor=north east, text width=3cm, text centered] {Kernel};
+
+\node (ServiceA) [container, anchor=east, above=1 cm of Kernel1.east, anchor=east] {Services};
+\node (AppA) [container,  left=0.25cm of ServiceA] {App 1};
+
+\node (ServiceB) [container, anchor=east, above=1 cm of Kernel2.east, anchor=east] {Services};
+\node (AppB) [container,  left=0.25cm of ServiceB] {App 2};
+%\node (AppC) [container,  right=0.25cm of AppB] {App 3};
+
+\draw[black,thick,dashed] ($(OS2.north west)+(-0.3,3.75)$)  rectangle ($(OS2.south east)+(0.5,-0.3)$);
+\node[text width=5cm, text=red, above=0.1cm of ServiceB] 
+    {\textbf{Container}};
+
+\draw[red,thick,dotted] ($(Kernel2.north west)+(-0.3,1.6)$)  rectangle ($(Kernel2.south east)+(0.3,-0.3)$);
+\node[text width=5cm, text=black, above=0.8cm of ServiceB] 
+    {\textbf{VM}};
+\end{tikzpicture}
+}
+    \caption{Hyper-V with containers}
+    \label{fig:hyperVcontainers}
+\end{figure}
+\FloatBarrier
+\subsubsection{\glsfmtshort{VM} versus Containers}
+\Cref{fg:vmsVersusContainers} shows a comparison of virtual machines (VMs) versus containers.
+
+\begin{figure*}[ht!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+\resizebox{1\textwidth}{!}{%
+\begin{tikzpicture}
+[align=left,node distance=2cm]
+
+\node (AppA) [container,align=left] {App 1};
+\node (AppB) [container,  right=0.25cm of AppA] {App 2};
+\node (AppC) [container,  right=0.25cm of AppB] {App 3};
+
+\node (GosA) [guestos,align=left,  below=0.25cm of AppA.south west,anchor=north west] {Guest OS};
+\node (GosB) [guestos,  right=0.25cm of GosA] {Guest OS};
+\node (GosC) [guestos,  right=0.25cm of GosB] {Guest OS};
+
+\draw [decoration={brace,amplitude=0.5em},decorate, ultra thick,gray, transform canvas={xshift = 0.5cm}]
+       (AppC.north -| AppC.east) -- (GosC.south -| AppC.east);
+\node[text width=5cm,  right=1cm of GosC.north east] 
+    {\textbf{VMs}};
+
+\node (Hypervisor) [hypervisor, anchor=north west, align=left, below=0.25cm of GosA.south west, anchor=north west, text width=13cm, text centered] {Hypervisor};
+
+\node (OS) [os, anchor=north west, align=left, below=0.25cm of Hypervisor.south west, anchor=north west, text width=13cm, text centered] {Host OS};
+
+\node (Infrastructure) [infrastructure, anchor=north west, align=left, below=0.25cm of OS.south west, anchor=north west, text width=13cm, text centered] {Infrastructure};
+
+
+\end{tikzpicture}
+}
+        \caption{VM}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \resizebox{1\textwidth}{!}{%
+\begin{tikzpicture}
+[align=left,node distance=2cm]
+
+\node (AppA) [container,align=left] {App 1};
+\node (AppB) [container,  right=0.25cm of AppA] {App 2};
+\node (AppC) [container,  right=0.25cm of AppB] {App 3};
+\node[text width=5cm,  right=0.25cm of AppC] 
+    {\textbf{Apps running in Containers}};
+
+
+\node (Containerization) [containerization, anchor=north west, align=left, below=0.25cm of AppA.south west, anchor=north west, text width=13cm, text centered] {Docker Engine};
+
+\node (OS) [os, anchor=north west, align=left, below=0.25cm of Containerization.south west, anchor=north west, text width=13cm, text centered] {Host OS};
+
+\node (Infrastructure) [infrastructure, anchor=north west, align=left, below=0.25cm of OS.south west, anchor=north west, text width=13cm, text centered] {Infrastructure};
+
+
+\end{tikzpicture}
+}
+        \caption{Containers}
+    \end{subfigure}
+    \caption{Virtual machines (VMs) versus Containers}
+    \label{fg:vmsVersusContainers}
+\end{figure*}
+
+\cleardoublepage
+\chapter{Results and Analysis}
+\label{ch:resultsAndAnalysis}
+\sweExpl{svensk: Resultat och Analys}
+
+\engExpl{Sometimes this is split into two chapters.\\Keep in mind: How you are going to evaluate what you have done? What are your metrics?\\Analysis of your data and proposed solution\\Does this meet the goals which you had when you started?}
+
+In this chapter, we present the results and discuss them.
+
+\sweExpl{I detta kapitel presenterar vi resultaten och diskutera dem.\\Ibland delas detta upp i två kapitel.\\Hur du ska utvärdera vad du har gjort? Vad är din statistik?\\Analys av data och föreslagen lösning\\Innebär detta att uppfyllelse av de mål som du hade när du började?}
+
+\section{Major results}
+\sweExpl{Huvudsakliga resultat}
+
+Some statistics of the delay measurements are shown in Table~\ref{tab:delayMeasurements}.
+The delay has been computed from the time the GET request is received until the response is sent.
+
+\sweExpl{Lite statistik av fördröjningsmätningarna visas i Tabell~\ref{tab:delayMeasurements}. Förseningen har beräknats från den tidpunkt då begäran GET tas emot fram till svaret skickas.}
+
+\begin{table}[!ht]
+  \begin{center}
+    \caption{Delay measurement statistics}
+    \label{tab:delayMeasurements}
+    \begin{tabular}{l|S[table-format=4.2]|S[table-format=3.2]} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Configuration} & \textbf{Average delay (ns)} & \textbf{Median delay (ns)}\\
+      \hline
+      1 & 467.35 & 450.10\\
+      2 & 1687.5 & 901.23\\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Table \ref{tab:ping_results} shows the measurement of round trip times from four hosts to and from a server.
+\begin{table}[ht!]
+\caption[RTT for 4 hosts]{Result for the ping measurements of RTT for 4 hosts} 
+\label{tab:ping_results}
+\vspace{1em}
+\centering
+\begin{tabular}{l *{4}{S[table-format=2.3]}}
+{} & \multicolumn{4}{c}{host to server RTT in ms} \\
+\cmidrule{2-5}
+Host & \multicolumn{1}{c}{min}  & \multicolumn{1}{c}{avg} & \multicolumn{1}{c}{max} & \multicolumn{1}{c}{mdev} \\
+\midrule
+h1 & 5.625 & 5.625 & 5.625 & 0.0 \\
+h2 & 2.909 & 2.909 & 1.909 & 0.0 \\
+h3 & 5.007 & 5.007 & 5.007 & 0.0 \\
+h4 & 2.308 & 2.308 & 2.308 & 0.0 \\
+\midrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\sweExpl{Fördröj mätstatistik}
+\sweExpl{Konfiguration | Genomsnittlig fördröjning (ns) | Median fördröjning (ns)}
+
+Figure \ref{fig:processing_vs_payload_length} shows an example of the performance as measured in the experiments.
+
+\begin{figure}[!ht]
+% GNUPLOT: LaTeX picture
+\setlength{\unitlength}{0.240900pt}
+\ifx\plotpoint\undefined\newsavebox{\plotpoint}\fi
+\begin{picture}(1500,900)(0,0)
+\sbox{\plotpoint}{\rule[-0.200pt]{0.400pt}{0.400pt}}%
+\put(171.0,131.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,131){\makebox(0,0)[r]{ 1.5}}
+\put(1419.0,131.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,212.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,212){\makebox(0,0)[r]{ 2}}
+\put(1419.0,212.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,292.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,292){\makebox(0,0)[r]{ 2.5}}
+\put(1419.0,292.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,373.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,373){\makebox(0,0)[r]{ 3}}
+\put(1419.0,373.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,454.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,454){\makebox(0,0)[r]{ 3.5}}
+\put(1419.0,454.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,534.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,534){\makebox(0,0)[r]{ 4}}
+\put(1419.0,534.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,615.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,615){\makebox(0,0)[r]{ 4.5}}
+\put(1419.0,615.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,695.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,695){\makebox(0,0)[r]{ 5}}
+\put(1419.0,695.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,776.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(151,776){\makebox(0,0)[r]{ 5.5}}
+\put(1419.0,776.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(171.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(171,90){\makebox(0,0){ 0}}
+\put(171.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(298.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(298,90){\makebox(0,0){ 10}}
+\put(298.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(425.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(425,90){\makebox(0,0){ 20}}
+\put(425.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(551.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(551,90){\makebox(0,0){ 30}}
+\put(551.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(678.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(678,90){\makebox(0,0){ 40}}
+\put(678.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(805.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(805,90){\makebox(0,0){ 50}}
+\put(805.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(932.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(932,90){\makebox(0,0){ 60}}
+\put(932.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1059.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1059,90){\makebox(0,0){ 70}}
+\put(1059.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1185.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1185,90){\makebox(0,0){ 80}}
+\put(1185.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1312.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1312,90){\makebox(0,0){ 90}}
+\put(1312.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1439,90){\makebox(0,0){ 100}}
+\put(1439.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(171.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
+\put(171.0,131.0){\rule[-0.200pt]{305.461pt}{0.400pt}}
+\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
+\put(171.0,776.0){\rule[-0.200pt]{305.461pt}{0.400pt}}
+\put(30,453){\rotatebox{-270}{\makebox(0,0){Processing time (ms)}}}
+\put(805,29){\makebox(0,0){Payload size (bytes)}}
+\put(868.0,131.0){\rule[-0.200pt]{0.400pt}{84.074pt}}
+\put(995.0,131.0){\rule[-0.200pt]{0.400pt}{98.287pt}}
+\put(1173.0,131.0){\rule[-0.200pt]{0.400pt}{118.041pt}}
+\put(1325.0,131.0){\rule[-0.200pt]{0.400pt}{134.904pt}}
+\put(1350.0,131.0){\rule[-0.200pt]{0.400pt}{137.795pt}}
+\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
+\end{picture}
+\caption[A GNUplot figure]{Processing time vs. payload length}\vspace{0.5cm}
+\label{fig:processing_vs_payload_length}
+\end{figure}
+\FloatBarrier		
+
+Given these measurements, we can calculate our processing bit rate as the inverse of the time it takes to process an additional byte divided by 8 bits per byte:
+
+\[
+	\text{bit rate} = \frac{1}{\frac{\text{time}_{\text{byte}}}{8}} = 20.03 \quad kb/s
+\] 
+
+\Cref{tab:majorMarkupLMDetailedResult} shows another table in which some values have been set in bold (using \textbackslash B) to emphasize them. Note how the \texttt{S} formatting has been modified so that it considers the weight of the characters and this is able to decimal align even these hold faced numbers with the numbers in the column above them.
+
+\begin{table}[!ht]
+    \centering
+    \caption{Median values of sandwich attributes}
+    \label{tab:majorMarkupLMDetailedResult}
+    \begin{tabular}{l *{2}{S[detect-weight,mode=text,table-format=3.2]}}
+        & \multicolumn{2}{c}{\textbf{sites}}\\
+        \cmidrule{2-3}
+        \textbf{Attribute} & \textbf{A} & \textbf{B} \\
+        \midrule
+        price (in SEK) & 36.5 & 71.3 \\
+        protean (g) & 97.2 & 100.0 \\
+        salt (mg) & 9.7 & 9.3 \\
+        \hline
+        \textbf{Average customer rating in \%} & \B 82.2 & \B 89.9 \\
+        \midrule
+    \end{tabular}
+\end{table}
+\FloatBarrier
+
+\section{Reliability Analysis}
+\sweExpl{Analys av tillförlitlighet\\
+Tillförlitlighet i metod och data}
+
+\section{Validity Analysis}
+\sweExpl{Analys av validitet\\
+Validitet i metod och data}
+
+\cleardoublepage
+\chapter{Discussion}
+\label{ch:discussion}
+\sweExpl{Diskussion\\
+Förbättringsförslag?}
+\generalExpl{This can be a separate chapter or a section in the previous chapter.}
+
+\cleardoublepage
+\chapter{Conclusions and Future work}
+\label{ch:conclusionsAndFutureWork}
+\sweExpl{Slutsats och framtida arbete}
+
+\generalExpl{Add text to introduce the subsections of this chapter.}
+
+\section{Conclusions}
+\label{sec:conclusions}
+\sweExpl{Slutsatser}
+\engExpl{Describe the conclusions (reflect on the whole introduction given in Chapter 1).}
+
+
+  
+\engExpl{Discuss the positive effects and the drawbacks.\\
+Describe the evaluation of the results of the degree project.\\
+Did you meet your goals?\\
+What insights have you gained?\\
+What suggestions can you give to others working in this area?\\
+If you had it to do again, what would you have done differently?}
+
+\sweExpl{Uppfyllde du dina mål?\\
+Vilka insikter har du fått?\\
+Vilka förslag kan du ge till andra som arbetar inom detta område?
+Om du skulle göra detta igen, vad skulle du ha gjort annorlunda?}
+
+\section{Limitations}
+\label{sec:limitations}
+\sweExpl{Begränsande faktorer\\Vad gjorde du som begränsade dina ansträngningar? Vilka är begränsningarna i dina resultat?}
+\engExpl{What did you find that limited your efforts? What are the limitations of your results?}
+
+
+\section{Future work}
+\label{sec:futureWork}
+\sweExpl{Vad du har kvar ogjort?\\Vad är nästa självklara saker som ska göras?\\Vad tips kan du ge till nästa person som kommer att följa upp på ditt arbete?}
+\engExpl{Describe valid future work that you or someone else could or should do.\\
+Consider: What you have left undone? What are the next obvious things to be done? What hints can you give to the next person who is going to follow up on your work?}
+
+
+
+Due to the breadth of the problem, only some of the initial goals have been
+met. In these section we  focus on some of the remaining issues that
+should be addressed in future work. \ldots\ 
+
+\subsection{What has been left undone?}
+\label{what-has-been-left-undone}
+
+The prototype does not address the third requirement, \ie a yearly unavailability of less than 3 minutes, this remains an open problem. \ldots\ 
+
+\subsubsection{Cost analysis}
+\generalExpl{Example of a missing component}
+The current prototype works, but the performance from a cost perspective makes this an impractical solution. Future work must reduce the cost of this solution, to do so a cost analysis needs to first be done. \ldots\ 
+
+\subsubsection{Security}
+\generalExpl{Example of a missing component}
+A future research effort is needed to address the security holes that results from using a self-signed certificate. Page filling text mass. Page filling text mass. \ldots\ 
+
+
+\subsection{Next obvious things to be done}
+
+In particular, the author of this thesis wishes to point out xxxxxx remains as a problem to be solved. Solving this problem is the next thing that should be done. \ldots\ 
+
+\section{Reflections}
+\label{sec:reflections}
+\sweExpl{Reflektioner}
+\sweExpl{Vilka är de relevanta ekonomiska, sociala, miljömässiga och etiska aspekter av ditt arbete?}
+\engExpl{What are the relevant economic, social,
+  environmental, and ethical aspects of your work?
+}
+
+
+One of the most important results is the reduction in the amount of
+energy required to process each packet while at the same time reducing the
+time required to process each packet.
+
+%The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by xxxx. 
+
+
+\noindent\rule{\textwidth}{0.4mm}
+%\engExpl{In the references, let Zotero or other tool fill this in for you. I suggest an extended version of the IEEE style, to include URLs, DOIs, ISBNs, etc., to make it easier for your reader to find them. This  make life easier for your opponents and examiner. \\IEEE Editorial Style Manual: \url{https://www.ieee.org/content/dam/ieee-org/ieee/web/org/conferences/style_references_manual.pdf}}
+%\sweExpl{Låt Zotero eller annat verktyg fylla i det här för dig. Jag föreslår en utökad version av IEEE stil - att inkludera webbadresser, DOI, ISBN osv. - för att göra det lättare för läsaren att hitta dem. Detta kommer att göra livet lättare för dina opponenter och examinator.}
+
+\cleardoublepage
+% Print the bibliography (and make it appear in the table of contents)
+\renewcommand{\bibname}{References}
+\addcontentsline{toc}{chapter}{References}
+
+\ifbiblatex
+    %\typeout{Biblatex current language is \currentlang}
+    \printbibliography[heading=bibintoc]
+\else
+    \bibliography{references}
+\fi
+
+
+
+% \warningExpl{If you do not have an appendix, do not include the \textbackslash cleardoublepage command below; otherwise, the last page number in the metadata  be one too large.}
+% \cleardoublepage
+% \appendix
+% \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
+% \chapter{Supporting materials}
+% \label{sec:supportingMaterial}
+% \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
+
+% Attach the BibTeX for your references to make it easy for a reader to find and use them
+%The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
+
+% Attach source code file(s) or add a URL to the github or other repository
+% Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
+
+% Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
+
+% An argument for including supporting material in the PDF file is that it is available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
+
+% \warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you  probably want to use one of the data repositories. For additional help about this, contact KTH Library via  \href{mailto:researchdata@kth.se}{researchdata@kth.se}.}
+
+% \begin{figure}[!ht]
+%   \begin{center}
+%     \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
+%   \end{center}
+%   \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
+%   \label{fig:PDFreaderPaperclipExample}
+% \end{figure}
+% \FloatBarrier
+
+% \begin{figure}[!ht]
+%   \begin{center}
+%     \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
+%   \end{center}
+%   \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
+%   \label{fig:PDFreaderPushpinExample}
+% \end{figure}
+% \FloatBarrier
+% \cleardoublepage
+
+% \chapter{Something Extra}
+% \sweExpl{svensk: Extra Material som Bilaga}
+
+% \section{Just for testing KTH colors}
+% \ifdigitaloutput
+%     \textbf{You have selected to optimize for digital output}
+% \else
+%     \textbf{You have selected to optimize for print output}
+% \fi
+% \begin{itemize}[noitemsep]
+%     \item Primary color
+%     \begin{itemize}
+%     \item \textcolor{kth-blue}{kth-blue \ifdigitaloutput
+%     actually Deep sea
+%     \fi} {\color{kth-blue} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-blue80}{kth-blue80} {\color{kth-blue80} \rule{0.3\linewidth}{1mm} }\\
+% \end{itemize}
+
+% \item  Secondary colors
+% \begin{itemize}[noitemsep]
+%     \item \textcolor{kth-lightblue}{kth-lightblue \ifdigitaloutput actually Stratosphere
+%     \fi} {\color{kth-lightblue} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-lightred}{kth-lightred \ifdigitaloutput
+%     actually Fluorescence\fi} {\color{kth-lightred} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-lightred80}{kth-lightred80} {\color{kth-lightred80} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-lightgreen}{kth-lightgreen \ifdigitaloutput
+%     actually Front-lawn\fi} {\color{kth-lightgreen} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-coolgray}{kth-coolgray \ifdigitaloutput
+%     actually Office\fi} {\color{kth-coolgray} \rule{0.3\linewidth}{1mm} }\\
+
+%     \item \textcolor{kth-coolgray80}{kth-coolgray80} {\color{kth-coolgray80} \rule{0.3\linewidth}{1mm} }
+% \end{itemize}
+% \end{itemize}
+
+% \textcolor{black}{black} {\color{black} \rule{\linewidth}{1mm} }
+
+% Include an example of using nomenclature
+% \ifnomenclature
+% \cleardoublepage
+% \chapter{Main equations}
+% \label{ch:NomenclatureExamples}
+% This appendix gives some examples of equations that are used throughout this thesis.
+% \section{A simple example}
+% The following example is adapted from Figure 1 of the documentation for the package nomencl (\url{https://ctan.org% /pkg/nomencl}).
+% \begin{equation}\label{eq:mainEq}
+% a=\frac{N}{A}
+% \end{equation}
+% \nomenclature{$a$}{The number of angels per unit area\nomrefeq}%       %% include the equation number in the list
+% \nomenclature{$N$}{The number of angels per needle point\nomrefpage}%  %% include the page number in the list
+% \nomenclature{$A$}{The area of the needle point}%
+% The equation $\sigma = m a$%
+% \nomenclature{$\sigma$}{The total mass of angels per unit area\nomrefeqpage}%
+% \nomenclature{$m$}{The mass of one angel}
+% follows easily from \Cref{eq:mainEq}.
+
+% \section{An even simpler example}
+% The formula for the diameter of a circle is shown in \Cref{eq:secondEq} area of a circle in \cref{eq:thirdEq}.
+% \begin{equation}\label{eq:secondEq}
+% D_{circle}=2\pi r
+% \end{equation}
+% \nomenclature{$D_{circle}$}{The diameter of a circle\nomrefeqpage}%
+% \nomenclature{$r$}{The radius of a circle\nomrefeqpage}%
+
+% \begin{equation}\label{eq:thirdEq}
+% A_{circle}=\pi r^2
+% \end{equation}
+% \nomenclature{$A_{circle}$}{The area of a circle\nomrefeqpage}%
+
+% Some more text that refers to \eqref{eq:thirdEq}.
+% \fi  %% end of nomenclature example
+
+%\cleardoublepage
+% Information for authors
+%\include{README_author}
+% \subfile{README_author}
+
+% \cleardoublepage
+% information about the template for everyone
+% \input{README_notes/README_notes}
+
+
+% information for examiners
+% \ifxeorlua
+% \cleardoublepage
+% \input{README_notes/README_examiner_notes}
+% \fi
+
+% Information for administrators
+% \ifxeorlua
+% \cleardoublepage
+% \input{README_notes/README_for_administrators.tex}
+% \fi
+
+
+
+% Information for Course coordinators
+% \ifxeorlua
+% \cleardoublepage
+% \input{README_notes/README_for_course_coordinators}
+% \fi
+
+
+%% The following label is necessary for computing the last page number of the body of the report to include in the "For DIVA" information
+\label{pg:lastPageofMainmatter}
+
+\cleardoublepage
+\clearpage\thispagestyle{empty}\mbox{} % empty page with backcover on the other side
+\kthbackcover
+\fancyhead{}  % Do not use header on this extra page or pages
+\section*{€€€€ For DIVA €€€€}
+\lstset{numbers=none} %% remove any list line numbering
+\divainfo{pg:lastPageofPreface}{pg:lastPageofMainmatter}
+
+
+\end{document}

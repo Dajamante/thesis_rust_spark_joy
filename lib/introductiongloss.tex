@@ -1,0 +1,72 @@
+%ABC
+\newglossaryentry{ig:ASLR}
+{
+    type=introductiongloss,
+    name={adress space layout randomization (ASLR)},
+    description={Address Space Layout Randomization (ASLR) is a defense technique that mangles the address space of a vulnerable process (libraries, main, heap and stack, as well as memory mapped files) to avoid an attack based on (correct) assumptions on where items lie in memory. Instead, the address space is laid out in a unique manner every time the program is used.}
+}
+
+
+%DEF
+
+\newglossaryentry{ig:DEP}
+{
+    type=introductiongloss,
+    name={data execution prevention (DEP)},
+    description={Data Execution Prevention (DEP) is a security feature that makes certain areas in memory non-executable, guaranteeing no malicious code is executed from those areas.
+    }
+}
+
+\newglossaryentry{ig:EHV}
+{
+    type=introductiongloss,
+    name={exception handler validation},
+    description={Exception Handler Validation checks the exception handler (triggered when an exception occurs in the program) against a list of valid handlers before it is executed, to ensure that the pointer is calling a valid address. 
+    }
+}
+
+
+
+%IJK
+\newglossaryentry{ig:just-in-time}{
+    type=introductiongloss,
+    name={just-in-time (JIT)},
+    description={A dynamic compilation process that occurs at runtime, which allows to optimization of compiled code for the platform and processor architecture, with the goal to improve performance.
+    }
+}
+\newglossaryentry{ig:ROP}{
+    type=introductiongloss,
+    name={return-oriented programming (ROP)},
+    name={ROP},
+    %long={Return Oriented \\ Programming (ROP)},
+    description={In ROP, the attacker redirects program execution to a gadget already present in the program memory.
+    }
+}
+
+\newglossaryentry{ig:stack-cookie}
+{
+    type=introductiongloss,
+    name={stack cookie},
+    description={A stack cookie, also known as a stack canary is a security mechanism used to detect stack buffer overflow attacks. It involves placing a random value between the local variables and the function return address on the stack. The canary value is checked when the function returns to ensure that it has not been modified by an attacker. If the canary value has been altered, then it is assumed that a buffer overflow attack has occurred. 
+    }
+}
+
+%UVWXYZ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
