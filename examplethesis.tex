@@ -1455,15 +1455,34 @@ The most significant threat to the validity of the statistics is that large SPAR
 applications, including air traffic, avionics, railways \etc. It is based on Ada, which is general-purpose and based on the classical stack model. Being used in industrial applications, one can assume safely that effectivity is a concern to SPARK programmers\,\cite{chapman_adacore_2018}.
 \subsection{Rust}
 
+\todoinline{Describe all the tools considered and used except valgrind and rust san. ffichecker, then the auri thing, then rr, miri}
+
 Rust is an open-source project with open crates (libraries). To perform the statistics below, the most popular crates were selected on Rust's official pages for crates, \href{crates.io}{crates.io}. Those crates are mostly used in the compiler, and for this reason, we selected popular projects on \href{lib.rs}{lib.rs} to analyze what programmers are actively using in production\footnote{Lib.rs utilizes a ranking algorithm that offers more qualitative information than crates.io, filtering away spam and poor-quality projects. The crate popularity is measured by downloads, direct and reverse dependencies, the usage trend, quality of README, tests, comments documentation, examples, and whether the crate is actively maintained}.
 Thirdly, the compiler, with a code base over 5 times bigger than the two projects above, was also deemed relevant for statistics.
 
+\todoinline{REPLACE VERSIONS WITH HASH 
+librs/log: dc32ab9
+librs/json: a15bd09
+librs/thiserror: 0e45dde
+librs/clap: 8469554
+librs/serde: b80e722
+rustc: 66a2d62
+cratesio/syn: 6365093
+cratesio/rand: 0f3eced
+cratesio/libc: 89ec881
+cratesio/quote: ca98b65
+cratesio/cfg-if: 2621a59
+cratesio/proc-macro2: ab25487
+ewok-kernel: ca8e2a0
+SPARKNaCl: dfb1bd1
+spark-by-example: 2e4eb5a
+}
 
 \begin{table}[htbp]
 \centering
 \caption{crates.io}
 \label{tab:crates_io}
-\begin{tabular}{ |m{3cm}|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\begin{tabular}{ |l|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
 \hline
 \rowcolor{brown!50!white}
 \multicolumn{4}{|c|}{Most popular crates.io projects 171 kLOC} \\
@@ -1472,6 +1491,7 @@ Thirdly, the compiler, with a code base over 5 times bigger than the two project
 \rowcolor{orange!50}
 Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time (in millions)\\
 \hline
+\footnotesize
 libc & Raw FFI bindings to platform libraries like libc & v0.2 (5,200) & 177 \\
 \hline
 syn & Parser for Rust source code & v1.0 (5,501) & 191 \\
@@ -1486,12 +1506,11 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & v1.
 \hline
 \end{tabular}
 \end{table}
-
 \begin{table}[ht!]
 \centering
 \caption{Most popular projects on lib.rs 102 kLOC}
 \label{tab:lib}
-\begin{tabular}{ |m{3cm}|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\begin{tabular}{ |l|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
 \hline
 \rowcolor{brown!50!white}
 \multicolumn{4}{|c|}{lib.rs} \\
@@ -1530,13 +1549,13 @@ Coming second are \inlinecode{\&mut T} and \inlinecode{\&T}. References are a ke
 
 \pgfplotstableread{
 Rust_type rustc crates_io lib_rs
-Numbers 299472 44688 12680
-Refs 137439 12662 7140
-Arrays 9266 1893 130
-Vec 14254 397 977
-Enum 14890 602 1162
-Struct 48106 4704 2428
-String 18540 445 1140
+Numbers  12680 44688 304618
+Refs 7140 12662 137530
+Arrays  130 1893 9291
+Vec  977 397 14278
+Enum  1162 602 15040
+Struct  2428 4704 48955
+String  1140 445 18613
 }\EXPDATA 
 
 \begin{figure}
@@ -1558,62 +1577,147 @@ String 18540 445 1140
           \addplot table [x=Rust_type, y=rustc]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=crates_io]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=lib_rs]{\EXPDATA} ;
-        \legend{rustc (1518 kLOC), crates.io (171 kLOC), lib.rs (102 kLOC)}
+        \legend{crates.io (171 kLOC),lib.rs (102 kLOC),rustc (1518 kLOC)}
         \end{axis}  
     \end{tikzpicture}
-\caption{Rust data types per project}
+\caption{Absolute number of Rust data types per project}
 \label{fig:barplottypesrust}
 \end{figure}
 %https://tex.stackexchange.com/questions/188147/how-to-put-legend-below-the-chart
 
 \pgfplotstableread{
-Rust_type rustc crates_io lib_rs
-Numbers 54.56 68.17 49.17
-Refs 25.04 19.32 27.69
-Struct 8.76 9.42 7.18
+Rust_type crates_io lib_rs rustc 
+Numbers 68.17 49.17 54.86 
+Refs 19.32 27.69 24.77 
+Struct 7.18 9.42 8.82
+Enum 0.92 4.51 2.71
+Vec 0.61 3.79 2.57
+String 0.68 4.42 3.35
+Box 0.24 0.51 1.26
+Arrays 2.89 0.50 1.67
 }\PERCENTDATA
 
-
-\begin{figure}
+\begin{figure}[ht!]
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-            %title={Rust data types per project},
             cycle list name=rustcolors,
             xtick=data,
-            symbolic x coords={Numbers,Refs, Struct},
+            symbolic x coords={Numbers,Refs,Struct,Enum,Vec,String,Box,Arrays},
             ybar,
             legend style={at={(0.5,-0.2)},anchor=north},
             ymajorgrids=true,
             grid style=dashed,
+            width=1\textwidth,
             ylabel=Percentage,
             ]
           \addplot table [x=Rust_type, y=rustc]{\PERCENTDATA} ;
           \addplot table [x=Rust_type, y=crates_io]{\PERCENTDATA} ;
           \addplot table [x=Rust_type, y=lib_rs]{\PERCENTDATA} ;
-        \legend{rustc, crates.io, lib.rs}
+        \legend{crates.io, lib.rs,rustc}
         \end{axis}  
     \end{tikzpicture}
 \caption{Rust types repartition for the compilers, crates.io and lib.rs (percentage)}
 \label{fig:barplottypesrustpercent}
 \end{figure}
+
+\begin{comment}
+Detailed table
+Label Numbers  Refs  Struct  Enum  Vec  String  Box  Arrays
+cratesio   68.17   19.32  7.18    0.92  0.61  0.68   0.24  2.89
+librs   49.17   27.69  9.42    4.51  3.79  4.42   0.51  0.50
+rustc   54.86   24.77  8.82    2.71  2.57  3.35   1.26  1.67
+\end{comment}
+\pgfplotstableread{
+Label Numbers  Refs  Struct/Enum  Heap  Arrays
+cratesio   68.17   19.32  8.1  1.53  2.89
+librs   49.17   27.69  13.91  8.72  0.50
+rustc   54.86   24.77  11.53 7.18 1.67
+}\testdata
+
+\begin{figure}[ht!]
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        ybar stacked,
+	    bar width=40pt,
+	    nodes near coords,
+     nodes near coords,
+     % https://tex.stackexchange.com/questions/600709/how-to-conditionally-specify-the-options-for-nodes-near-coords-in-pgfplots
+    % -----------------------------------------------------------------
+    % we create a style for the `nodes near coords` which is dependent
+    % on the value
+    % (adapted from <http://tex.stackexchange.com/a/141006/95441>)
+    % (#1: the THRESHOLD after which we switch to a special display)
+    nodes near coords greater equal only/.style={
+            % define the style of the nodes with "small" values
+        small value/.style={
+                /tikz/coordinate,
+        },
+    every node near coord/.append style={
+        color=black,
+        check for small values/.code={
+        \begingroup
+        % this group is merely to switch to FPU locally.
+        % Might be unnecessary, but who knows.
+        \pgfkeys{/pgf/fpu}
+        \pgfmathparse{\pgfplotspointmeta<#1}
+        \global\let\result=\pgfmathresult
+        \endgroup
+            %
+            % simplifies debugging:
+            %\show\result
+            %
+        \pgfmathfloatcreate{1}{1.0}{0}
+        \let\ONE=\pgfmathresult
+        \ifx\result\ONE
+                % AH: our condition 'y < #1' is met.
+            \pgfkeysalso{/pgfplots/small value}
+        \fi
+        },
+        check for small values,
+        },
+    },
+    % assign a value to the new style which is the threshold at which
+    % the `small value` style is used.
+    nodes near coords greater equal only=3,
+%----------------------------------------------------------------
+        enlargelimits=0.05,
+        bar shift=5pt,
+        ymin=0,
+        ymax=100,
+        xtick=data,
+        reverse legend=true,
+        width=1\textwidth,
+        ylabel=Percentage points (\%),
+        xticklabels from table={\testdata}{Label},
+        xticklabel style={rotate=30},
+    ]
+    \addplot  table [y=Numbers, meta=Label, x expr=\coordindex] {\testdata};
+    \addlegendentry{Numbers}
+    \addplot table [y=Refs, meta=Label, x expr=\coordindex] {\testdata};
+    \addlegendentry{Refs}
+    \addplot  table [y=Struct/Enum, meta=Label, x expr=\coordindex] {\testdata};
+    \addlegendentry{Struct/Enum}
+    \addplot  table [y=Heap, meta=Label, x expr=\coordindex] {\testdata};
+    \addlegendentry{Heap}
+    \addplot  table [y=Arrays, meta=Label, x expr=\coordindex] {\testdata};
+    \addlegendentry{Arrays}
+    \end{axis}
+    \end{tikzpicture}
+\caption{BAR STACKED TEST (With percentage)}
+\label{fig:stacked}
+\end{figure}
+
+
 \makeatletter
 \let\stripatpt\strip@pt
 \makeatother
+
 \begin{figure}[ht!]
   \centering
 \begin{tikzpicture}[scale=3]
 \centering    
-
-%Total number of types: 646633
-%key : Number, value : 361986, percentage 0.5598
-%key : Array, value : 11314, percentage 0.0175
-%key : Struct, value : 56087, percentage 0.0867
-%key : &T or &mut T, value : 157332, percentage 0.2433
-%key : Box/Rc/Arc, value : 7260, percentage 0.0112
-%key : String, value : 20198, percentage 0.0312
-%key : Vec, value : 15652, percentage 0.0242
-%key : Enum, value : 16804, percentage 0.0260
 
 \newlength\lena
 \newlength\lenb
@@ -1662,7 +1766,6 @@ Struct 8.76 9.42 7.18
 \FloatBarrier
 
 \subsection{SPARK}
-
 
 Most SPARK large code bases are proprietary. It is therefore difficult to run statistics on a representative code base. From expert opinion (Moy, in direct conversation) and our statistics, similar types to Rust types are appropriate for the control studies, as SPARK and Rust are used in similar contexts.
 
