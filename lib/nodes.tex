@@ -1,0 +1,40 @@
+nodes near coords,
+     % https://tex.stackexchange.com/questions/600709/how-to-conditionally-specify-the-options-for-nodes-near-coords-in-pgfplots
+    % -----------------------------------------------------------------
+    % we create a style for the `nodes near coords` which is dependent
+    % on the value
+    % (adapted from <http://tex.stackexchange.com/a/141006/95441>)
+    % (#1: the THRESHOLD after which we switch to a special display)
+    nodes near coords greater equal only/.style={
+            % define the style of the nodes with "small" values
+        small value/.style={
+                /tikz/coordinate,
+        },
+    every node near coord/.append style={
+        color=black,
+        check for small values/.code={
+        \begingroup
+        % this group is merely to switch to FPU locally.
+        % Might be unnecessary, but who knows.
+        \pgfkeys{/pgf/fpu}
+        \pgfmathparse{\pgfplotspointmeta<#1}
+        \global\let\result=\pgfmathresult
+        \endgroup
+            %
+            % simplifies debugging:
+            %\show\result
+            %
+        \pgfmathfloatcreate{1}{1.0}{0}
+        \let\ONE=\pgfmathresult
+        \ifx\result\ONE
+                % AH: our condition 'y < #1' is met.
+            \pgfkeysalso{/pgfplots/small value}
+        \fi
+        },
+        check for small values,
+        },
+    },
+    % assign a value to the new style which is the threshold at which
+    % the `small value` style is used.
+    nodes near coords greater equal only=2,
+%----------------------------------------------------------------
