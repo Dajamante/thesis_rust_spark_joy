@@ -38,3 +38,26 @@ nodes near coords,
     % the `small value` style is used.
     nodes near coords greater equal only=2,
 %----------------------------------------------------------------
+
+
+every node near coord/.style={
+            color=black,
+            font=\small,
+            name=X,
+            %on={\thisrow{value} \as \val},
+            %visualization depends on={ifthenelse(\val < 2, 1, 0) \as \issmall},
+            shift={    
+                (50pt,25pt)
+                %ifthenelse(\issmall ,(50pt,25pt),(50pt,25pt))
+                },
+            },
+            scatter/@post marker code/.append code={
+                \node(Y){};
+                \draw(X)--(Y.center);
+            }
+        },
+	    nodes near coords,
+        bar shift=5pt,
+        ymin=0,
+        ymax=105,
+        xtick=data,
