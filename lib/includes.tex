@@ -188,9 +188,33 @@
 %    {brown!60!black,fill=brown!30!white,mark=none},
 %    {black,fill=gray,mark=none}
 %}
+    \tikzset{
+        hatch distance/.store in=\hatchdistance,
+        hatch distance=10pt,
+        hatch thickness/.store in=\hatchthickness,
+        hatch thickness=2pt
+    }
 
+    \makeatletter
+    \pgfdeclarepatternformonly[\hatchdistance,\hatchthickness]{flexible hatch}
+    {\pgfqpoint{0pt}{0pt}}
+    {\pgfqpoint{\hatchdistance}{\hatchdistance}}
+    {\pgfpoint{\hatchdistance-1pt}{\hatchdistance-1pt}}%
+    {
+        \pgfsetcolor{\tikz@pattern@color}
+        \pgfsetlinewidth{\hatchthickness}
+        \pgfpathmoveto{\pgfqpoint{0pt}{0pt}}
+        \pgfpathlineto{\pgfqpoint{\hatchdistance}{\hatchdistance}}
+        \pgfusepath{stroke}
+    }
+\makeatother
+\usetikzlibrary{patterns, patterns.meta}
 \pgfplotscreateplotcyclelist{rustcolors}{
-  {red!70!black,fill=red!40!white,mark=none},{orange!80!black,fill=orange!50!white,mark=none},{yellow!80!black,fill=yellow!50!white,mark=none},{green!60!black,fill=green!30!white,mark=none},{brown!80!black,fill=brown!50!white,mark=none},
+  {red!70!black,mark=none, pattern=
+  %{flexible hatch}
+  {crosshatch}
+  ,pattern color=red!70!white},
+  {orange!90!black,mark=none, pattern={vertical lines}, pattern color=orange!90!white},{yellow!50!black,mark=none, pattern={horizontal lines}, pattern color=yellow!90!orange},{green!60!black,mark=none, pattern={north east lines}, pattern color=green!60!black},{brown!80!black,fill=brown!50!white,mark=none},
   {black,fill=gray,mark=none}
 }
 %\pgfplotscreateplotcyclelist{mycolors}{

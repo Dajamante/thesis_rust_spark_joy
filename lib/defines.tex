@@ -68,16 +68,20 @@
 %\hyphenpenalty=15000
 %\tolerance=1000
 
+
 % For notes by the authors to themselves
 \newcommand*{\todoinline}[1]{\textcolor{red}{TODO: #1}}
-
+% https://tex.stackexchange.com/questions/411566/tikz-how-to-modify-pie-chart-with-individually-adjustable-colors-and-point-numb
 %\DeclareUnicodeCharacter{2003}{\quad}
-\newcommand{\slice}[5]{
+
+
+
+\newcommand{\slice}[6]{
   \pgfmathparse{0.5*#1+0.5*#2}
   \let\midangle\pgfmathresult
   % \show\midangle
   % slice
-  \draw[thick,fill=#5] (0,0) -- (#1:1) arc (#1:#2:1) -- cycle;
+  \draw[thick, pattern=#5, pattern color=#6] (0,0) -- (#1:1) arc (#1:#2:1) -- cycle;
 
   % outer label
   \node[label=\midangle:#4] at (\midangle:1) {};

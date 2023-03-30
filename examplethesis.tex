@@ -248,6 +248,7 @@ nopostdot]{glossaries}
 
 % give the alternative title - i.e., if the thesis is in English, then give a Swedish title
 \alttitle{Does Rust SPARK joy?}
+% You can just comment out the following line - if you do not have a Swedish subtitle
 \altsubtitle{Detta är den svenska översättningen av undertiteln}
 % alternative, if the thesis is in Swedish, then give an English title
 %\alttitle{This is the English translation of the title}
@@ -423,10 +424,6 @@ eng
 
 %\engExpl{Exchange students may want to include one or more abstracts in the language(s) used in their home institutions to avoid the need to write another thesis when returning to their home institution.}
 
-
-
-\begin{scontents}[store-env=abstracts,print-env=true]
-%\generalExpl{Enter your abstract here!}
 %Write an abstract that is about 250 and 350 words (1/2 A4-page)  with the following components:
 % key parts of the abstract
 
@@ -440,15 +437,19 @@ eng
 \end{itemize}
 \end{comment}
 
-This thesis aims to explore the challenges of combining memory-safe programming languages Rust and SPARK.
+\begin{scontents}[store-env=abstracts,print-env=true]
+%\generalExpl{Enter your abstract here!}
 
-SPARK is a subset of Ada, a programming language with a long-standing track record in the safety-critical industry. Rust is a multi-paradigm language that has gained significant popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
 
-Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, macOS, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK which were designed with safety in mind. 
+This thesis aims to explore the challenges of combining two memory-safe programming languages: Rust and SPARK.
 
-Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical\ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and analyzing how they are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems, which is implemented in both languages. The identified best practices can be used for safe bindings and for automated tools/code generation. 
+SPARK is a subset of Ada, a programming language with a long track record in safety-critical applications. Rust is a multi-paradigm language that has gained significant popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
 
-This thesis fills a gap in existing research, which has largely focused on the combination of safe and unsafe languages and provides a valuable contribution to the field of software security and safety-critical systems.
+Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, macOS, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK, which were designed with safety in mind. 
+
+Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how they are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
+
+This thesis fills a gap in existing research, which has primarily focused on the combination of safe and unsafe languages, and provides a valuable contribution to software security and safety-critical systems.
 
 \end{scontents}
 %\engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
@@ -826,7 +827,7 @@ Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to
   \begin{center}
     \includegraphics[width=1\textwidth]{figures/complexity.png}
   \end{center}
-  \caption{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
+  \caption[Software complexity in the automotive and aerospace industry]{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
   \label{fig:complexity}
 \end{figure}
 
@@ -1019,7 +1020,7 @@ fn main() {
 \end{listing}
 \FloatBarrier
 
-
+\Needspace*{5\baselineskip}	
 In contrast, if we frame the variable ``SHARED" inside \texttt{unsafe} blocks, the program compiles and runs, and prints all possible results between 100000 and 200000, as expected from a data race. This is an example of what \texttt{unsafe} allows the programmer to do: more freedom but it makes Rust as memory-safe as any C/C++ program.
 
 \begin{listing}[!ht]
@@ -1137,7 +1138,7 @@ SPARK allows beginning aliasing (the possibility to read) that it calls \textit{
 
 The concept of type safety and ownership, and why these traits are considered desirable in safe programming languages like Rust and SPARK, have been covered in detail. Those traits are their use of strong \gls{type-safety} and ensuring \gls{memory-safety} through \gls{ownership}. This reduces the probability of \gls{memory-safety} errors as SPARK does not fail at runtime and the Rust compiler maintains its guarantees as long as the programmer does not use \texttt{unsafe} wrongly.
 
-\newpage
+%\newpage
 
 \section{Background: Software Safety}
 \label{sec:software_safety}
@@ -1150,6 +1151,7 @@ Skezeres \etal\,\cite{szekeres_sok_2013} (in ``SoK: Eternal War in Memory") and 
 In the C++ standard, writing out-of-bounds of an array, dereferencing null pointers, or reading uninitialized variables results in undefined behavior. Buffer overflows (writing outside of the allocated space in memory), double-frees (freeing the memory twice), and use after free (accessing a memory that has been freed before) are very common errors\,\cite{szekeres_sok_2013,scherer_engineering_2021}. 
 These errors can be leveraged into full-fledged attacks, as ``every exploit starts by triggering a memory error"\,\cite{szekeres_sok_2013}. The attack process is two-fold. The first is to make a pointer invalid, and the second is dereferencing this invalid pointer. Attackers can exploit either dangling pointers (\ie temporal errors) or an out-of-bound pointer (\ie a spatial error). These attack techniques can be combined and chained for successful exploitation, as illustrated in detail in \Cref{fig:sok}.
 
+\Needspace*{17\baselineskip}
 \subsection{The Memory Wars}.
 
 C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom they give to the programmer. Szekeres \etal\,\cite{szekeres_sok_2013} call the \gls{memory-corruption} bugs in low-level languages ``one of the oldest problems" in security. Memory errors have been exploited for 30 years, while real-world exploits prove that protections can always be defeated. The authors established that not only does a completely secure system not exist, but protection mechanisms never achieve wide adoption by the software engineering community. The reason is that protection mechanisms present a significant overhead, in terms of performance (\eg garbage collectors are costly in systems relying on speed, not even to mention changing the programming language, and the trade-off is not worth the benefit of the protection) or more simply the cost of replacing billions of lines of existing C/C++ is too expensive. According to Skezeres \etal\,\cite{szekeres_sok_2013} the issues may be that the protection is not robust enough or there exist problems of incompatibility with legacy code and dependencies.
@@ -1159,13 +1161,15 @@ C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom 
     \includegraphics[width=0.8\textwidth]{figures/sok.png}
     %\includesvg{figures/sok.svg}
   \end{center}
-  \caption{Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,\cite{szekeres_sok_2013}  \textcopyright2013 IEEE}
+  \caption[Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,]{Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,\cite{szekeres_sok_2013}  \textcopyright2013 IEEE}
   \label{fig:sok}
 \end{sidewaysfigure}
+
 
 To mitigate these problems, various tools have been introduced\,\cite{mergendahl_cross-language_2022}. Dynamic analysis tools observe the program while it is running, while static analysis tools analyze the source code. Such tools are for example Valgrind, sanitizers (dynamic analysis), or the Clang static analyzer. Even if writing analysis tools is, to say the least, ``non-trivial"\,\cite{scherer_engineering_2021}, some authors studied in the frame of this thesis wrote their own (FFIChecker by Li \etal\,\cite{li_detecting_2022} and Scherer who participated to the project Miri\,\cite{noauthor_miri_2023}). Tools have limitations: dynamic analysis tools are time-consuming and specific to the input, and static analysis tools have false positives\,\cite{li_improving_2014}.
 Unfortunately, those tools provide very limited protection, in part because the software engineering community is facing professionalization and an increase in complexity from the attacking side\,\cite{scherer_engineering_2021, chapman_adacore_2018}. 
 According to Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, ``sanitizers suffer from coverage limitations", with many missed bugs as a consequence, while ``enforcement-based exploit mitigation techniques" can still allow attacks that do not violate their policies as they are ``relaxed enough", and randomization techniques remain susceptible to information leakage.
+\FloatBarrier
 
 \subsection{The monopoly of C/C++}
 
@@ -1293,9 +1297,7 @@ This reinforces the need for safe guidelines when building multi-language applic
 
 
 \cleardoublepage
-\chapter{Method}
-\todoinline{Choose possible title later, for example, "Method: Experiments and Real-world implementation"}
-
+\chapter[Methods: Experiments and Real-world implementation]{Methods: Experiments and\linebreak[4]  Real-world implementation}
 \label{ch:methods}
 %\sweExpl{Metod eller Metodval}
 %\generalExpl{This chapter is about Engineering-related  content, Methodologies and Methods.  Use a self-explaining title.\\The  contents and structure of this chapter change with your choice of  methodology and methods.}
@@ -1315,11 +1317,16 @@ This reinforces the need for safe guidelines when building multi-language applic
 (6) Resonemanget bygger på att studenter på hing-programmet ofta skall konstruera något åt problemägaren och att man till detta måste koppla en intressant ingenjörsfråga. Det finns hela tiden en dualism mellan dessa aspekter i exjobbet.
 \end{comment}
 
-This chapter provides an overview of the research and experimentation method. Section~\ref{sec:researchProcess} describes the research process. Section~\ref{sec:researchParadigm} details the research paradigm. 
-Section~\ref{sec:dataCollection} explains the selection of data types for the control studies. Section~\ref{sec:experimentalDesign}
-describes the experimental design. Finally, Section~\ref{sec:systemDocumentation}
-describes the system to ensure reproducibility.
-\todoinline{I will need to add a section to detail the experiments on BBQueue later when it comes to that.}
+This chapter provides an overview of the research method and experimentation, as well as information for reproducibility. 
+
+%Section~\ref{sec:researchProcess} describes the research process. Section~\ref{sec:researchParadigm} details the research paradigm. 
+%Section~\ref{sec:dataCollection} explains the selection of data types for the control studies. Section~\ref{sec:experimentalDesign}
+%describes the experimental design. 
+%\Cref{sec:methodBBQueue} covers our work on BBQueue. Finally, Section~\ref{sec:systemDocumentation}
+%describes the system to ensure reproducibility.
+
+
+\todoinline{ADD a section to detail the experiments on BBQueue later when it comes to that.}
 \section{Research Process}
 \label{sec:researchProcess}
 
@@ -1329,6 +1336,7 @@ Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project.
 
 \begin{figure}[ht!]
     \centering
+    \scalebox{0.8}{
     \begin{tikzpicture}
     [node distance=.8cm,
     start chain=going below,
@@ -1336,43 +1344,27 @@ Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project.
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
     ]
     % group 1
-         \node[punktchain, join, draw=black, fill=red!40!white
-         %fill=black!15
+         \node[punktchain, join, draw=black,fill=red!40!white
          ] (lit){Litterature study};
-         \node[punktchain, join, draw=black, 
-         fill=red!40!white
-         %fill=black!15
+         \node[punktchain, join, draw=black,fill=red!40!white
          ] (consult){Consultation with experts};
-         \node[punktchain, join, draw=black, 
-         %fill=black!15
-         fill=red!40!white
+         \node[punktchain, join, draw=black,fill=red!40!white
          ] (scope){Scope limitation};  
     % group 2
-         \node[punktchain, join, draw=black, 
-         %fill=black!25
-         fill=yellow!50!white
+         \node[punktchain, join, draw=black,fill=yellow!50!white
          ] (typselec){Type selection};
-         \node[punktchain, join, draw=black, 
-         %fill=black!25
-         fill=yellow!50!white
+         \node[punktchain, join, draw=black,fill=yellow!50!white
          ] (stats){Statistics};
     % group 3
-         \node[punktchain, join, draw=black, 
-         %fill=black!35
-         fill=brown!50!white
+         \node[punktchain, join, draw=black,fill=brown!50!white
          ] (cs){Control studies};
-         \node[punktchain, join, draw=black, 
-         %fill=black!35
-         fill=brown!50!white
+         \node[punktchain, join, draw=black,fill=brown!50!white
          ] (analys){Analysis};   
-         \node[punktchain, join, draw=black, 
-         %fill=black!35
-         fill=brown!50!white
+         \node[punktchain, join, draw=black,fill=brown!50!white
          ] (memver){Verification of correctness};   
     % group 4
-         \node[punktchain, join, draw=black, 
-         %fill=black!45
-         fill=orange
+         \node[punktchain, join, draw=black,
+         pattern={vertical lines}, pattern color=orange
          ] (bbq){BBQueue implementation};
     %% No. 1
     \draw[tuborg, decoration={brace}] let \p1=(lit.north), \p2=(scope.south) in
@@ -1386,13 +1378,13 @@ Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project.
     %% No. 4
     \draw[tuborg, decoration={brace}] let \p1=(bbq.north), \p2=(bbq.south) in
         ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Real-world \\ implementation};
-    \end{tikzpicture}
+    \end{tikzpicture}}
   \caption{Research Process}
   \label{fig:researchprocess}
 \end{figure}
-\FloatBarrier
 
-The process is constituted of four steps:
+
+The research process is constituted of four steps:
 
 \begin{enumerate}[leftmargin=*, label=\textbf{Step \arabic*}, ref=Step \arabic*] %labelindent=1em for indent
     \itemsep0em
@@ -1401,7 +1393,7 @@ The process is constituted of four steps:
     \item \label{x:s3} Control studies: perform the control studies, and
     \item \label{x:s4} Application: apply the learning from the control studies in a real-world setting.
 \end{enumerate}
-
+\FloatBarrier
 
 \section{Research Paradigm}
 \label{sec:researchParadigm}
@@ -1417,119 +1409,156 @@ Secondly, the qualitative research paradigm is applied when carefully selecting 
 
 Thirdly, the empirical research paradigm is also used. After guidelines are established through control studies, an applied experiment consists of following said guidelines to a larger code base. This step is appropriate as this is an experiment with real-life setting, and bugs and errors are expected to arise. This experiment is relevant as it is a first step in reproducibility and generalization.
 
+\section{Sustainability considerations}
 \todoinline{Add a short discussion on the sustainability of code, use the AWS source that speaks of Rust as an example.}
 
 \section{Choice of datatypes for control studies}
 \label{sec:dataCollection}
 
-The data types selected are series of stack and heap objects. 
+The research question that was raised early in this process is how to select useful Rust and SPARK types for analysis. 
+With the tool described below, we could reply to the preliminary research question and select data types that are stack and heap objects, and mostly references/pointers. 
 
-The choice can be justified with a statistical tool that shows which types are widely used in Rust and SPARK projects (\cref{sec:stats}).
+A simple regex counter was created to analyze 17 Rust code bases\footnote{\href{https://github.com/Dajamante/stat_ada_rust_code}{Rusty Regex Types Counter}}, including the Rust compiler, and three open-source code bases in SPARK for a total of 1,861 k\gls{LOC}. The selected data types are a series of stack and heap objects, which were chosen based on the results of the statistical tool that identified widely used types in Rust and SPARK projects. 
+
+With that tool and expert advice, we identified which types are widely used and relevant in Rust and SPARK projects (\cref{sec:stats}).
 
 \subsection{Statistic tool}
 \label{sec:stats}
-We created a program analyzing 17 code bases in Rust, including the Rust compiler, and three open-source code bases in SPARK. 
-%\inlinecode{x=2}
 
 
-\todoinline{make a friendly README for the stat repo and link it, link it also at the end}
+The program counts occurrences of different patterns with Regex in the code bases, including numbers, arrays, references, strings, and various heap-allocated types. The detailed patterns and scripts will be provided in \Cref{sec:systemDocumentation}.
 
-\todoinline{new research question: how can we select useful types? 
-possible reply: it seems to be scalar types and pointers are widely used in both languages}
-
-The program counts occurrences of different patterns with Regex in the code bases, including numbers, arrays, references, strings, and various heap-allocated types. 
-
-\texttt{cloc 1.9} counted 26,137 Rust files (1,792 k\gls{LOC}) in popular and qualitative Rust repositories.
+\texttt{cloc 1.9} counted 26,754 Rust files (1,862 k\gls{LOC}) in popular and qualitative Rust repositories.
 
 It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
+
+\subsection{Regexes}
+\subsubsection{Rust regexes}
+
+Rust compiler is quite liberal, and the type does not need to be declared as long as the compiler can figure out the type from the number. For this reason, we looked at number literals. 
+
+The number regex: \verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b| matches integers and floats. It matches also numbers with an underscore, as authorized by Rust. Because it is fenced by boundaries, it should not match type declarations or numbers inside a struct (please see next regex).
+
+Examples:
+\begin{minted}{Rust}
+    let x = 10_000;
+    let pi = 3.14;
+\end{minted}
+
+
+\texttt{struct} regex and \texttt{enum} regex. Since structs and enums need to be explicitly declared.
+
+\begin{minted}{Rust}
+    struct Point {
+        x: f32,
+        y: f32,
+    }
+    enum Color {
+    //...
+    }
+\end{minted}
+
+
+\texttt{array} regex: This regex matches array literals \inlinecode{[1, 2, 3, 4, 5]}, but not their declaration \inlinecode{[i32;5]}. More often then not the compiler does not need the declaration and can figure out the type. But in case we have the declaration, we don't want to match twice.
+
+\texttt{references} regex: This regex matches reference types in Rust, including mutable and immutable references.
+
+\begin{minted}{rust}
+let x = &x;
+let y = &mut x;
+\end{minted}
+
+\texttt{heap} regex: This regex matches the declaration heap-allocated types, specifically Box, Rc, and Arc. The regex is the keyword followed by \texttt{<}.
+
+\begin{minted}{rust}
+let boxed_value: Box<i32> = Box::new(5);
+let rc_value: Rc<String> = Rc::new(String::from("Hello"));
+let arc_value: Arc<u8>;
+\end{minted}
+
+\texttt{vector} regex: This regex matches dynamic Vec types and the vec![] macro in Rust.
+
+\begin{minted}{rust}
+let v = vec![1, 2, 3];
+let w: Vec<i32> = Vec::new();
+\end{minted}
+
+
+\texttt{string} regex pattern matches instances where a String is created. The usual methods are \inlinecode{to\_string()}, \inlinecode{String::new()},  \inlinecode{String::from()} or \inlinecode{format!()}.
+
+\begin{minted}{rust}
+let name = "Yacouba";
+let age = 12;
+let formatted = format!("{} is {} years old", name, age);
+\end{minted}
+
 
 \subsection{Reliability and validity of the statistics}
 
 The data is collected via file parsing and \texttt{Regex} patterns. 
 
-One source of error can be that some data types can be in comments instead of code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
+One source of error can be that some data types can appear in comments instead of the code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
 
-When it comes to Rust mutable and immutable references, and admittedly references can point at any data structure. But in the experiments references are used to study how ownership is transmitted, rather than a data type in its own rights. The presence of many \inlinecode{\&mut T} and \inlinecode{\&T}, as well as \inlinecode{Access} types in SPARK, shows that we need to study references and pointers.
+When it comes to Rust mutable and immutable references, admittedly references can point at any data structure. We mean that a \inlinecode{struct AStruct} can be declared and then referred by a number of \inlinecode{\&AStruct}. But this does not mean that we count the same object several times, rather then we study the use of references and how ownership is transmitted. 
 
-The most significant threat to the validity of the statistics is that large SPARK code bases are proprietary, forcing us to operate statistical analysis on small OSS projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). Besides, SPARK has a long industrial track record. It is used in many industrial
-applications, including air traffic, avionics, railways \etc. It is based on Ada, which is general-purpose and based on the classical stack model. Being used in industrial applications, one can assume safely that effectivity is a concern to SPARK programmers\,\cite{chapman_adacore_2018}.
+The presence of many references and pointers (\inlinecode{\&mut T} and \inlinecode{\&T}, as well as \inlinecode{Access} types in SPARK), rather confirms the need to study references and pointers.
+
 \subsection{Rust}
 
-\todoinline{Describe all the tools considered and used except valgrind and rust san. ffichecker, then the auri thing, then rr, miri}
+Rust is an open-source project with open crates (libraries). To perform the statistics below, the most popular crates were selected on Rust's official pages for crates, \href{crates.io}{crates.io}. 
 
-Rust is an open-source project with open crates (libraries). To perform the statistics below, the most popular crates were selected on Rust's official pages for crates, \href{crates.io}{crates.io}. Those crates are mostly used in the compiler, and for this reason, we selected popular projects on \href{lib.rs}{lib.rs} to analyze what programmers are actively using in production\footnote{Lib.rs utilizes a ranking algorithm that offers more qualitative information than crates.io, filtering away spam and poor-quality projects. The crate popularity is measured by downloads, direct and reverse dependencies, the usage trend, quality of README, tests, comments documentation, examples, and whether the crate is actively maintained}.
-Thirdly, the compiler, with a code base over 5 times bigger than the two projects above, was also deemed relevant for statistics.
+Those crates are mostly used in the compiler, and for this reason, we selected popular projects on \href{lib.rs}{lib.rs} to analyze what programmers are actively using in production\footnote{Lib.rs utilizes a ranking algorithm that offers more qualitative information than crates.io, filtering away spam and poor-quality projects. 
 
-\todoinline{REPLACE VERSIONS WITH HASH 
-librs/log: dc32ab9
-librs/json: a15bd09
-librs/thiserror: 0e45dde
-librs/clap: 8469554
-librs/serde: b80e722
-rustc: 66a2d62
-cratesio/syn: 6365093
-cratesio/rand: 0f3eced
-cratesio/libc: 89ec881
-cratesio/quote: ca98b65
-cratesio/cfg-if: 2621a59
-cratesio/proc-macro2: ab25487
-ewok-kernel: ca8e2a0
-SPARKNaCl: dfb1bd1
-spark-by-example: 2e4eb5a
-}
+The crate popularity is measured by downloads, direct and reverse dependencies, the usage trend, quality of README, tests, comments documentation, examples, and whether the crate is actively maintained}.
+Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger than the two projects above, was also deemed relevant for statistics.
 
 \begin{table}[htbp]
+\footnotesize
 \centering
-\caption{crates.io}
+\caption{Most popular projects on crates.io (171,897 LOC)}
 \label{tab:crates_io}
-\begin{tabular}{ |l|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
-\hline
-\rowcolor{brown!50!white}
-\multicolumn{4}{|c|}{Most popular crates.io projects 171 kLOC} \\
-\hline
+\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
 \hline
 \rowcolor{orange!50}
-Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time (in millions)\\
+Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline  all time in millions (LOC)\\
 \hline
-\footnotesize
-libc & Raw FFI bindings to platform libraries like libc & v0.2 (5,200) & 177 \\
+libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 (100,719)\\
 \hline
-syn & Parser for Rust source code & v1.0 (5,501) & 191 \\
+syn & Parser for Rust source code & 6365093 (5,501) & 191 (50,801) \\
 \hline
-rand and rand-core & Random number generators and other randomness functionality & v0.8 (9,892) & 183 \\
+rand and rand-core & Random number generators and other randomness functionality & 0f3eced (9,892) & 183 (13,655)\\
 \hline
-quote & Macro for turning Rust syntax tree data structures into tokens of source code & v1.0 (5,498) & 177 \\
+quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (5,498) & 177 (2,154)\\
 \hline
-cfg\-if & Ergonomically defines an item depending on a large number of \#[cfg]  & v1.0 (1,147) & 175 \\
+cfg\-if & Ergonomically defines an item depending on a large number of \#[cfg]  & 2621a59 (1,147) & 175 (144) \\
 \hline
-procmacro2 & A substitute implementation of the compiler's proc\_macro API & v1.0 (4,538) & 176 \\
+procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (4,538) & 176 (4,424)\\
 \hline
 \end{tabular}
 \end{table}
+
+
 \begin{table}[ht!]
+\footnotesize
 \centering
-\caption{Most popular projects on lib.rs 102 kLOC}
-\label{tab:lib}
-\begin{tabular}{ |l|m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
-\hline
-\rowcolor{brown!50!white}
-\multicolumn{4}{|c|}{lib.rs} \\
-\hline
+\caption{Most popular projects on lib.rs 172,049 LOC} 
+\label{tab:lib_rs}
+\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
 \hline
 \rowcolor{orange!50}
-Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time (in millions)\\
+Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time in millions (LOC)\\
 \hline
-    serde & Framework for serializing and deserializing & v1.0 (24,754) & 151  \\
-    \hline
-    serde-json &  A JSON serialization file format  & v1.0 (16,488) & 126   \\
-    \hline
-    clap & Command line args parser & v4.1 (10,201) & 106  \\ 
-    \hline
-    log &  A lightweight logging facade for Rust  & v0.4 (12,158) &  135  \\ 
-    \hline
-    thiserror &  Error handler  & v1.0 (9,010) &   83  \\ 
-    \hline
-    tokio &  Non-blocking platform for asynchronous I/O backed applications & v1.26 (11,583) & 89 \\
+serde & Framework for serializing and deserializing & b80e722 (24,754) & 151 (30,681)  \\
+\hline
+serde-json &  A JSON serialization file format  & a15bd09 (16,488) & 126  (15,553) \\
+\hline
+clap & Command line args parser & 8469554 (10,201) & 106 (49,799) \\ 
+\hline
+log &  A lightweight logging facade for Rust  & dc32ab9 (12,158) &  135 (3,322) \\ 
+\hline
+thiserror &  Error handler  & 0e45dde (9,010) &   83 (2,812) \\ 
+\hline
+tokio &  Non-blocking platform for asynchronous I/O backed applications & 1df874e (11,583) & 89 (69,892) \\
 \hline
 \end{tabular}
 \end{table}
@@ -1537,109 +1566,88 @@ Package& Description & Version \newline (Reverse Dependencies)&Downloads \newlin
 
 \subsection{Results}
 
-When looking at types per project, we can see that the rust compiler is much bigger \cref{fig:barplottypesrust}, for comparison, we have 102 k\gls{LOC} for lib.rs,  171 kLOC for crates.io and 1,518 kLOC in the rust compiler, but the repartition is quite similar with a domination of numbers \cref{fig:barplottypesrustpercent}. 
+When looking at types per project, we can see that the rust compiler is almost 5 times bigger than crates.io and lib.rs combined (\Cref{fig:barplottypesrust}). We have 172 k\gls{LOC} for lib.rs,  171 kLOC for crates.io and 1,518 kLOC in the rust compiler, but the repartition is quite similar with a domination of numbers \Cref{fig:stackedrust}. 
 
-But as we can see, numbers (Integers and Float) dominate the statistics \cref{fig:repartitionrust}. 
+As we can see, numbers (Integers and Float) dominate the statistics \Cref{fig:repartitionrust}, which allows replying to the subsidiary research question: both numbers and references need to be tested when binding Rust and SPARK.
 
-Their size is known at compile time, they are expressive and protected against overflow\footnote{The compiler will warn against risks of overflow}. 
+Numbers size is known at compile time. They are expressive in their type and protected against overflow\footnote{The compiler warns against risks of overflow}. 
 
 This confirms that Rust is used as a low-level, systems programming language. 
 
-Coming second are \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system and are used in a fourth of the cases. Logically, heap types account for a minority of types.
+The second most common category are references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system - they are like pointers, but guarantee a valid owner - and are used in a fourth of the cases. Logically, heap types account for a minority of types.
 
 \pgfplotstableread{
-Rust_type rustc crates_io lib_rs
-Numbers  12680 44688 304618
-Refs 7140 12662 137530
-Arrays  130 1893 9291
-Vec  977 397 14278
-Enum  1162 602 15040
-Struct  2428 4704 48955
-String  1140 445 18613
+Rust_type lib_rs crates_io rustc
+Numbers  22430 44688 304618
+Refs 7140 13909 137530
+Arrays  409 1893 9291
+Vec  1302 397 14278
+Enum  1283 602 15040
+Struct  3646 4704 48955
+String  1363 445 18613
 }\EXPDATA 
 
 \begin{figure}
     \centering
+    \scalebox{0.9}{
     \begin{tikzpicture}
-        \begin{axis}[
-            %title={Rust data types per project},
+        \begin{axis}[ 
             cycle list name=rustcolors,
             xtick=data,
             symbolic x coords={Numbers,Struct,String,Refs, Arrays,Vec,Enum},
             ybar,
-            legend style={at={(0.5,-0.2)},anchor=north},
             ymajorgrids=true,
             grid style=dashed,
             ymode=log,
             width=1\textwidth,
-            ylabel=Absolut number of types,
+            ylabel=Count of types,
+            reverse legend=true,
+            width=1\textwidth,
+            reverse legend=true,
+            legend style={draw=none},
+            legend image post style={scale=2.0},
+            legend style={
+                at={(0.5,-0.1)},
+            anchor=north,
+            %legend columns=-2
+            %mark size=20pt,
+        },
             ]
           \addplot table [x=Rust_type, y=rustc]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=crates_io]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=lib_rs]{\EXPDATA} ;
-        \legend{crates.io (171 kLOC),lib.rs (102 kLOC),rustc (1518 kLOC)}
+        \legend{crates.io (171 kLOC),lib.rs (172 kLOC),rustc (1518 kLOC)}
         \end{axis}  
-    \end{tikzpicture}
+    \end{tikzpicture}}
 \caption{Absolute number of Rust data types per project}
 \label{fig:barplottypesrust}
 \end{figure}
 %https://tex.stackexchange.com/questions/188147/how-to-put-legend-below-the-chart
+\clearpage
 
-\pgfplotstableread{
-Rust_type crates_io lib_rs rustc 
-Numbers 68.17 49.17 54.86 
-Refs 19.32 27.69 24.77 
-Struct 7.18 9.42 8.82
-Enum 0.92 4.51 2.71
-Vec 0.61 3.79 2.57
-String 0.68 4.42 3.35
-Box 0.24 0.51 1.26
-Arrays 2.89 0.50 1.67
-}\PERCENTDATA
 
-\begin{figure}[ht!]
-    \centering
-    \begin{tikzpicture}
-        \begin{axis}[
-            cycle list name=rustcolors,
-            xtick=data,
-            symbolic x coords={Numbers,Refs,Struct,Enum,Vec,String,Box,Arrays},
-            ybar,
-            legend style={at={(0.5,-0.2)},anchor=north},
-            ymajorgrids=true,
-            grid style=dashed,
-            width=1\textwidth,
-            ylabel=Percentage,
-            ]
-          \addplot table [x=Rust_type, y=rustc]{\PERCENTDATA} ;
-          \addplot table [x=Rust_type, y=crates_io]{\PERCENTDATA} ;
-          \addplot table [x=Rust_type, y=lib_rs]{\PERCENTDATA} ;
-        \legend{crates.io, lib.rs,rustc}
-        \end{axis}  
-    \end{tikzpicture}
-\caption{Rust types repartition for the compilers, crates.io and lib.rs (percentage)}
-\label{fig:barplottypesrustpercent}
-\end{figure}
 
-\begin{comment}
-Detailed table
-Label Numbers  Refs  Struct  Enum  Vec  String  Box  Arrays
-cratesio   68.17   19.32  7.18    0.92  0.61  0.68   0.24  2.89
-librs   49.17   27.69  9.42    4.51  3.79  4.42   0.51  0.50
-rustc   54.86   24.77  8.82    2.71  2.57  3.35   1.26  1.67
-\end{comment}
+
 \pgfplotstableread{
 Label Numbers  Refs  Struct/Enum  Heap  Arrays
-cratesio   68.17   19.32  8.1  1.53  2.89
-librs   49.17   27.69  13.91  8.72  0.50
-rustc   54.86   24.77  11.53 7.18 1.67
+cratesio   68.17   19.32  8.10  1.53  2.88
+librs   49.95   30.97  10.98  7.20  0.90
+rustc   54.86   24.76  11.53 7.18 1.67
 }\testdata
 
+\pgfkeys{
+    /pgf/number format/.cd,
+    fixed,
+    fixed zerofill,
+    precision=2
+}
 \begin{figure}[ht!]
     \centering
+    \scalebox{0.9}{
     \begin{tikzpicture}
     \begin{axis}[
         ybar stacked,
+        reverse legend,
         %https://tex.stackexchange.com/questions/88892/pgfplots-bar-plot-spacing-inbetween-bars
         enlarge x limits=0.4,
 	    bar width=45pt,
@@ -1648,9 +1656,12 @@ rustc   54.86   24.77  11.53 7.18 1.67
             color=black,
             font=\small,
             name=X,
-            shift={    
-                (50pt,25pt)
-                },
+%            shift={    
+%                (50pt,25pt)
+%                },
+            xshift={  50pt },
+                yshift ={
+                ifthenelse((\plotnum == 4), 30pt,25pt)},
             },
             scatter/@post marker code/.append code={
                 \node(Y){};
@@ -1662,12 +1673,15 @@ rustc   54.86   24.77  11.53 7.18 1.67
         ymin=0,
         ymax=115,
         xtick=data,
-        reverse legend=true,
         width=1\textwidth,
+        legend style={draw=none},
+        legend image post style={scale=2.0},
         legend style={
             at={(0.5,-0.2)},
             anchor=north,
             legend columns=-2,
+            font=\large,
+            %mark size=20pt,
         },
         ylabel=Percentage points (\%),
         xticklabels from table={\testdata}{Label},
@@ -1684,9 +1698,10 @@ rustc   54.86   24.77  11.53 7.18 1.67
     \addplot  table [y=Arrays, meta=Label, x expr=\coordindex] {\testdata};
     \addlegendentry{Arrays}
     \end{axis}
-    \end{tikzpicture}
-\caption{BAR STACKED TEST (With percentage)}
-\label{fig:stacked}
+    \end{tikzpicture}}
+\caption{Rust types repartition for the compilers, crates.io, and lib.rs
+(percentage)}
+\label{fig:stackedrust}
 \end{figure}
 
 
@@ -1696,53 +1711,33 @@ rustc   54.86   24.77  11.53 7.18 1.67
 
 \begin{figure}[ht!]
   \centering
-\begin{tikzpicture}[scale=3]
-\centering    
-
-\newlength\lena
-\newlength\lenb
-  {black,fill=gray,mark=none}
-\foreach \p/\t/\c in {56.0/Numbers/red!40!white, 24.3/ Refs/yellow!50!white, 11.3/Struct\&Enum/brown!50!white, 8.38/others (heap)/orange}
-  {
-    \global\lena=\lenb
-    \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
-
-    \edef\numbera{\stripatpt\lena}
-    \edef\numberb{\stripatpt\lenb}
-
-    \slice{\numbera/100*360}
-          {\numberb/100*360}
-          {\p\%}{\t}
-          {\c}
-          %{black!\p}
-  }
-\end{tikzpicture}
+  \scalebox{0.9}{
+    \begin{tikzpicture}[scale=3]
+    \centering    
+     
+    \newlength\lena
+    \newlength\lenb
+      {black,fill=gray,mark=none}
+    \foreach \p/\t/\pat\c in {55.84/Numbers/crosshatch/red!70!white, 24.65/Refs/vertical lines/orange!90!white, 11.30/Struct\&Enum/grid/yellow!90!orange, 8.21/others (heap)/horizontal lines/green!60!black}
+      {
+        \global\lena=\lenb
+        \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
+    
+        \edef\numbera{\stripatpt\lena}
+        \edef\numberb{\stripatpt\lenb}
+    
+        \slice{\numbera/100*360}
+              {\numberb/100*360}
+              {\p\%}{\t}
+              {\pat}
+              {\c}
+              %{\pattern}
+              %{black!\p}
+      }
+    \end{tikzpicture}}
   \caption{Rust types repartition for all Rust projects}
   \label{fig:repartitionrust}
 \end{figure}
-\FloatBarrier
-
-%\begin{table}[ht!]
-%  \centering
-%  \caption{Rust Types Data}
-%    \begin{tabular}{|l|r|r|}
-%   \hline
-%    Rust Type & Frequency of Use & Percentage \\
-%    \hline
-%    Numbers & 362,648 & 56.20\% \\
-%    \&mut T or \&T & 155,911 & 24.16\% \\
-%    struct & 55,716 & 8.68\% \\
-%    enum & 16,677 & 2.58\% \\
-%    Vec & 15,613 & 2.46\% \\
-%    Array & 11,418 & 1.77\% \\
-%    String & 20,012 & 3.10\% \\
-%    Box/Arc/Rc & 7,217 & 1.12\% \\
-%    \hline
-%    Total & 654,124 & 100.00\% \\
-%    \hline
-%    \end{tabular}%
-%  \label{tab:rust_types}%
-%\end{table}%
 \FloatBarrier
 
 \subsection{SPARK}
@@ -1752,52 +1747,44 @@ Most SPARK large code bases are proprietary. It is therefore difficult to run st
 The statistics were made on three open-source repositories. 
 We checked a total number of 504 files and a total of 27 k\gls{LOC}.
 
-
 \begin{itemize}
-    \item \textbf{SPARKNaCl}, a cryptography library that implements the same functionality as the NaCl (a networking crypto library), which aims to provide a completely automated static proof of type-safety.
-    \item \textbf{EwoK}, a secure microkernel designed for micro-controllers and embedded systems that enforces strict isolation between tasks and device drivers, and provides strong access control to physical resources. 
-    \item \textbf{SPARK by example}, a repository with exercises to practice the language
+    \item \textbf{SPARKNaCl}, with 8,546 \gls{LOC} (git hash dfb1bd1). SPARKNaCl is a cryptography library that implements the same functionality as the NaCl (a networking crypto library), which aims to provide a completely automated static proof of type-safety.
+    \item \textbf{EwoK}, with 12,755 LOC (git hash ca8e2a0). Ewok is a secure microkernel designed for micro-controllers and embedded systems that enforces strict isolation between tasks and device drivers, and provides strong access control to physical resources.  
+    \item \textbf{SPARK by example}, with 6,485 LOC (git hash 2e4eb5a). This a repository with exercises to practice the language
 \end{itemize}
-
 
 \begin{figure}[ht!]
   \centering
-\begin{tikzpicture}[scale=3]
-\centering    
-
-%Total number of types : 2695
-%key : Record, value : 310, percentage 0.1150
-%key : Number, value : 1397, percentage 0.5184
-%key : Enum, value : 86, percentage 0.0319
-%key : Unconstrained array, value : 28, percentage 0.0104
-%key : Access, value : 873, percentage 0.3239
-%key : Unbounded strings, value : 1, percentage 0.0004
-
-\foreach \p/\t\c in {51.8/Numbers/red!40!white, 32.4/Access/yellow!50!white, 14.6/Record\&Enum/brown!50!white, 1.6/others(1.6\%)/orange}
-  {
-   \pgfmathtruncatemacro\intp{\p}
-
-    \global\lena=\lenb
-    \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
-
-    \edef\numbera{\stripatpt\lena}
-    \edef\numberb{\stripatpt\lenb}
-
-    \ifthenelse{\intp<2}{
-    \slice{\numbera/100*360}
-          {\numberb/100*360}
-          {}{\t}
-          {\c}
-          %{black!\p}
-   }{
-    \slice{\numbera/100*360}
-          {\numberb/100*360}
-          {\p\%}{\t}
-          {\c}
-          %{black!\p}
-    }
-  }
-\end{tikzpicture}
+  \scalebox{0.9}{
+    \begin{tikzpicture}[scale=3]
+    \centering    
+    \foreach \p/\t\pat\c in {51.84/Numbers/crosshatch/red!70!white, 32.15/Access/vertical lines/orange!90!white, 14.42/Record\&Enum/grid/yellow!90!orange, 1.59/others (1.59\%)/horizontal lines/green!60!black}   
+      {
+       \pgfmathtruncatemacro\intp{\p}
+    
+        \global\lena=\lenb
+        \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
+    
+        \edef\numbera{\stripatpt\lena}
+        \edef\numberb{\stripatpt\lenb}
+    
+        \ifthenelse{\intp<2}{
+        \slice{\numbera/100*360}
+              {\numberb/100*360}
+              {}{\t}
+              {\pat}
+              {\c}
+              %{black!\p}
+       }{
+        \slice{\numbera/100*360}
+              {\numberb/100*360}
+              {\p\%}{\t}
+              {\pat}
+              {\c}
+              %{black!\p}
+        }
+      }
+    \end{tikzpicture}}
   \caption{SPARK types repartition}
   \label{fig:repartition_spark}
 \end{figure}
@@ -1807,54 +1794,36 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
 
 \section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
 \label{sec:experimentalDesign}
-The control studies will be centered around:
+
+\subsection{Chosen data types}
+The control studies are centered around:
 \begin{itemize}
     \item Stack objects and scalars: numbers, arrays, enums, and structs (with objects size known at compile time).
-    \item Heap objects: dynamic types such as Vec.
+    \item \texttt{\&mut T} and \texttt{\&T}, as well as the \texttt{Access} types, with focus on how ownership is kept or transmitted ownership.
+    \item Some heap objects: dynamic types such as Vec.
 \end{itemize}
+\subsection{Threat to validity in the statistics}
 
-The focus will be on \texttt{\&mut T} and \texttt{\&T}, as well as the \texttt{Access} types, to keep or transmit ownership.
+We do not foresee large threats to validity for Rust. Rust is a systems programming languages and appears to be used a such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to operate statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). Besides, SPARK has a long industrial track record. It is used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is general-purpose and based on the classical stack model. Being used in industrial applications, one can assume safely that effectivity is a concern to SPARK programmers\,\cite{chapman_adacore_2018}.
+
+\section[BBqueue]{Application with BBQueue}
+\label{sec:methodBBQueue}
 
 \todoinline{Describe more the BBQueue test when we come to that}
 
+\subsection{Additional tools for debugging and tracking memory usage}
+
+To assess for type safety, memory safety, and ownership, we ran mostly \texttt{valgrind} and \texttt{Rust-san}\footnote{https://github.com/japaric/rust-san}.
+When possible we used \texttt{gnatprove}, even if the tool is not designed for FFI as the prover works on SPARK code, not external code.
+
+Other tools we tried were \texttt{FFI-checker}\cite{li_detecting_2022}, \texttt{rr}\footnote{https://rr-project.org/} and \texttt{memflow}\footnote{https://github.com/memflow/memflow}. In the end, the existing Rust sanitizers and \texttt{valgrind} proved to sufficient .
+For some types that are copy, we used graphs generators to visualize control flow.
+
 \subsection{Environment}
 
-\todoinline{Describe briefly the Dockerfile and link to the repo}
-
-\subsection{Hardware/Software to be used}
-
-\todoinline{Describe my settings}
+The environment is fairly complex as it needs to function for Rust and SPARK in interaction. A  Dockerfile was prepared for this usage (more details in \Cref{sec:systemDocumentation}).
 
 
-\subsection{Validity of method}
-\label{sec:validtyOfMethod}
-
-The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that are applicable to an automated tool for bindings on the model of \texttt{bindgen}\,\cite{noauthor_bindgen_2022}. 
-
-As a reminder, bindgen is a binding tool that generates bindings between Rust and C. The languages analyzed in this thesis have richer types than C, and the goal is to learn to take full advantage of their expressivity.
-
-The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. It is necessary to establish that ownership, type safety, and memory safety are conserved for a binding to be considered correct.
-
-This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
-Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
-Control study programs can provide a foundation for automatic tooling.
-
-When the control studies are performed, an additional experiment is executed with a library that exists in both languages.
-
-
-\subsection{Software Tools}
-%\label{sec:softwareTools}
-%\sweExpl{Mjukvaruverktyg}
-
-Linking is always a major problem in this kind of project.
-
-From SPARK to rust I used direct linking with memory sanitizer at the gcc level or rustc level.
-From Rust to SPARK I was lucky enough to use a more advanced tool that has its own build script.
-
-\todoinline{Describe the above}
-
-
-\todoinline{Add valgring and flags}
 \section{System documentation}
 \label{sec:systemDocumentation}
 %\sweExpl{Systemdokumentation\\
@@ -1862,7 +1831,7 @@ From Rust to SPARK I was lucky enough to use a more advanced tool that has its o
 %Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
 %\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
 
-\todoinline{Link to the different github repos with description of what they do including stats, do the README to be more friendly}
+\todoinline{Link to the different GitHub repos with a description of what they do including stats, do the README to be more friendly}
 
 %gpr-rust
 
@@ -1874,147 +1843,149 @@ From Rust to SPARK I was lucky enough to use a more advanced tool that has its o
 \label{ch:whatYouDid}
 
 
-\todoinline{Currently only experiments, need to add BBqueue when we come to that.}
+\todoinline{
+1. Describe experiments (done)
+2. Describe BBqueue 
+}
 
 
-\engExpl{What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?}
+%What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?
 
-This section covers the experiments done to implement our FFI bindings between Rust and SPARK. 
+This section describes both control studies and real-world implementation with BBQueue, to provide recommendations for FFI bindings between Rust and SPARK. 
 
-For reproducibility purposes, it will describe the setup from a high level perspective.
-Efforts were put into going away from in between C types and going away from C as a protocol.
 
-After assessing for type safety and ownership, we ran tools for memory safety.
 
-FFI-checker, rr and memflow were not used as valgrind was more than sufficient (FFI-checker had dependencies issues, rr had issues on AMD and memflow was an overkill).
-We used graphs to visualise control flow to see which types were copy (graphviz).
 
-We are using gnatprove whenever we can.
 
 \section{System}
-Linux version 5.19.0-051900-generic (kernel@sita) (x86\_64-linux-gnu-gcc-11 (Ubuntu 11.3.0-5ubuntu1) 11.3.0, GNU ld (GNU Binutils for Ubuntu) 2.38.90.20220713) \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022
+Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
+Distributor ID:	Ubuntu
+Description:	Ubuntu 22.04.1 LTS
+Release:	22.04
+Codename:	jammy
 
 % the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
 \section[Environment for \& SPARK/Rust experiments]{Environment for SPARK/Rust experiments}
 
+We experimented with SPARK to/from Rust systems. Both setups had similarities but also differences. 
 
-Figure~\ref{fig:buildada} shows the build process for a SPARK file using a Rust library. Both files reside in the same directory. This is a straightforward process where the rust lib is compiled as a staticlib.
+For reproducibility purposes, this section describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
 
-\begin{figure}[!ht]
-  \begin{center}
-\begin{tikzpicture}[node distance=2cm, font=\sffamily]
-    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=4.5cm, fill=white, rounded corners=10,thick]
-    \tikzstyle{arrow} = [->, >=stealth, thick]
-    \node (step1) [process, fill=red!20] {main.adb file};
-    \node (step2) [process, fill=yellow!20, below of=step1] {lib.rs};
-    \node (step3) [process, fill=brown!20, below of=step2] {gnatbind main};
-    \node (step4) [process, fill=orange!20, below of=step3] {gnatlink main + lib.a};
 
-    \draw [arrow] (step1) -- (step2) node[midway, right] {gcc, no optimisation};
-    \draw [arrow] (step2) -- (step3) node[midway, right] {build the rust file as staticlib with rustc};
-    \draw [arrow] (step3) -- (step4)
-    node[midway, right] {gnatbind};
-    \draw [arrow] (step4.south) -- +(0,-0.5) node[below] {link main + lib.a} -- +(5.5,-0.5)  node[right] {executable};
-\end{tikzpicture}
-  \end{center}
-  \caption{SPARK using a Rust library}
-  \label{fig:buildada}
-\end{figure}
+\subsection{SPARK to Rust}
+
+\Cref{fig:sparkbuild} shows the build process for a SPARK file using a Rust library. Both files reside in the same root folder and this is a straightforward process. 
+The SPARK file is compiled without optimizations for debugging purposes and the Rust library is compiled as a static library for simplicity. 
+Gnatbind then checks whether the SPARK program is consistent and the linking with the Rust library is done in the last step.
+The process is designed to fail if a step is not done properly.
 
 \begin{figure}[ht!]
     \centering
-    \begin{tikzpicture}[node distance=2cm, font=\sffamily]
-    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=4.5cm, fill=white, rounded corners=10,thick]
+    \scalebox{0.8}{
+    \begin{tikzpicture}[node distance=2cm, font=\small]
+    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=6cm, fill=white, rounded corners=10,thick]
+    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=2.5cm, minimum height=0.8cm, text centered, text width=2.2cm, fill=white, rounded corners=5,thick]
     \tikzstyle{arrow} = [->, >=stealth, thick]
-    \node (step1) [process, fill=red!20] {cargo project: main.rs + build.rs \\
-        \begin{tikzpicture}[font=\small, scale=0.2, inner sep=2pt]
-            \node (lib.adb) [process] {lib.adb};
-        \end{tikzpicture}
+    \node (step1) [process, fill=red!30] {Common root folder
+    \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
+    \node (main) [smallprocess, fill=red!20] {main.adb};
+    \node (lib) [smallprocess, fill=red!20, right of=main, xshift=1cm] {lib.rs};
+    \end{tikzpicture}
     };
-    \node (step2) [process, fill=yellow!20, below of=step1] {Compiling Ada files};
-    \node (step3) [process, fill=brown!20, below of=step2] {Building};
-    \draw [arrow] (step1) -- (step2) node[midway, right] {Build with call to gprbuild};
-    \draw [arrow] (step2) -- (step3) node[midway, right] {Linking};
-    \draw [arrow] (step3.south) -- +(0,-0.5) -- +(5.5,-0.5)  node[right] {executable};
-\end{tikzpicture}
-    \caption{Rust using a SPARK library}
-    \label{fig:rustbuild}
+    \node (step2) [process, below of=step1,fill=orange!30] {Compile SPARK main};
+    \node (step3) [process, ,fill=orange!20, below of=step2] {Compile Rust lib as static lib};
+    \node (step4) [process, fill=yellow!30, below of=step3] {Control consistency};
+    \node (step5) [process, fill=yellow!30, below of=step4] {Link Ada and Rust objects};
+ 
+    \draw [arrow] (step1) -- (step2) node[midway, right] {gcc -O0};
+    \draw [arrow] (step2) -- (step3) node[midway, right] {rustc staticlib};
+    \draw [arrow] (step3) -- (step4) node[midway, right] {gnatbind};
+    \draw [arrow] (step4) -- (step5) node[midway, right] {gnatlink SPARK, Rust and system libs};
+\end{tikzpicture}}
+\caption{Process for SPARK code using Rust library}
+\label{fig:sparkbuild}
 \end{figure}
 
+\subsection{Rust to SPARK}
 
-\section{Experiments on types known at compile time}
+\Cref{fig:rustbuild} shows the build process for a Rust project using a SPARK project. 
 
-\subsection{Description}
+This time we are using the crate \texttt{gpr} which is designed for bigger projects. While it introduces a more complexity, it also allows access to a richer toolset.  
 
-A series of experiments were done on scalar and aggregate types. For a reminder, a scalar type is a type that can hold a single value at a time (for example, an integer or an enum). Conversely, a non-scalar type example would be an array.
+An entire Rust project was built with \texttt{cargo new <proj>}, the Rust packet manager. Then a library project was built inside the Rust project with \texttt{alire}, the GNAT packet manager \texttt{alr init --lib <newlib>}. The library path is provided to the Rust \texttt{build.rs} file. This approach requires some familiarity with Rust and Ada packet managers.
+Even in this case, we made the build fail if one step is not successful, to avoid to inadvertently run an experiment with an old version of the library.
 
-In this section we did experiments on integers, enums and arrays.
+\begin{figure}[ht!]
+\centering
+\scalebox{0.8}{
+    \begin{tikzpicture}[node distance=2.5cm, font=\small]
+    \tikzstyle{process} = [draw, rectangle, minimum width=6cm, minimum height=1cm, text centered, text width=5.5cm, fill=white, rounded corners=10,thick]
+    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=3.5cm, minimum height=0.8cm, text centered, text width=3.2cm, fill=white, rounded corners=5,thick]
+    \tikzstyle{arrow} = [->, >=stealth, thick]
+        \node (step1) [process, fill=red!30] {Cargo project \
+        \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
+        \node (lib.adb) [smallprocess, fill=red!20] {lib.adb};
+        \end{tikzpicture}
+        };
+        \node (step2) [process, below of=step1,fill=orange!30] {Load SPARK project file with gpr crate};
+        \node (step3) [process, ,fill=orange!20, below of=step2] {Build SPARK project with gprbuild command};
+        \node (step4) [process, fill=yellow!30, below of=step3] {Generate linker search path and flags for Cargo};
+        \node (step5) [process, fill=yellow!20, below of=step4] {Output "rerun-if-changed" directive for Cargo};
+        \node (step6) [process, fill=brown!20, below of=step5] {Build and link Rust executable};
+        
+        \draw [arrow] (step1) -- (step2) node[midway, right] {cargo run + path to LD\_LIBRARY\_PATH};
+        \draw [arrow] (step2) -- (step3) node[midway, right] {Call gprbuild};
+        \draw [arrow] (step3) -- (step4) node[midway, right, align=center] {Extract library directory \\ and name from project object};
+        \draw [arrow] (step4) -- (step5) node[midway, right] {Iterate over source directories};
+        \draw [arrow] (step5) -- (step6) node[midway, right, , align=center] {Use linker search path and flags \\ to build and link executable};
+    \end{tikzpicture}}
+\caption{Process for Rust code building a SPARK library}
+\label{fig:rustbuild}
+\end{figure}
+Efforts were put into going away from in between C types and going away from C as a protocol.
 
-The goal of the experiments is demonstrate the integration of Rust functions into Ada through the FFI (foreign function interface) by performing simple operations like swapping integers, summing an array of integers, and printing an enumeration. The experiments illustrate the ability to pass integers and arrays by reference and pass enumerations (that are resolved to a list of numbers) between the two languages.
+\section{Experiments stack-types}
 
-\textbf{Make a table with all the programs and their description.}
+Stack-types sizes are known at compile time in both Rust and SPARK. For numbers, Rust types names clarify its size, while the GNAT compiler chooses the best type to hold the variable depending on the precision that is required (**learned that in the training yesterday, to develop?).
 
-\subsection{Discussion on numbers}
+A series of experiments were done on stack-allocated scalar and aggregate types. As a reminder, a scalar type is a type that can hold a single value at a time (for example, an integer or an enum). Conversely, a non-scalar type holds different values, like an array. 
 
-What are the strong and weak points of Rust and Ada and how do we work around them?
+The data explored in the experiments include arithmetic manipulations, ensuring correct layout and size, and shows that compatibility is relatively easily achieved, even if human error is still possible. The goal of our experiments is not to write defensive code which could never be exhaustive. That being said, loosing contract based programming in SPARK and Rust compiler verification showed how brittle the FFI passing could be (** I mean here that I read that in the literature but I could see properly what was meant).
 
-Rust has Sized types u64 that are not machine dependent.
+We tested basic integer types, with simple integer arithmetic and swapping integer values. They were passed by copy and reference, and the result was returned or updated in place.
 
-Ada has in addition Modular type and Bounded types.
+We tested fieldless enums to shows that the memory layout is compatible between the two languages by using the repr attribute in Rust and the Size aspect in Ada, since fieldless enums are internally resolved to tags.
 
+We tested arrays of integers and fixed-size strings. We highlighted possible unsafe operations, that could be prevented by sanitizing.
 
-\textbf{List of assumptions and discussion:}
-
-Assumptions of the Rust program for Ada
-1. It is going to be an i32 integer --> Integer on the Ada side
-2. We don't know the size of the Integer in Ada. `usize` and `isize` (that used to be called int, dependent on the machine) may be `Integer` in Ada? Needs to be clarified
-3. We are not using `usize` and `isize` as ``The size of this primitive is how many bytes it takes to reference any location in memory." --> they are not meant for calculation but for indexing
-4. In Rust we should use sized type for calculation, but semantically = Integer\_ada are machine-dependent numbers// Rust they are not machine dependent
-5. We should always use specific type sizes. Are there Ada libraries that give you scoped sizes? Like `u64`?
-6. Remember it was a huge problem before: for example C's is using machine-dependent types
-That was a huge problem before, Ada has 32 bits integers! The legality rules say that the Ada Integer size is between Min and Max of what the machine supports\url{https://ada-lang.io/docs/arm/AA-3/AA-3.5/#legality-rules-1}: 
-
-From that, we see that GNAT provides also some references\url{https://docs.adacore.com/live/wave/gnat_rm/html/gnat_rm/gnat_rm/implementation_defined_characteristics.html#implementation-defined-characteristics}
-
-7. What is happening
-
-It is working without issues.
-
-8. What can happen:
-
-It is possible to "lie" to the compiler. Overflow can happen. SPARK cannot check.
-
-9. Recommendations:
-I expect the GNAT compiler to be used
-I expect that sized types to be used
-For constrained Integers the following must be done: …
-For modular Integers the following must be done: …
-
-Put some words on fieldless enums.
-Put some words on arrays. We did it with Strings and it seem to work.
-Those types are copy so there is no need to worry about it.
-Copy types can be observed with MIR.
-
+Those experiments demonstrated how to perform sound and safe operations with SPARK/Rust code in simple operations with stack-allocated data.
 
 \section{Experiments on heap types}
 
-In those experiments, we could focus on memory management.
+For heap-types, the focus was laid on memory management. 
 
-Those still focus on arithmetic operations and writing at a specific location (bounded and unbounded string).
-Working with heap-allocated data structures like strings and records containing accesses.
-Memory management and deallocation were demonstrated.
+The heap experiments focus on arithmetic operations and writing at specific locations, for example replacing the bytes inside a String.
 
-The work focuses on meeting Ada expectations about the layout. Here we modeled the size of the datastructure with the flag -gnatRj, and did the same size on the rust side. we did some padding for example but it was a bad idea.
-the expectations must be respected, for example ada fat pointers are first the data then the bounds, a similar data structure needs to be done on the rust side.
-Also memory management needs to be done in good ffi citizen way. data allocated on one side must be freed on the same side.
+The experiment is done both with a String and records containing heterogenous data types (access String and Integer).
+This part focuses on meeting layout expectations. We looked at the size and layout of data structures we were passing (with flags and \inlinecode{std::mem}). We experimented with padding and disassembled the program. We compared addresses to make sure that the same object was fetched on both sides.
+We saw that the expectations of SPARK must be respected. For example, fat pointers must be reproduced with the same layout, with a similar data structure on the other side.
+Also, memory management needs to be done in a good FFI citizen way. data allocated on one side must be freed on the same side.
 
-rust is using jemalloc something something what the heck is ada using.
+While still not focusing on defensive code, we exported all the unsafe operations to a part of the code where safety checks were done, allowing proper error handling.
 
-Also we showed it is easy to make memory errors by returning non boxed elements.
+We also control for not unwinding at the FFI frontier, which is undefined behavior.
 
-\textbf{Make a table with all the programs and their description.}
+We run \texttt{valgrind} to show both sound bindings and bindings which have intentional memory leaks, as a demonstration.
+
+\section{BBqueue}
+
+\todoinline{BBqueue experiments}
 
 
+
+
+\begin{comment}
+    
 \section{Old figures}
 
 
@@ -2100,7 +2071,7 @@ Also we showed it is easy to make memory errors by returning non boxed elements.
     \label{fig:hyperVcontainers}
 \end{figure}
 \FloatBarrier
-
+\end{comment}
 
 \cleardoublepage
 \chapter{Results and Analysis}
@@ -2116,8 +2087,73 @@ In this chapter, we present the results and discuss them.
 \section{Major results}
 \sweExpl{Huvudsakliga resultat}
 
+\todoinline{This discussion on numbers will go to the discussion together with the recommendation}
+
+\todoinline{This is what we found out about numbers, and with its recommendation will be moved to the discussion part.}
+
+What are the strong and weak points of Rust and Ada and how do we work around them?
+
+Rust has Sized types u64 that are not machine dependent.
+
+Ada has in addition Modular type and Bounded types.
+
+
+\textbf{List of assumptions and discussion:}
+
+Assumptions of the Rust program for Ada
+1. It is going to be an i32 integer --> Integer on the Ada side
+2. We don't know the size of the Integer in Ada. `usize` and `isize` (that used to be called int, dependent on the machine) may be `Integer` in Ada? Needs to be clarified
+3. We are not using `usize` and `isize` as ``The size of this primitive is how many bytes it takes to reference any location in memory." --> they are not meant for calculation but for indexing
+4. In Rust we should use sized type for calculation, but semantically = Integer\_ada are machine-dependent numbers// Rust they are not machine dependent
+5. We should always use specific type sizes. Are there Ada libraries that give you scoped sizes? Like `u64`?
+6. Remember it was a huge problem before: for example C's is using machine-dependent types
+That was a huge problem before, Ada has 32 bits integers! The legality rules say that the Ada Integer size is between Min and Max of what the machine supports\url{https://ada-lang.io/docs/arm/AA-3/AA-3.5/#legality-rules-1}: 
+
+From that, we see that GNAT provides also some references\url{https://docs.adacore.com/live/wave/gnat_rm/html/gnat_rm/gnat_rm/implementation_defined_characteristics.html#implementation-defined-characteristics}
+
+7. What is happening
+
+It is working without issues.
+
+8. What can happen:
+
+It is possible to "lie" to the compiler. Overflow can happen. SPARK cannot check.
+
+9. Recommendations:
+I expect the GNAT compiler to be used
+I expect that sized types to be used
+For constrained Integers the following must be done: …
+For modular Integers the following must be done: …
+
+Put some words on fieldless enums.
+Put some words on arrays. We did it with Strings and it seem to work.
+Those types are copy so there is no need to worry about it.
+Copy types can be observed with MIR.
+
+
+
 Some statistics of the delay measurements are shown in Table~\ref{tab:delayMeasurements}.
 The delay has been computed from the time the GET request is received until the response is sent.
+
+
+
+
+\subsection{Validity of method}
+\label{sec:validtyOfMethod}
+
+The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that are applicable to an automated tool for bindings on the model of \texttt{bindgen}\,\cite{noauthor_bindgen_2022}. 
+
+As a reminder, bindgen is a binding tool that generates bindings between Rust and C. The languages analyzed in this thesis have richer types than C, and the goal is to learn to take full advantage of their expressivity.
+
+The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. It is necessary to establish that ownership, type safety, and memory safety are conserved for a binding to be considered correct.
+
+This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
+Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
+Control study programs can provide a foundation for automatic tooling.
+
+When the control studies are performed, an additional experiment is executed with a library that exists in both languages.
+
+
 
 \sweExpl{Lite statistik av fördröjningsmätningarna visas i Tabell~\ref{tab:delayMeasurements}. Förseningen har beräknats från den tidpunkt då begäran GET tas emot fram till svaret skickas.}
 
