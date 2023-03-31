@@ -1435,63 +1435,90 @@ It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
 \subsection{Regexes}
 \subsubsection{Rust regexes}
 
-Rust compiler is quite liberal, and the type does not need to be declared as long as the compiler can figure out the type from the number. For this reason, we looked at number literals. 
+The Rust regex patterns are designed to match type declarations and literals, except for the number pattern. The number pattern focuses on matching numeric literals. Since the Rust compiler is generally efficient at deducing the types, writing a type declaration is generally omitted. The patterns cover the following constructs:
 
-The number regex: \verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b| matches integers and floats. It matches also numbers with an underscore, as authorized by Rust. Because it is fenced by boundaries, it should not match type declarations or numbers inside a struct (please see next regex).
-
-Examples:
-\begin{minted}{Rust}
-    let x = 10_000;
-    let pi = 3.14;
+1. Numbers (\verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b|): Matches integer and floating-point literals, including those with underscores. For example:
+\begin{minted}{rust}
+let c = 3.14;
 \end{minted}
 
-
-\texttt{struct} regex and \texttt{enum} regex. Since structs and enums need to be explicitly declared.
-
-\begin{minted}{Rust}
-    struct Point {
-        x: f32,
-        y: f32,
-    }
-    enum Color {
-    //...
-    }
-\end{minted}
-
-
-\texttt{array} regex: This regex matches array literals \inlinecode{[1, 2, 3, 4, 5]}, but not their declaration \inlinecode{[i32;5]}. More often then not the compiler does not need the declaration and can figure out the type. But in case we have the declaration, we don't want to match twice.
-
-\texttt{references} regex: This regex matches reference types in Rust, including mutable and immutable references.
+2. Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|): Matches array literals, excluding array declarations to avoid double matching. For example, this will be only one match:
 
 \begin{minted}{rust}
-let x = &x;
-let y = &mut x;
+let a : [i32; 5] = [1, 2, 3, 4, 5];  
 \end{minted}
 
-\texttt{heap} regex: This regex matches the declaration heap-allocated types, specifically Box, Rc, and Arc. The regex is the keyword followed by \texttt{<}.
+3. References (\verb|&[mut\s]*\w+|): Matches mutable and immutable reference types. It will match \texttt{\&T} and \texttt{\&mut T}.
 
 \begin{minted}{rust}
-let boxed_value: Box<i32> = Box::new(5);
-let rc_value: Rc<String> = Rc::new(String::from("Hello"));
-let arc_value: Arc<u8>;
+let y = &mut x;  
 \end{minted}
 
-\texttt{vector} regex: This regex matches dynamic Vec types and the vec![] macro in Rust.
+4. Heap Types (\verb|Box<[<>]+>|Rc<[<>]+>|Arc<[<>]+>|): Matches Box, Rc, and Arc heap-allocated type declarations. For example:
 
 \begin{minted}{rust}
-let v = vec![1, 2, 3];
-let w: Vec<i32> = Vec::new();
+let boxed_value: Box<i32>
 \end{minted}
-
-
-\texttt{string} regex pattern matches instances where a String is created. The usual methods are \inlinecode{to\_string()}, \inlinecode{String::new()},  \inlinecode{String::from()} or \inlinecode{format!()}.
+5. Dynamic Vectors (\verb|vec!|Vec::new|): Matches dynamic vector types declaration in Rust and the vec![] macro.
 
 \begin{minted}{rust}
-let name = "Yacouba";
-let age = 12;
-let formatted = format!("{} is {} years old", name, age);
+let v = Vec::new();
+\end{minted}
+6. Strings (\verb|String::|.to\_string|format!|): Matches String creation and manipulation through various methods and macros.
+
+\begin{minted}{rust}
+let girl_name = "Mouneissa".to_string();
 \end{minted}
 
+\subsection{SPARK regexes}
+
+These focus on type declarations.
+The patterns cover the following constructs:
+
+1. Numbers: This pattern uses Ada keywords for numbers (\texttt{Integer, Float, Modular...}) and matches various numeric types such as integer, float, fixed, decimal, modular, natural, positive, long, and range. We choose to proceed differently and list all possible types as SPARK requires initialization.
+
+\begin{minted}{ada}
+type Float is digits 6;
+\end{minted}
+
+2. Structs (\verb|type\s\+\w\+\s\+is\s\+record|). This pattern matches record types, which are similar to structs in other languages.
+
+\begin{minted}{ada}
+type Point is record
+    -- ...
+end record;
+\end{minted}
+
+3. Enums: (\verb|type\s\+\w\+\s\+is\s\+\(|). Matches enumeration types in SPARK.
+
+\begin{minted}{ada}
+type Color is (Red,Green,Blue);
+\end{minted}
+
+4. Arrays: (\texttt{|type\\s+[a-zA-Z\_]+\\s+is\\s+array\\s*(\\d+)|}. Matches array declarations.
+
+\begin{minted}{ada}
+type Int_Array is array (1 .. 10) of Integer;
+\end{minted}
+
+5. Dynamic Vectors: (Combines \verb|range <>|, \verb|Containers.Vector| and \verb|Containers|).
+This pattern matches unconstrained arrays and instances of the Containers.Vector package.
+
+\begin{minted}{ada}
+type Int_Vector is array (Integer range <>) of Integer;
+\end{minted}
+
+6. References: (Combines: \verb|type\s+\w+\s+is\s+access\s+\w+| and \verb|new\s+\w+)|). This pattern matches access types (pointers) and memory allocations using 'new'.
+
+\begin{minted}{ada}
+type Int_Ptr is access Integer;
+\end{minted}
+
+7. Unbounded Strings: (\verb|Strings.Unbounded|). This matches unbounded strings from the Ada.Strings.Unbounded package.
+
+\begin{minted}{ada}
+S : Unbounded_String;
+\end{minted}
 
 \subsection{Reliability and validity of the statistics}
 
@@ -1499,6 +1526,7 @@ The data is collected via file parsing and \texttt{Regex} patterns.
 
 One source of error can be that some data types can appear in comments instead of the code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
 
+Another source of error is that while the regex cover the most common cases, they do not cover edge cases.
 When it comes to Rust mutable and immutable references, admittedly references can point at any data structure. We mean that a \inlinecode{struct AStruct} can be declared and then referred by a number of \inlinecode{\&AStruct}. But this does not mean that we count the same object several times, rather then we study the use of references and how ownership is transmitted. 
 
 The presence of many references and pointers (\inlinecode{\&mut T} and \inlinecode{\&T}, as well as \inlinecode{Access} types in SPARK), rather confirms the need to study references and pointers.
@@ -1512,53 +1540,52 @@ Those crates are mostly used in the compiler, and for this reason, we selected p
 The crate popularity is measured by downloads, direct and reverse dependencies, the usage trend, quality of README, tests, comments documentation, examples, and whether the crate is actively maintained}.
 Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger than the two projects above, was also deemed relevant for statistics.
 
-\begin{table}[htbp]
+\begin{table}[ht!]
 \footnotesize
 \centering
 \caption{Most popular projects on crates.io (171,897 LOC)}
 \label{tab:crates_io}
-\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
 \rowcolor{orange!50}
-Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline  all time in millions (LOC)\\
+Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
 \hline
-libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 (100,719)\\
+libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 & 100,719\\
 \hline
-syn & Parser for Rust source code & 6365093 (5,501) & 191 (50,801) \\
+syn & Parser for Rust source code & 6365093 (5,501) & 191 & 50,801 \\
 \hline
-rand and rand-core & Random number generators and other randomness functionality & 0f3eced (9,892) & 183 (13,655)\\
+rand and rand-core & Random number generators and other randomness functionality & 0f3eced (9,892) & 183 & 13,655\\
 \hline
-quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (5,498) & 177 (2,154)\\
+quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (5,498) & 177 & 2,154\\
 \hline
-cfg\-if & Ergonomically defines an item depending on a large number of \#[cfg]  & 2621a59 (1,147) & 175 (144) \\
+cfg-if & Ergonomically defines an item depending on a large number of \#[cfg] & 2621a59 (1,147) & 175 & 144 \\
 \hline
-procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (4,538) & 176 (4,424)\\
+procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (4,538) & 176 & 4,424\\
 \hline
 \end{tabular}
 \end{table}
 
-
 \begin{table}[ht!]
 \footnotesize
 \centering
-\caption{Most popular projects on lib.rs 172,049 LOC} 
+\caption{Most popular projects on lib.rs 172,059 LOC}
 \label{tab:lib_rs}
-\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{2cm}| }
+\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
 \rowcolor{orange!50}
-Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline  all time in millions (LOC)\\
+Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
 \hline
-serde & Framework for serializing and deserializing & b80e722 (24,754) & 151 (30,681)  \\
+serde & Framework for serializing and deserializing & b80e722 & 151 & 30,681 \\
 \hline
-serde-json &  A JSON serialization file format  & a15bd09 (16,488) & 126  (15,553) \\
+serde-json & A JSON serialization file format & a15bd09 & 126 & 15,553 \\
 \hline
-clap & Command line args parser & 8469554 (10,201) & 106 (49,799) \\ 
+clap & Command line args parser & 8469554 & 106 & 49,799 \\
 \hline
-log &  A lightweight logging facade for Rust  & dc32ab9 (12,158) &  135 (3,322) \\ 
+log & A lightweight logging facade for Rust & dc32ab9 & 135 & 3,322 \\
 \hline
-thiserror &  Error handler  & 0e45dde (9,010) &   83 (2,812) \\ 
+thiserror & Error handler & 0e45dde & 83 & 2,812 \\
 \hline
-tokio &  Non-blocking platform for asynchronous I/O backed applications & 1df874e (11,583) & 89 (69,892) \\
+tokio & Non-blocking platform for asynchronous I/O backed applications & 1df874e & 89 & 69,892 \\
 \hline
 \end{tabular}
 \end{table}
@@ -1577,14 +1604,14 @@ This confirms that Rust is used as a low-level, systems programming language.
 The second most common category are references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system - they are like pointers, but guarantee a valid owner - and are used in a fourth of the cases. Logically, heap types account for a minority of types.
 
 \pgfplotstableread{
-Rust_type lib_rs crates_io rustc
-Numbers  22430 44688 304618
-Refs 7140 13909 137530
-Arrays  409 1893 9291
-Vec  1302 397 14278
-Enum  1283 602 15040
-Struct  3646 4704 48955
-String  1363 445 18613
+Rust_type crates_io lib_rs rustc
+Numbers  44715 22470 305087
+Refs 12662 13909 137530
+Arrays  329 700 13790
+Vec  228 1682 8576
+Enum  602 1283 15040
+Struct  4704 3646 48955
+String  445 1363 18613
 }\EXPDATA 
 
 \begin{figure}
@@ -1616,7 +1643,7 @@ String  1363 445 18613
           \addplot table [x=Rust_type, y=rustc]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=crates_io]{\EXPDATA} ;
           \addplot table [x=Rust_type, y=lib_rs]{\EXPDATA} ;
-        \legend{crates.io (171 kLOC),lib.rs (172 kLOC),rustc (1518 kLOC)}
+        \legend{rustc (1518 kLOC), crates.io (171 kLOC), lib.rs (172 kLOC)}
         \end{axis}  
     \end{tikzpicture}}
 \caption{Absolute number of Rust data types per project}
@@ -1630,10 +1657,11 @@ String  1363 445 18613
 
 \pgfplotstableread{
 Label Numbers  Refs  Struct/Enum  Heap  Arrays
-cratesio   68.17   19.32  8.10  1.53  2.88
-librs   49.95   30.97  10.98  7.20  0.90
-rustc   54.86   24.76  11.53 7.18 1.67
+cratesio 70.04 19.83 8.31 1.3 0.52
+librs 49.26 30.49 10.80 7.92 1.53
+rustc 55.01 24.80 11.54 6.16 2.49
 }\testdata
+
 
 \pgfkeys{
     /pgf/number format/.cd,
@@ -1659,9 +1687,9 @@ rustc   54.86   24.76  11.53 7.18 1.67
 %            shift={    
 %                (50pt,25pt)
 %                },
-            xshift={  50pt },
+            xshift={50pt},
                 yshift ={
-                ifthenelse((\plotnum == 4), 30pt,25pt)},
+                ifthenelse((\plotnum == 4), 30pt,20pt)},
             },
             scatter/@post marker code/.append code={
                 \node(Y){};
@@ -1718,8 +1746,8 @@ rustc   54.86   24.76  11.53 7.18 1.67
     \newlength\lena
     \newlength\lenb
       {black,fill=gray,mark=none}
-    \foreach \p/\t/\pat\c in {55.84/Numbers/crosshatch/red!70!white, 24.65/Refs/vertical lines/orange!90!white, 11.30/Struct\&Enum/grid/yellow!90!orange, 8.21/others (heap)/horizontal lines/green!60!black}
-      {
+    \foreach \p/\t/\pat\c in {56.06/Numbers/crosshatch/red!70!white, 24.71/Refs/vertical lines/orange!90!white, 11.18/Struct\&Enum/grid/yellow!90!orange, 8.05/others (heap)/horizontal lines/green!60!black}
+       {
         \global\lena=\lenb
         \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
     
@@ -1794,7 +1822,7 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
 
 \section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
 \label{sec:experimentalDesign}
-
+\todo[inline]{Add some text here to introduce the subsections - there should always be text between any pair of headings.}
 \subsection{Chosen data types}
 The control studies are centered around:
 \begin{itemize}
@@ -1802,9 +1830,9 @@ The control studies are centered around:
     \item \texttt{\&mut T} and \texttt{\&T}, as well as the \texttt{Access} types, with focus on how ownership is kept or transmitted ownership.
     \item Some heap objects: dynamic types such as Vec.
 \end{itemize}
-\subsection{Threat to validity in the statistics}
+\subsection{Threat to validity of the statistics}
 
-We do not foresee large threats to validity for Rust. Rust is a systems programming languages and appears to be used a such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to operate statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). Besides, SPARK has a long industrial track record. It is used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is general-purpose and based on the classical stack model. Being used in industrial applications, one can assume safely that effectivity is a concern to SPARK programmers\,\cite{chapman_adacore_2018}.
+We do not foresee large threats to statistical validity for Rust. Rust is a systems programming language and appears to be used as such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to apply statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). SPARK has a long industrial track record and it is widely used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is a general-purpose language based on the classical stack model. Being used in industrial applications, one can safely assume that effectivity is a concern pf SPARK programmers\,\cite{chapman_adacore_2018}.
 
 \section[BBqueue]{Application with BBQueue}
 \label{sec:methodBBQueue}
