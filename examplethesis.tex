@@ -983,7 +983,7 @@ println!("b: {:?}", a);
 \caption[Rust code showing ownership]{Rust code showing ownership}
 \label{lst:rust_ownership}
 \end{listing}
-\FloatBarrier
+%\FloatBarrier
 
 In addition, Rust’s type system statically rules out data races. At its heart, the Rust type-system has the concept of ownership. In the Rust ownership system, many aliases can exist to a place in memory, but only one alias can give mutable access, that the capacity to write to this place in memory. If ownership is shared between many aliases, then those aliases can only read the contents of this place in memory. The restrictions linked to borrowing ensure that a value is unable to exist in memory without an owning variable in the same scope, and it is impossible to modify a variable from different threads, preventing data-races\,\cite{poveda_ruiz_bounded_2019,noauthor_rust_nodate}\footnote{There are of course ways to implement thread safety such as channels or atomic reference counters (\texttt{Arc} in Rust terminology) but this is a general overview.}. 
 
@@ -996,7 +996,7 @@ Rust does not implement exceptions, but has an error management system, distingu
 In the somewhat contrived  example shown in \Cref{lstlisting:data_race}, we see that the compiler does not accept modification of a global variable from different threads. The compiler warns about aliasing violations or potential data races that cause undefined behavior.
 \begin{listing}[!ht]
 \begin{minted}[
-frame=lines,
+%frame=lines,
 framesep=2mm,
 baselinestretch=1.2,
 fontsize=\footnotesize,
@@ -1025,7 +1025,7 @@ In contrast, if we frame the variable ``SHARED" inside \texttt{unsafe} blocks, t
 
 \begin{listing}[!ht]
 \begin{minted}[
-frame=lines,
+%frame=lines,
 framesep=2mm,
 baselinestretch=1.2,
 fontsize=\footnotesize,
@@ -1046,7 +1046,6 @@ linenos
     }
 }
 \end{minted}
-%\label{lst:data_race2}
 \caption[Rust code showing a data race]{Rust code showing a data race }
 \label{lstlisting:data_race2}
 \end{listing}
@@ -1099,7 +1098,7 @@ As an example from AdaCore documentation (\Cref{lstlisting:spark_illegal_transfe
 
 \begin{listing}[!ht]
     \begin{minted}[
-    frame=lines,
+    %frame=lines,
     framesep=2mm,
     baselinestretch=1.2,
     fontsize=\footnotesize,
@@ -1249,7 +1248,7 @@ Li distinguishes four software quality issues caused by \glsxtrshort{FFI}: secur
 
 However, independently of quality metrics, calling external code is inherently dangerous (Mergendahl \etal\,\cite{mergendahl_cross-language_2022} and Li \etal\,\cite{li_detecting_2022}). Intuitively, calling foreign code that does not present the same guarantees as a safe language should be considered dangerous. But according to the existing literature, simply the fact that our code \textbf{is} multi-language makes it dangerous, independently of which languages are bound together, even if called languages offer many guarantees. It depends on the assumption.
 
-\subsection{A new cross-language paradigm for the programmer}
+\subsection{A new cross-language paradigm for the \\programmer}
 
 Li\,\cite{li_improving_2014} stresses why using \glsxtrshort{FFI} is an error-prone process for the programmer. From the human perspective, it is not only expected to reason in their own language but across different languages. Some differences are straightforward, such as  type system, semantics, and syntax while some are more subtle, such as exceptions or error handling, or memory management. All of a sudden, the programmer needs to understand the nuances and complex inter-connectivity of programming languages, as well as the context that allows the apparition of specific bugs.
 
@@ -1438,91 +1437,102 @@ It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
 The Rust regex patterns are designed to match type declarations and literals, except for the number pattern. The number pattern focuses on matching numeric literals. Since the Rust compiler is generally efficient at deducing the types, writing a type declaration is generally omitted. The patterns cover the following constructs:
 
 1. Numbers (\verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b|): Matches integer and floating-point literals, including those with underscores. For example:
-\begin{minted}{rust}
-let c = 3.14;
-\end{minted}
+    \begin{minted}{rust}
+    let c = 3.14;
+    \end{minted}
 
 2. Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|): Matches array literals, excluding array declarations to avoid double matching. For example, this will be only one match:
 
-\begin{minted}{rust}
-let a : [i32; 5] = [1, 2, 3, 4, 5];  
-\end{minted}
+    \begin{minted}{rust}
+    let a : [i32; 5] = [1, 2, 3, 4, 5];  
+    \end{minted}
 
 3. References (\verb|&[mut\s]*\w+|): Matches mutable and immutable reference types. It will match \texttt{\&T} and \texttt{\&mut T}.
 
-\begin{minted}{rust}
-let y = &mut x;  
-\end{minted}
+    \begin{minted}{rust}
+    let y = &mut x;  
+    \end{minted}
 
 4. Heap Types (\verb|Box<[<>]+>|Rc<[<>]+>|Arc<[<>]+>|): Matches Box, Rc, and Arc heap-allocated type declarations. For example:
 
-\begin{minted}{rust}
-let boxed_value: Box<i32>
-\end{minted}
+    \begin{minted}{rust}
+    let boxed_value: Box<i32>
+    \end{minted}
 5. Dynamic Vectors (\verb|vec!|Vec::new|): Matches dynamic vector types declaration in Rust and the vec![] macro.
 
-\begin{minted}{rust}
-let v = Vec::new();
-\end{minted}
+    \begin{minted}{rust}
+    let v = Vec::new();
+    \end{minted}
 6. Strings (\verb|String::|.to\_string|format!|): Matches String creation and manipulation through various methods and macros.
 
-\begin{minted}{rust}
-let girl_name = "Mouneissa".to_string();
-\end{minted}
+    \begin{minted}{rust}
+    let girl_name = "Mouneissa".to_string();
+    \end{minted}
 
 \subsection{SPARK regexes}
 
 These focus on type declarations.
 The patterns cover the following constructs:
 
-1. Numbers: This pattern uses Ada keywords for numbers (\texttt{Integer, Float, Modular...}) and matches various numeric types such as integer, float, fixed, decimal, modular, natural, positive, long, and range. We choose to proceed differently and list all possible types as SPARK requires initialization.
+1. Numbers 
+(\verb|: (Integer ...) or (range \d.. \d)\ or| \verb|(is digits)|).
+This pattern\footnote{Vertical bars replaced for simplicity} uses Ada keywords for numbers (\texttt{Integer, Float, Modular...}) and matches various numeric types such as integer, float, fixed, decimal, modular, natural, positive, long, and range, but not an array declaration where the type is used for indexing or as the type contained in the array. We choose to proceed differently and list all possible types as SPARK requires initialization.
 
-\begin{minted}{ada}
-type Float is digits 6;
-\end{minted}
+    \begin{minted}{ada}
+    -- matches:
+    -- predefined types
+    X : Integer := 42;
+    Y : Short_Integer := 5;
+    -- custom declarations
+    type My_Integer is range -100 .. 100;
+    -- does not match
+    type Integer_Array is array (1 .. 5) of Integer;
+    \end{minted}
 
 2. Structs (\verb|type\s\+\w\+\s\+is\s\+record|). This pattern matches record types, which are similar to structs in other languages.
 
-\begin{minted}{ada}
-type Point is record
-    -- ...
-end record;
-\end{minted}
+    \begin{minted}{ada}
+    type Point is record
+        -- ...
+    end record;
+    \end{minted}
 
 3. Enums: (\verb|type\s\+\w\+\s\+is\s\+\(|). Matches enumeration types in SPARK.
 
-\begin{minted}{ada}
-type Color is (Red,Green,Blue);
-\end{minted}
+    \begin{minted}{ada}
+    type Color is (Red,Orange,Green);
+    \end{minted}
 
-4. Arrays: (\texttt{|type\\s+[a-zA-Z\_]+\\s+is\\s+array\\s*(\\d+)|}. Matches array declarations.
+4. Arrays: (\verb|type\s+[a-zA-Z\_]+\s+is\s+array\s*(\d+)|). Matches array declarations.
 
-\begin{minted}{ada}
-type Int_Array is array (1 .. 10) of Integer;
-\end{minted}
+    \begin{minted}{ada}
+    type Int_Array is array (1 .. 10) of Integer;
+    \end{minted}
 
 5. Dynamic Vectors: (Combines \verb|range <>|, \verb|Containers.Vector| and \verb|Containers|).
 This pattern matches unconstrained arrays and instances of the Containers.Vector package.
 
-\begin{minted}{ada}
-type Int_Vector is array (Integer range <>) of Integer;
-\end{minted}
+    \begin{minted}{ada}
+    type Int_Vector is array (Integer range <>) of Integer;
+    \end{minted}
 
 6. References: (Combines: \verb|type\s+\w+\s+is\s+access\s+\w+| and \verb|new\s+\w+)|). This pattern matches access types (pointers) and memory allocations using 'new'.
 
-\begin{minted}{ada}
-type Int_Ptr is access Integer;
-\end{minted}
+    \begin{minted}{ada}
+    type Int_Ptr is access Integer;
+    \end{minted}
 
 7. Unbounded Strings: (\verb|Strings.Unbounded|). This matches unbounded strings from the Ada.Strings.Unbounded package.
 
-\begin{minted}{ada}
-S : Unbounded_String;
-\end{minted}
+    \begin{minted}{ada}
+    S : Unbounded_String;
+    begin
+    S := "Some string";
+    \end{minted}
 
 \subsection{Reliability and validity of the statistics}
 
-The data is collected via file parsing and \texttt{Regex} patterns. 
+The data is collected via file parsing and \texttt{Regex} patterns\footnote{Using the Regex Rust crate \href{(documentation)}{https://crates.io/crates/regex}}. 
 
 One source of error can be that some data types can appear in comments instead of the code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
 
@@ -1564,6 +1574,7 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab2
 \hline
 \end{tabular}
 \end{table}
+\FloatBarrier
 
 \begin{table}[ht!]
 \footnotesize
@@ -1573,7 +1584,7 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab2
 \begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
 \rowcolor{orange!50}
-Package& Description & Version \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
+Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
 \hline
 serde & Framework for serializing and deserializing & b80e722 & 151 & 30,681 \\
 \hline
@@ -1786,7 +1797,7 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
   \scalebox{0.9}{
     \begin{tikzpicture}[scale=3]
     \centering    
-    \foreach \p/\t\pat\c in {51.84/Numbers/crosshatch/red!70!white, 32.15/Access/vertical lines/orange!90!white, 14.42/Record\&Enum/grid/yellow!90!orange, 1.59/others (1.59\%)/horizontal lines/green!60!black}   
+    \foreach \p/\t\pat\c in {58.69/Numbers/crosshatch/red!70!white, 27.78/Access/vertical lines/orange!90!white, 12.65/Record\&Enum/grid/yellow!90!orange, 0.88/others (0.88\%)/horizontal lines/green!60!black}   
       {
        \pgfmathtruncatemacro\intp{\p}
     
@@ -1822,7 +1833,9 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
 
 \section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
 \label{sec:experimentalDesign}
-\todo[inline]{Add some text here to introduce the subsections - there should always be text between any pair of headings.}
+%\todo[inline]{Add some text here to introduce the subsections - there should always be text between any pair of headings.}
+
+This part covers the conclusion to the control studies and threat to validity.
 \subsection{Chosen data types}
 The control studies are centered around:
 \begin{itemize}
@@ -1832,7 +1845,7 @@ The control studies are centered around:
 \end{itemize}
 \subsection{Threat to validity of the statistics}
 
-We do not foresee large threats to statistical validity for Rust. Rust is a systems programming language and appears to be used as such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to apply statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). SPARK has a long industrial track record and it is widely used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is a general-purpose language based on the classical stack model. Being used in industrial applications, one can safely assume that effectivity is a concern pf SPARK programmers\,\cite{chapman_adacore_2018}.
+We do not foresee large threats to statistical validity for Rust. Rust is a systems programming language and appears to be used as such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to apply statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). SPARK has a long industrial track record and it is widely used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is a general-purpose, stack-based language. Being used in industrial applications, one can safely assume that high-effectivity is a concern of SPARK programmers\,\cite{chapman_adacore_2018}.
 
 \section[BBqueue]{Application with BBQueue}
 \label{sec:methodBBQueue}
@@ -1867,14 +1880,14 @@ The environment is fairly complex as it needs to function for Rust and SPARK in 
 
 %control study
 \cleardoublepage
-\chapter{Experiments and elements of discussion}
+\chapter{Experiments}
 \label{ch:whatYouDid}
-
 
 \todoinline{
 1. Describe experiments (done)
 2. Describe BBqueue 
 }
+  
 
 
 %What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?
@@ -1902,79 +1915,18 @@ For reproducibility purposes, this section describes the setup from a high-level
 
 \subsection{SPARK to Rust}
 
-\Cref{fig:sparkbuild} shows the build process for a SPARK file using a Rust library. Both files reside in the same root folder and this is a straightforward process. 
-The SPARK file is compiled without optimizations for debugging purposes and the Rust library is compiled as a static library for simplicity. 
-Gnatbind then checks whether the SPARK program is consistent and the linking with the Rust library is done in the last step.
-The process is designed to fail if a step is not done properly.
-
-\begin{figure}[ht!]
-    \centering
-    \scalebox{0.8}{
-    \begin{tikzpicture}[node distance=2cm, font=\small]
-    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=6cm, fill=white, rounded corners=10,thick]
-    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=2.5cm, minimum height=0.8cm, text centered, text width=2.2cm, fill=white, rounded corners=5,thick]
-    \tikzstyle{arrow} = [->, >=stealth, thick]
-    \node (step1) [process, fill=red!30] {Common root folder
-    \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
-    \node (main) [smallprocess, fill=red!20] {main.adb};
-    \node (lib) [smallprocess, fill=red!20, right of=main, xshift=1cm] {lib.rs};
-    \end{tikzpicture}
-    };
-    \node (step2) [process, below of=step1,fill=orange!30] {Compile SPARK main};
-    \node (step3) [process, ,fill=orange!20, below of=step2] {Compile Rust lib as static lib};
-    \node (step4) [process, fill=yellow!30, below of=step3] {Control consistency};
-    \node (step5) [process, fill=yellow!30, below of=step4] {Link Ada and Rust objects};
- 
-    \draw [arrow] (step1) -- (step2) node[midway, right] {gcc -O0};
-    \draw [arrow] (step2) -- (step3) node[midway, right] {rustc staticlib};
-    \draw [arrow] (step3) -- (step4) node[midway, right] {gnatbind};
-    \draw [arrow] (step4) -- (step5) node[midway, right] {gnatlink SPARK, Rust and system libs};
-\end{tikzpicture}}
-\caption{Process for SPARK code using Rust library}
-\label{fig:sparkbuild}
-\end{figure}
+\Cref{fig:sparkbuild} in \Cref{sec:buildSystems}
+shows the build process for a SPARK file using a Rust library. 
 
 \subsection{Rust to SPARK}
 
-\Cref{fig:rustbuild} shows the build process for a Rust project using a SPARK project. 
+\Cref{fig:rustbuild} in \Cref{sec:buildSystems} shows the build process for a Rust project using a SPARK project. 
 
-This time we are using the crate \texttt{gpr} which is designed for bigger projects. While it introduces a more complexity, it also allows access to a richer toolset.  
-
-An entire Rust project was built with \texttt{cargo new <proj>}, the Rust packet manager. Then a library project was built inside the Rust project with \texttt{alire}, the GNAT packet manager \texttt{alr init --lib <newlib>}. The library path is provided to the Rust \texttt{build.rs} file. This approach requires some familiarity with Rust and Ada packet managers.
-Even in this case, we made the build fail if one step is not successful, to avoid to inadvertently run an experiment with an old version of the library.
-
-\begin{figure}[ht!]
-\centering
-\scalebox{0.8}{
-    \begin{tikzpicture}[node distance=2.5cm, font=\small]
-    \tikzstyle{process} = [draw, rectangle, minimum width=6cm, minimum height=1cm, text centered, text width=5.5cm, fill=white, rounded corners=10,thick]
-    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=3.5cm, minimum height=0.8cm, text centered, text width=3.2cm, fill=white, rounded corners=5,thick]
-    \tikzstyle{arrow} = [->, >=stealth, thick]
-        \node (step1) [process, fill=red!30] {Cargo project \
-        \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
-        \node (lib.adb) [smallprocess, fill=red!20] {lib.adb};
-        \end{tikzpicture}
-        };
-        \node (step2) [process, below of=step1,fill=orange!30] {Load SPARK project file with gpr crate};
-        \node (step3) [process, ,fill=orange!20, below of=step2] {Build SPARK project with gprbuild command};
-        \node (step4) [process, fill=yellow!30, below of=step3] {Generate linker search path and flags for Cargo};
-        \node (step5) [process, fill=yellow!20, below of=step4] {Output "rerun-if-changed" directive for Cargo};
-        \node (step6) [process, fill=brown!20, below of=step5] {Build and link Rust executable};
-        
-        \draw [arrow] (step1) -- (step2) node[midway, right] {cargo run + path to LD\_LIBRARY\_PATH};
-        \draw [arrow] (step2) -- (step3) node[midway, right] {Call gprbuild};
-        \draw [arrow] (step3) -- (step4) node[midway, right, align=center] {Extract library directory \\ and name from project object};
-        \draw [arrow] (step4) -- (step5) node[midway, right] {Iterate over source directories};
-        \draw [arrow] (step5) -- (step6) node[midway, right, , align=center] {Use linker search path and flags \\ to build and link executable};
-    \end{tikzpicture}}
-\caption{Process for Rust code building a SPARK library}
-\label{fig:rustbuild}
-\end{figure}
-Efforts were put into going away from in between C types and going away from C as a protocol.
+The main difference is the use of the crate \texttt{gpr} which is designed for bigger projects. While it introduces a more complexity for control studies, it also allows access to a richer toolset (\texttt{alire, cargo}) which is useful for more complicated experiments.  
 
 \section{Experiments stack-types}
 
-Stack-types sizes are known at compile time in both Rust and SPARK. For numbers, Rust types names clarify its size, while the GNAT compiler chooses the best type to hold the variable depending on the precision that is required (**learned that in the training yesterday, to develop?).
+Stack-types sizes are known at compile time in both Rust and SPARK. For numbers, Rust types are explicit regarding their size, while the GNAT compiler chooses the best type to hold the variable depending on the precision that is required.
 
 A series of experiments were done on stack-allocated scalar and aggregate types. As a reminder, a scalar type is a type that can hold a single value at a time (for example, an integer or an enum). Conversely, a non-scalar type holds different values, like an array. 
 
@@ -2446,83 +2398,112 @@ time required to process each packet.
 
 
 % \warningExpl{If you do not have an appendix, do not include the \textbackslash cleardoublepage command below; otherwise, the last page number in the metadata  be one too large.}
-% \cleardoublepage
-% \appendix
-% \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
-% \chapter{Supporting materials}
-% \label{sec:supportingMaterial}
-% \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
+\cleardoublepage
+\appendix
+\renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
+\chapter{Supporting materials}
+\label{sec:supportingMaterial}
+\generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
-% Attach the BibTeX for your references to make it easy for a reader to find and use them
-%The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
+Attach the BibTeX for your references to make it easy for a reader to find and use them
+The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
 
-% Attach source code file(s) or add a URL to the github or other repository
-% Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
+Attach source code file(s) or add a URL to the github or other repository
+Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
 
-% Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
+Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
 
-% An argument for including supporting material in the PDF file is that it is available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
+An argument for including supporting material in the PDF file is that it is available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
 
-% \warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you  probably want to use one of the data repositories. For additional help about this, contact KTH Library via  \href{mailto:researchdata@kth.se}{researchdata@kth.se}.}
+\warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you  probably want to use one of the data repositories. For additional help about this, contact KTH Library via  \href{mailto:researchdata@kth.se}{researchdata@kth.se}.}
 
-% \begin{figure}[!ht]
-%   \begin{center}
-%     \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
-%   \end{center}
-%   \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
-%   \label{fig:PDFreaderPaperclipExample}
-% \end{figure}
-% \FloatBarrier
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
+  \end{center}
+  \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
+  \label{fig:PDFreaderPaperclipExample}
+\end{figure}
+\FloatBarrier
 
-% \begin{figure}[!ht]
-%   \begin{center}
-%     \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
-%   \end{center}
-%   \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
-%   \label{fig:PDFreaderPushpinExample}
-% \end{figure}
-% \FloatBarrier
-% \cleardoublepage
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
+  \end{center}
+  \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
+  \label{fig:PDFreaderPushpinExample}
+ \end{figure}
+ \FloatBarrier
+ \cleardoublepage
 
-% \chapter{Something Extra}
-% \sweExpl{svensk: Extra Material som Bilaga}
+\chapter{Build systems to reproduce experiments}
+\label{sec:buildSystems}
 
-% \section{Just for testing KTH colors}
-% \ifdigitaloutput
-%     \textbf{You have selected to optimize for digital output}
-% \else
-%     \textbf{You have selected to optimize for print output}
-% \fi
-% \begin{itemize}[noitemsep]
-%     \item Primary color
-%     \begin{itemize}
-%     \item \textcolor{kth-blue}{kth-blue \ifdigitaloutput
-%     actually Deep sea
-%     \fi} {\color{kth-blue} \rule{0.3\linewidth}{1mm} }\\
+\section{Build systems Ada to Rust}
 
-%     \item \textcolor{kth-blue80}{kth-blue80} {\color{kth-blue80} \rule{0.3\linewidth}{1mm} }\\
-% \end{itemize}
+Both files reside in the same root folder and this is a straightforward process. 
+The SPARK file is compiled without optimizations for debugging purposes and the Rust library is compiled as a static library for simplicity. 
+Gnatbind then checks whether the SPARK program is consistent and the linking with the Rust library is done in the last step.
+The process is designed to fail if a step does not compile properly and provides useful information for debugging.
+\begin{figure}[ht!]
+    \centering
+    \scalebox{0.8}{
+    \begin{tikzpicture}[node distance=2cm, font=\small]
+    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=6cm, fill=white, rounded corners=10,thick]
+    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=2.5cm, minimum height=0.8cm, text centered, text width=2.2cm, fill=white, rounded corners=5,thick]
+    \tikzstyle{arrow} = [->, >=stealth, thick]
+    \node (step1) [process, fill=red!30] {Common root folder
+    \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
+    \node (main) [smallprocess, fill=red!20] {main.adb};
+    \node (lib) [smallprocess, fill=red!20, right of=main, xshift=1cm] {lib.rs};
+    \end{tikzpicture}
+    };
+    \node (step2) [process, below of=step1,fill=orange!30] {Compile SPARK main};
+    \node (step3) [process, ,fill=orange!20, below of=step2] {Compile Rust lib as static lib};
+    \node (step4) [process, fill=yellow!30, below of=step3] {Control consistency};
+    \node (step5) [process, fill=yellow!30, below of=step4] {Link Ada and Rust objects};
+ 
+    \draw [arrow] (step1) -- (step2) node[midway, right] {gcc -O0};
+    \draw [arrow] (step2) -- (step3) node[midway, right] {rustc staticlib};
+    \draw [arrow] (step3) -- (step4) node[midway, right] {gnatbind};
+    \draw [arrow] (step4) -- (step5) node[midway, right] {gnatlink SPARK, Rust and system libs};
+\end{tikzpicture}}
+\caption{Process for SPARK code using Rust library}
+\label{fig:sparkbuild}
+\end{figure}
 
-% \item  Secondary colors
-% \begin{itemize}[noitemsep]
-%     \item \textcolor{kth-lightblue}{kth-lightblue \ifdigitaloutput actually Stratosphere
-%     \fi} {\color{kth-lightblue} \rule{0.3\linewidth}{1mm} }\\
+\section{Build systems Rust to Ada}
+An entire Rust project was built with \texttt{cargo new <proj>}, the Rust packet manager. Then a library project was built inside the Rust project with \texttt{alire}, the GNAT packet manager \texttt{alr init --lib <newlib>}. The library path is provided to the Rust \texttt{build.rs} file. This approach requires some familiarity with Rust and Ada packet managers.
+Even in this case, we made the build fail if one step is not successful, to avoid to inadvertently run an experiment with an old version of the library.
 
-%     \item \textcolor{kth-lightred}{kth-lightred \ifdigitaloutput
-%     actually Fluorescence\fi} {\color{kth-lightred} \rule{0.3\linewidth}{1mm} }\\
-
-%     \item \textcolor{kth-lightred80}{kth-lightred80} {\color{kth-lightred80} \rule{0.3\linewidth}{1mm} }\\
-
-%     \item \textcolor{kth-lightgreen}{kth-lightgreen \ifdigitaloutput
-%     actually Front-lawn\fi} {\color{kth-lightgreen} \rule{0.3\linewidth}{1mm} }\\
-
-%     \item \textcolor{kth-coolgray}{kth-coolgray \ifdigitaloutput
-%     actually Office\fi} {\color{kth-coolgray} \rule{0.3\linewidth}{1mm} }\\
-
-%     \item \textcolor{kth-coolgray80}{kth-coolgray80} {\color{kth-coolgray80} \rule{0.3\linewidth}{1mm} }
-% \end{itemize}
-% \end{itemize}
-
+\begin{figure}[ht!]
+\centering
+\scalebox{0.8}{
+    \begin{tikzpicture}[node distance=2.5cm, font=\small]
+    \tikzstyle{process} = [draw, rectangle, minimum width=6cm, minimum height=1cm, text centered, text width=5.5cm, fill=white, rounded corners=10,thick]
+    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=3.5cm, minimum height=0.8cm, text centered, text width=3.2cm, fill=white, rounded corners=5,thick]
+    \tikzstyle{arrow} = [->, >=stealth, thick]
+        \node (step1) [process, fill=red!30] {Cargo project \
+        \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
+        \node (lib.adb) [smallprocess, fill=red!20] {lib.adb};
+        \end{tikzpicture}
+        };
+        \node (step2) [process, below of=step1,fill=orange!30] {Load SPARK project file with gpr crate};
+        \node (step3) [process, ,fill=orange!20, below of=step2] {Build SPARK project with gprbuild command};
+        \node (step4) [process, fill=yellow!30, below of=step3] {Generate linker search path and flags for Cargo};
+        \node (step5) [process, fill=yellow!20, below of=step4] {Output "rerun-if-changed" directive for Cargo};
+        \node (step6) [process, fill=brown!20, below of=step5] {Build and link Rust executable};
+        
+        \draw [arrow] (step1) -- (step2) node[midway, right] {cargo run + path to LD\_LIBRARY\_PATH};
+        \draw [arrow] (step2) -- (step3) node[midway, right] {Call gprbuild};
+        \draw [arrow] (step3) -- (step4) node[midway, right, align=center] {Extract library directory \\ and name from project object};
+        \draw [arrow] (step4) -- (step5) node[midway, right] {Iterate over source directories};
+        \draw [arrow] (step5) -- (step6) node[midway, right, , align=center] {Use linker search path and flags \\ to build and link executable};
+    \end{tikzpicture}}
+\caption{Process for Rust code building a SPARK library}
+\label{fig:rustbuild}
+\end{figure}
+Efforts were put into going away from in between C types and going away from C as a protocol.
 % \textcolor{black}{black} {\color{black} \rule{\linewidth}{1mm} }
 
 % Include an example of using nomenclature
