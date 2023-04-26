@@ -84,7 +84,7 @@
 %%----------------------------------------------------------------------------
 \usepackage{tikz}
 \usepackage{colortbl}
-\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning, decorations.pathreplacing, calc,shapes,calc,trees,positioning,chains,shapes.geometric,matrix,shapes.symbols}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning, decorations.pathreplacing, calc,shapes,calc,trees,positioning,chains,shapes.geometric,matrix,shapes.symbols,patterns,patterns.meta}
 
 \tikzset{
     >=stealth',
@@ -208,8 +208,8 @@
         \pgfusepath{stroke}
     }
 \makeatother
-\usetikzlibrary{patterns, patterns.meta}
-\usetikzlibrary{decorations.pathreplacing}
+%\usetikzlibrary{patterns, patterns.meta}
+%\usetikzlibrary{decorations.pathreplacing}
 % high contrast colors: https://venngage.com/tools/accessible-color-palette-generator
 
 %#1d138a, #ffffff
@@ -241,3 +241,6 @@
 \usepackage[table]{xcolor}
 
 \usepackage{pgf-pie}
+%\usepackage{CJKutf8}
+\usepackage{luatexja-fontspec}
+\setmainjfont{IPAexMincho} % A high quality Japanese font preinstalled in TeX Live

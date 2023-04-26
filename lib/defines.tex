@@ -68,7 +68,7 @@
 \newcommand\MemoryLayout[1]{
   \begin{tikzpicture}[scale=0.3]
      \draw[thick](0,0)--++(0,3)node[above]{$0$};
-     \foreach \pt/\col/\lab [remember=\pt as \tp (initially 0)] in {#1} {
+     \foreach [parse=true] \pt/\col/\lab [remember=\pt as \tp (initially 0)] in {#1} {
        \foreach \a in {\tp,...,\pt-1} {
           \draw[fill=\col](-\a,0) rectangle ++(-1,2);
        }

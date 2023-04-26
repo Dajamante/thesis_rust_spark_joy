@@ -443,11 +443,11 @@ eng
 
 This thesis aims to explore the challenges of combining two memory-safe programming languages: Rust and SPARK.
 
-SPARK is a subset of Ada, a programming language with a long track record in safety-critical applications. Rust is a multi-paradigm language that has gained significant popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
+SPARK is a subset of Ada, a programming language with a long track record in safety-critical applications. Rust is a multi-paradigm language that has gained great popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
 
-Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, macOS, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK, which were designed with safety in mind. 
+Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, Apple, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK, which were designed with safety in mind. 
 
-Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how they are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
+Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how these properties are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
 
 This thesis fills a gap in existing research, which has primarily focused on the combination of safe and unsafe languages, and provides a valuable contribution to software security and safety-critical systems.
 
@@ -827,7 +827,7 @@ Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to
   \begin{center}
     \includegraphics[width=1\textwidth]{figures/complexity.png}
   \end{center}
-  \caption[Software complexity in the automotive and aerospace industry]{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
+  \caption[Shorter title to be changed later]{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
   \label{fig:complexity}
 \end{figure}
 
@@ -1747,7 +1747,7 @@ rustc 55.01 24.80 11.54 6.16 2.49
     \newlength\lena
     \newlength\lenb
       {black,fill=gray,mark=none}
-    \foreach \p/\t/\pat\c in {56.06/Numbers/horizontal lines/color1bg!90!white, 24.71/Refs/vertical lines/color2bg!90!white, 11.18/Struct\&Enum/grid/color3bg!90!white, 8.05/others (heap)/crosshatch/color4bg!90!white}
+    \foreach \p/\t/\pat\c in {56.06/Numbers/crosshatch/color1bg!90!white, 24.71/Refs/vertical lines/color2bg!90!white, 11.18/Struct\&Enum/grid/color3bg!90!white, 8.05/others (heap)/horizontal lines/color4bg!90!white}
        {
         \global\lena=\lenb
         \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
@@ -1785,7 +1785,7 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
   \scalebox{0.9}{
     \begin{tikzpicture}[scale=3]
     \centering    
-    \foreach \p/\t\pat\c in {58.69/Numbers/horizontal lines/color1bg!90!white, 27.78/Access/vertical lines/color2bg!90!white, 12.65/Record\&Enum/grid/color3bg!90!white, 0.88/others (0.88\%)/crosshatch/color4bg!90!white}   
+    \foreach \p/\t\pat\c in {58.69/Numbers/crosshatch/color1bg!90!white, 27.78/Access/vertical lines/color2bg!90!white, 12.65/Record\&Enum/grid/color3bg!90!white, 0.88/others (0.88\%)/crosshatch/color4bg!90!white}   
       {
        \pgfmathtruncatemacro\intp{\p}
     
@@ -1833,7 +1833,7 @@ The control studies are centered around:
 \end{itemize}
 \subsection{Threat to validity of the statistics}
 
-We do not foresee large threats to statistical validity for Rust. Rust is a systems programming language and appears to be used as such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to apply statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). SPARK has a long industrial track record and it is widely used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is a general-purpose, stack-based language. Being used in industrial applications, one can safely assume that high-effectivity is a concern of SPARK programmers\,\cite{chapman_adacore_2018}.
+We do not foresee large threats to statistical validity for Rust. Rust is a systems programming language and appears to be used as such. The most significant threat to the validity of the statistics concerns the experiments on SPARK. Large SPARK code bases are proprietary, forcing us to apply statistical analysis on small \gls{OSS} projects. As a counterpoint, we can rely here on expert opinion on how SPARK code is used in real projects (Moy, in direct conversation). SPARK has a long industrial track record and it is widely used in many industrial applications, including air traffic, avionics, railways \etc. It is based on Ada, which is a general-purpose, stack-based\footnote{\href{https://www.adacore.com/uploads/books/pdf/AdaCore-Tech-Cyber-Security-web.pdf}{documentation reference}} language. Being used in industrial applications, one can safely assume that high-effectivity is a concern of SPARK programmers\,\cite{chapman_adacore_2018}.
 
 \section[BBqueue]{Application with BBQueue}
 \label{sec:methodBBQueue}
@@ -1855,8 +1855,9 @@ BBqueue is particularly useful for \glsxtrfull{DMA} in embedded microcontroller 
 For our experiments, it is important to note that all communications with the queue go through the Read and Write grants, and the header remains protected from direct interaction. 
 
 \begin{figure}[ht!]
-  \centering \includesvg[inkscapelatex=false, scale=0.8]{figures/figuressvg/bbqueuecom.svg}
-  \caption{Data flow in BBqueue}
+  \centering 
+\includesvg[inkscapelatex=false, scale=0.7]{figures/figuressvg/bbqueuelogic.svg}
+\caption{Communication flow in BBqueue}
 \end{figure}
 
 \subsection{Implementation details}
@@ -2239,10 +2240,10 @@ println!("Lenth of c {}", e.len());
     start chain=going right,
     tuborg/.style={decorate, decoration={brace, amplitude=3pt}, line width=1mm},
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
-    ]         \node[punktchain, join, draw=black,fill=red!40!white] (string){Vec<u8> of UTF-8};  
+    ]         \node[punktchain, join, draw=black,fill=color1bg!50!white] (string){Vec<u8> of UTF-8};  
     % group 2
-    \node[punktchain, join, draw=black,fill=yellow!50!white] (vec){Vec<T>};
-    \node[punktchain, join, draw=black,fill=brown!50!white] (rawvec){RawVec<T>};
+    \node[punktchain, join, draw=black,fill=color2bg!50!white] (vec){Vec<T>};
+    \node[punktchain, join, draw=black,fill=color3bg!50!white] (rawvec){RawVec<T>};
     \end{tikzpicture}}
   \caption{Rust String}
   \label{fig:ruststring}
@@ -2253,13 +2254,13 @@ println!("Lenth of c {}", e.len());
     \centering
     \scalebox{0.8}{
     \begin{tikzpicture}
-	\node [draw, rectangle, fill=blue!20, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
-	\node [draw, rectangle, fill=blue!20, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
-	\node [draw, rectangle, fill=yellow!20, minimum width=1cm, minimum height=1cm, right=0cm of box2] (box3) {'h'};
-	\node [draw, rectangle, fill=yellow!20, minimum width=1cm, minimum height=1cm, right=0cm of box3] (box4) {'e'};
-	\node [draw, rectangle, fill=yellow!20, minimum width=1cm, minimum height=1cm, right=0cm of box4] (box5) {'l'};
-	\node [draw, rectangle, fill=yellow!20, minimum width=1cm, minimum height=1cm, right=0cm of box5] (box6) {'l'};
-	\node [draw, rectangle, fill=yellow!20, minimum width=1cm, minimum height=1cm, right=0cm of box6] (box7) {'o'};
+	\node [draw, rectangle, fill=color1bg!50!white, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
+	\node [draw, rectangle, fill=color1bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
+	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box2] (box3) {'h'};
+	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box3] (box4) {'e'};
+	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box4] (box5) {'l'};
+	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box5] (box6) {'l'};
+	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box6] (box7) {'o'};
  	\draw [decorate, decoration={brace, mirror, amplitude=10pt}] (box1.south west) -- (box2.south east) node [midway, below=12pt] {Bounds (discrete type)};
     \end{tikzpicture}
  }
