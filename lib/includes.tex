@@ -210,20 +210,29 @@
 \makeatother
 \usetikzlibrary{patterns, patterns.meta}
 \usetikzlibrary{decorations.pathreplacing}
+% high contrast colors: https://venngage.com/tools/accessible-color-palette-generator
+
+%#1d138a, #ffffff
+%#3829bc, #ffffff
+%#c44601, #ffffff
+%#008e4a, #000000
+%#026526, #ffffff
+\definecolor{color1bg}{HTML}{1954a6}
+\definecolor{color2bg}{HTML}{24a0d8}
+\definecolor{color3bg}{HTML}{d85497}
+\definecolor{color4bg}{HTML}{b0c92b}
+\definecolor{color5bg}{HTML}{63666a}
+
+
 \pgfplotscreateplotcyclelist{rustcolors}{
-  {red!70!black,mark=none, pattern=
+  {color1bg,mark=none, pattern=
   %{flexible hatch}
   {crosshatch}
-  ,pattern color=red!70!white},
-  {orange!90!black,mark=none, pattern={vertical lines}, pattern color=orange!90!white},{yellow!50!black,mark=none, pattern={horizontal lines}, pattern color=yellow!90!orange},{green!60!black,mark=none, pattern={north east lines}, pattern color=green!60!black},{brown!80!black,fill=brown!50!white,mark=none},
+  ,pattern color=color1bg},
+  {color2bg,mark=none, pattern={vertical lines}, pattern color=color2bg},{color3bg,mark=none, pattern={horizontal lines}, pattern color=color3bg},{color4bg,mark=none, pattern={north east lines}, pattern color=color4bg},{color5bg,fill=color5bg,mark=none},
   {black,fill=gray,mark=none}
 }
-%\pgfplotscreateplotcyclelist{mycolors}{
-%  {black!30!white,fill=black!15!white},
-%  {black!50!white,fill=black!35!white},
-%  {black!70!white,fill=black!60!white},
-%  {black!90!white,fill=black!70!white},
-%}
+
 \pgfplotsset{cycle list name=rustcolors}
 \pgfplotsset{/pgfplots/bar cycle list/.style={/pgfplots/cycle list name={rustcolors}}}
 

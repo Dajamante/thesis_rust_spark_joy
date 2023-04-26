@@ -1335,36 +1335,26 @@ Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project.
 
 \begin{figure}[ht!]
     \centering
-    \scalebox{0.8}{
+    \scalebox{0.9}{
     \begin{tikzpicture}
     [node distance=.8cm,
-    start chain=going below,
+    start chain=going below, %font=\large,
     tuborg/.style={decorate, decoration={brace, amplitude=3pt}, line width=1mm},
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
     ]
     % group 1
-         \node[punktchain, join, draw=black,fill=red!40!white
-         ] (lit){Litterature study};
-         \node[punktchain, join, draw=black,fill=red!40!white
-         ] (consult){Consultation with experts};
-         \node[punktchain, join, draw=black,fill=red!40!white
-         ] (scope){Scope limitation};  
+         \node[punktchain, join, draw=black,fill=color1bg!50!white] (lit){Litterature study};
+         \node[punktchain, join, draw=black,fill=color1bg!50!white] (consult){Consultation with experts};
+         \node[punktchain, join, draw=black,fill=color1bg!50!white] (scope){Scope limitation};  
     % group 2
-         \node[punktchain, join, draw=black,fill=yellow!50!white
-         ] (typselec){Type selection};
-         \node[punktchain, join, draw=black,fill=yellow!50!white
-         ] (stats){Statistics};
+         \node[punktchain, join, draw=black,fill=color2bg!50!white] (typselec){Type selection};
+         \node[punktchain, join, draw=black,fill=color2bg!50!white] (stats){Statistics};
     % group 3
-         \node[punktchain, join, draw=black,fill=brown!50!white
-         ] (cs){Control studies};
-         \node[punktchain, join, draw=black,fill=brown!50!white
-         ] (analys){Analysis};   
-         \node[punktchain, join, draw=black,fill=brown!50!white
-         ] (memver){Verification of correctness};   
+         \node[punktchain, join, draw=black,fill=color3bg!50!white] (cs){Control studies};
+         \node[punktchain, join, draw=black,fill=color3bg!50!white] (analys){Analysis};   
+         \node[punktchain, join, draw=black,fill=color3bg!50!white] (memver){Verification of correctness};   
     % group 4
-         \node[punktchain, join, draw=black,
-         pattern={vertical lines}, pattern color=orange
-         ] (bbq){BBQueue implementation};
+         \node[punktchain, join, draw=black, fill=color4bg!50!white] (bbq){BBQueue implementation};
     %% No. 1
     \draw[tuborg, decoration={brace}] let \p1=(lit.north), \p2=(scope.south) in
         ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Preparation};
@@ -1557,7 +1547,7 @@ Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger
 \label{tab:crates_io}
 \begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
-\rowcolor{orange!50}
+\rowcolor{color1bg!20}
 Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
 \hline
 libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 & 100,719\\
@@ -1583,7 +1573,7 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab2
 \label{tab:lib_rs}
 \begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
-\rowcolor{orange!50}
+\rowcolor{color1bg!20}
 Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
 \hline
 serde & Framework for serializing and deserializing & b80e722 & 151 & 30,681 \\
@@ -1757,14 +1747,12 @@ rustc 55.01 24.80 11.54 6.16 2.49
     \newlength\lena
     \newlength\lenb
       {black,fill=gray,mark=none}
-    \foreach \p/\t/\pat\c in {56.06/Numbers/crosshatch/red!70!white, 24.71/Refs/vertical lines/orange!90!white, 11.18/Struct\&Enum/grid/yellow!90!orange, 8.05/others (heap)/horizontal lines/green!60!black}
+    \foreach \p/\t/\pat\c in {56.06/Numbers/horizontal lines/color1bg!90!white, 24.71/Refs/vertical lines/color2bg!90!white, 11.18/Struct\&Enum/grid/color3bg!90!white, 8.05/others (heap)/crosshatch/color4bg!90!white}
        {
         \global\lena=\lenb
         \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
-    
         \edef\numbera{\stripatpt\lena}
         \edef\numberb{\stripatpt\lenb}
-    
         \slice{\numbera/100*360}
               {\numberb/100*360}
               {\p\%}{\t}
@@ -1797,7 +1785,7 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
   \scalebox{0.9}{
     \begin{tikzpicture}[scale=3]
     \centering    
-    \foreach \p/\t\pat\c in {58.69/Numbers/crosshatch/red!70!white, 27.78/Access/vertical lines/orange!90!white, 12.65/Record\&Enum/grid/yellow!90!orange, 0.88/others (0.88\%)/horizontal lines/green!60!black}   
+    \foreach \p/\t\pat\c in {58.69/Numbers/horizontal lines/color1bg!90!white, 27.78/Access/vertical lines/color2bg!90!white, 12.65/Record\&Enum/grid/color3bg!90!white, 0.88/others (0.88\%)/crosshatch/color4bg!90!white}   
       {
        \pgfmathtruncatemacro\intp{\p}
     
@@ -1913,6 +1901,7 @@ pub struct BBBuffer {
 \end{listing}
 
 \begin{listing}[!ht]
+
 \begin{minted}[fontsize=\footnotesize]{ada}
  type Offsets_Only (Size : Buffer_Size) is limited record
       Write : aliased Atomic_Count.Instance := Atomic_Count.Init (0);
@@ -2174,7 +2163,7 @@ We came through some guidelines an automated tool would need to implement:
 
 3. Numbers are well-behaved and can be passed by copy or reference. There is no need to worry about ownership as numbers are \texttt{Copy} in Rust. For passing references from Ada/SPARK, use in out.
 
-4. While SPARK verifications (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
+4. While SPARK verification (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
 
 \subsubsection{Enums}
 
@@ -2198,6 +2187,18 @@ type TwoEnum is (One, Two);
 \subsubsection{Composite types}
 
 This is the first type where layout plays a big role.
+
+\begin{figure}[ht!]
+    \centering
+    \MemoryLayout{
+    12/blue!10/A,
+    21/orange!20/B,
+    30/red!30/C,
+    39/yellow!30/\relax
+    }
+  \caption{Composite type}
+  \label{fig:memlayout}
+\end{figure}
 
 
 \subsection{Heap types and pointers}
