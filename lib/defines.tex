@@ -80,7 +80,6 @@
      }
   \end{tikzpicture}
 }
-
 \newcommand{\slice}[6]{
   \pgfmathparse{0.5*#1+0.5*#2}
   \let\midangle\pgfmathresult
@@ -98,4 +97,35 @@
   \let\innerpos\pgfmathresult
   \node[fill=white, inner sep=1pt, outer sep=0pt, text=white, text opacity=0] at (\midangle:\innerpos) {#3};
   \node at (\midangle:\innerpos) {#3};
+}
+
+% facilitates the creation of memory maps. Start address at the bottom, end address at the top.
+% Addresses will be print with a leading '0x' and in upper case.
+% syntax: \memsection{end address}{start address}{height in lines}{text in box}
+
+% facilitates the creation of memory maps. Start address at the bottom, end address at the top.
+% Addresses will be print with a leading '0x' and in upper case.
+% syntax: \memsection{end address}{start address}{height in lines}{text in box}
+\newcommand{\memsection}[4]{
+	\bytefieldsetup{bitheight=#3\baselineskip}	% define the height of the memsection
+	\bitbox[]{8}{
+		\texttt{0x\uppercase{#1}}	 % print end address
+		\\ \vspace{#3\baselineskip} \vspace{-2\baselineskip} \vspace{-#3pt} % do some spacing
+		\texttt{0x\uppercase{#2}} % print start address
+	}
+	\bitbox{16}{#4} % print box with caption
+}
+
+\newcommand{\bigmemsection}[4]{
+	\bytefieldsetup{bitheight=#3\baselineskip}	% define the height of the memsection
+	\bitbox[]{8}{
+		\texttt{0x\uppercase{#1}}	 % print end address
+		\\ \vspace{#3\baselineskip} \vspace{-2\baselineskip} 
+        %\wordbox[lrt] \\
+        %\skippedwords \\
+        %\wordbox[lrb] 
+        \vspace{-#3pt} % do some spacing
+		\texttt{0x\uppercase{#2}} % print start address
+	}
+	\bitbox{16}{#4} % print box with caption
 }
