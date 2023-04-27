@@ -1841,16 +1841,22 @@ BBqueue is a bi-partite circular buffer that allows for contiguous data writes. 
 
 BBqueue is particularly useful for \glsxtrfull{DMA} in embedded microcontroller systems with memory-mapped peripherals. DMA allows hardware to directly read from or write to memory, minimizing the time needed for the CPU to copy data. This allows efficient data transfer, frees the CPU to execute other tasks or entering sleep-mode, saving energy.
 
-
-
-
-\begin{figure}[ht!]
-    \centering 
-    \includesvg[inkscapelatex=false, scale=0.8]{figures/figuressvg/bbqueueprocess.svg}
-      \caption{BBqueue process}
-\end{figure}
-\FloatBarrier
-
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{BBqueue Producer-Consumer}
+\label{tab:bbqueue}
+\begin{tabular}{ |>{\centering\arraybackslash}m{5cm}|>{\centering\arraybackslash}m{5cm}| }
+\hline
+\rowcolor{color1bg!20}
+Producer & Consumer \\
+\hline
+1. \textbf{Grant} \newline Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. & 3. \textbf{Read} \newline Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. \\
+\hline
+2. \textbf{Commit} \newline Makes memory available to read. & 4. \textbf{Release} \newline Frees the memory and gives the space back. \\
+\hline
+\end{tabular}
+\end{table}
 For our experiments, it is important to note that all communications with the queue go through the Read and Write grants, and the header remains protected from direct interaction. 
 
 \begin{figure}[ht!]
@@ -1859,7 +1865,9 @@ For our experiments, it is important to note that all communications with the qu
 \caption{Communication flow in BBqueue}
 \end{figure}
 
+\subsection{algorithm}
 
+\todoinline{describe the algorithm here}
 
 
 \section{Additional tools for debugging and tracking memory usage}
@@ -1870,9 +1878,7 @@ When possible we used \texttt{gnatprove}, even if the tool is not designed for F
 Other tools we tried were \texttt{FFI-checker}\cite{li_detecting_2022}, \texttt{rr}\footnote{https://rr-project.org/} and \texttt{memflow}\footnote{https://github.com/memflow/memflow}. In the end, the existing Rust sanitizers and \texttt{valgrind} proved to sufficient .
 For some types that are copy, we used graphs generators to visualize control flow.
 
-\subsubsection{algorithm}
 
-\todoinline{describe the algorithm here}
 \section{Environment}
 
 The environment is fairly complex as it needs to function for Rust and SPARK in interaction. A  Dockerfile was prepared for this usage (more details in \Cref{sec:systemDocumentation}).
@@ -2232,12 +2238,23 @@ pub struct AdaStringPtr {
 
 One of the unexpected results was that we could not rely on the \&mut T type, despite the apparent guarantees (single ownership, no aliasing). We instead choose a design with a unique owner. Borrowing is a short term problem and should not be passed accross FFI borders. Instead we adopted the following design, with a Rust-like string facing the user, and a private String with unique pointers that managed communication across the FFI border.
 
-\begin{figure}[ht!]
-    \centering \includesvg[inkscapelatex=false, scale=0.7]{figures/figuressvg/stringlogic.svg}
-      \caption{Business logic separation}
-  \label{fig:businesslogic}
-\end{figure}
-\FloatBarrier
+
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{FFI Heap object logic (String)}
+\label{tab:ffistringlogic}
+\begin{tabular}{ |>{\raggedright\arraybackslash}m{5cm}|>{\raggedright\arraybackslash}m{5cm}| }
+\hline
+\rowcolor{color1bg!20}
+\multicolumn{1}{|>{\centering\arraybackslash}m{5cm}|}{pub String} &
+\multicolumn{1}{>{\centering\arraybackslash}m{5cm}|}{priv String} \\
+%pub String & priv String \\
+\hline
+1. Unique \newline 2. Can be borrowed \newline 3. Must implements language memory guarantees & 1. Fat pointer with data and bounds \newline 2. Hidden from the user \newline 3. Memory management relies on the programmer \\
+\hline
+\end{tabular}
+\end{table}
 
 In SPARK, the process was similar. The String containing the information needed to be broken down and reconstructed. We ensure the passing by reference as passing of smaller objects can be implementation defined.
 Again types definition is primordial so we need to find the corresponding equivalences such.
@@ -2479,7 +2496,7 @@ Nevertheless decisions design for the API were different enough to not be able t
             %\wordbox[lrt]{1}{Lots of data} \\
             %\skippedwords \\
             %\wordbox[lrb]{1}{} 
-            \bigmemsection{..AD0}{..B9F}{36}{Header (64B) - 8 fields of 8 bytes with atomic variables \tikzmark{end}}\\
+            \bigmemsection{..AD0}{..B0F}{36}{Header (64B) - 8 fields of 8 bytes with atomic variables \tikzmark{end}}\\
     	    \bigmemsection{..B10}{..B9F}{16}{\tikzmark{end2} BBBuffer UnsafeCell<[u8; 128]> (128B+16B padding)}
             \end{bytefield}
         }
