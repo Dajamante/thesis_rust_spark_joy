@@ -116,16 +116,15 @@
 	\bitbox{16}{#4} % print box with caption
 }
 
-\newcommand{\bigmemsection}[4]{
-	\bytefieldsetup{bitheight=#3\baselineskip}	% define the height of the memsection
-	\bitbox[]{8}{
-		\texttt{0x\uppercase{#1}}	 % print end address
-		\\ \vspace{#3\baselineskip} \vspace{-2\baselineskip} 
-        %\wordbox[lrt] \\
-        %\skippedwords \\
-        %\wordbox[lrb] 
-        \vspace{-#3pt} % do some spacing
-		\texttt{0x\uppercase{#2}} % print start address
-	}
-	\bitbox{16}{#4} % print box with caption
+
+\renewcommand\tikzmark[1]{%
+  \tikz[remember picture,overlay]\node (#1) {};%
+}
+\newcommand\Connect[3][]{%
+\tikz[remember picture,overlay]
+  \draw[->,red,>=latex,#1] (#2.north east) -- ( $ (#3.north west) + (-2pt,0) $ );%
+}
+%https://tex.stackexchange.com/questions/324008/patterned-legend-in-caption
+\newcommand{\legendsquare}[1]{%
+  \textcolor{#1}{\rule{1ex}{1ex}}%
 }

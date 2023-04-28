@@ -1841,22 +1841,27 @@ BBqueue is a bi-partite circular buffer that allows for contiguous data writes. 
 
 BBqueue is particularly useful for \glsxtrfull{DMA} in embedded microcontroller systems with memory-mapped peripherals. DMA allows hardware to directly read from or write to memory, minimizing the time needed for the CPU to copy data. This allows efficient data transfer, frees the CPU to execute other tasks or entering sleep-mode, saving energy.
 
+This structure is often used when a producer and consumer process must communicate with each other, this is why the Rust implementation has a wrapper Producer/Consumer. While the SPARK implementation does not use those wrappers, the underlying logic is the same.
 \begin{table}[ht!]
 \footnotesize
 \centering
-\caption{BBqueue Producer-Consumer}
+\caption{BBqueue structure: Producer-Consumer vs Single queue}
 \label{tab:bbqueue}
-\begin{tabular}{ |>{\centering\arraybackslash}m{5cm}|>{\centering\arraybackslash}m{5cm}| }
+\begin{tabular}{ |m{5cm}|m{5cm}| }
 \hline
 \rowcolor{color1bg!20}
-Producer & Consumer \\
+\multicolumn{2}{|c|}{BBQueue (SPARK)} \\
 \hline
-1. \textbf{Grant} \newline Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. & 3. \textbf{Read} \newline Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. \\
+\rowcolor{color1bg!20}
+\centering Producer (Rust) & \centering Consumer (Rust) \tabularnewline
 \hline
-2. \textbf{Commit} \newline Makes memory available to read. & 4. \textbf{Release} \newline Frees the memory and gives the space back. \\
+1. \textbf{Grant} \newline Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. & 3. \textbf{Read} \newline Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. \tabularnewline
+\hline
+2. \textbf{Commit} \newline Makes memory available to read. & 4. \textbf{Release} \newline Frees the memory and gives the space back. \tabularnewline
 \hline
 \end{tabular}
 \end{table}
+\FloatBarrier
 For our experiments, it is important to note that all communications with the queue go through the Read and Write grants, and the header remains protected from direct interaction. 
 
 \begin{figure}[ht!]
@@ -1864,10 +1869,15 @@ For our experiments, it is important to note that all communications with the qu
 \includesvg[inkscapelatex=false, scale=0.7]{figures/figuressvg/bbqueuelogic.svg}
 \caption{Communication flow in BBqueue}
 \end{figure}
+\FloatBarrier
 
-\subsection{algorithm}
+\subsection{Algorithm}
 
-\todoinline{describe the algorithm here}
+BBqeue is a BipBuffer, which is a circular buffer commonly used in embedded systems. It ensures that data is written in continuously to avoid fractioning. This makes it an ideal candidate for our real-life implementation as we are garanteed by both Rust and SPARK implementations that the data will be assigned in a continuous manner.
+
+The data structure uses pointers that simulates a circular buffer connected end to end, even if the underlying buffer is of course a fixed size buffer of size N (decided by the user.)  
+
+It has a series of atomic pointers to for both safety and efficiency. Atomic variables ensure thread safety and permit concurrency, as two threads should never access the same memory chunks at the same time. The atomic pointers track where data should be written and where it should be read from. It also has extra pointers for inverted condition (when the write mark is before the read), a watermark to ensure continuity of the written data (making the queue wrap around if there is not enough space at the end of the buffer).  The write operation is in charge of write and watermark pointers, and the read operation is in charge the read pointer. It also has atomic variables to indicate read/write in progress, returning errors to be handled. More information are available from \cite{chouteau_rust_2021, munns_design_2019}.
 
 
 \section{Additional tools for debugging and tracking memory usage}
@@ -2260,7 +2270,7 @@ In SPARK, the process was similar. The String containing the information needed 
 Again types definition is primordial so we need to find the corresponding equivalences such.
 A Rust string is not \texttt{\#[repr(C)]}, so first we need to break down the structure to return the fields. This is a major difference. As anything that is not \texttt{\#[repr(C)]} cannot be passed safely, we need to do it ourselves and in addition Rust must forget about the string, meaning that we must get around the safety guarantees and prevent the language to drop the data when it is out of scope. 
 
-As per previous considerations of being a good FFI citizen in \Cref{fig:businesslogic}, the Rust side must reconstruct the language and implement the drop behaviour.
+As per previous considerations of being a good FFI citizen in \Cref{tab:ffistringlogic}, the Rust side must reconstruct the language and implement the drop behaviour.
 
 \begin{listing}[!ht]
 \begin{minted}[fontsize=\footnotesize]{rust}
@@ -2368,20 +2378,22 @@ After modelling it as per previous section, it is then possible to check that th
 
 \todoinline{add summary with florian and a graph of forbidden states}
 
-Exceptions can be handled in SPARK if the exception is expected, that is covered by a choice in an exception handler. Rust has also panics. In the experiments we saw that exceptions should never unwind accross the FFI boundary, as this is undefined behaviour. However we recommend the strategy of aborting any exception. The reason is that after an error has happened, it is impossible to go back to the state where the error did not happen. We enter instead in a new state where the error is being managed. Then the next state is post error. We do not know whether this state is fully correct. There is a risk of branching into new erroneous state from this state.
+Exceptions can be handled in SPARK if the exception is expected, meaning it is covered by a choice in an exception handler. 
+Rust has also recoverable errors as \inlinecode{Result<>} and unrecoverable errors in the form of \inlinecode{panic!()}. In the experiments, we saw that exceptions should never unwind across the FFI boundary, as this is undefined behavior. 
+Even if exceptions and panics could theoretically be handled, we recommend the strategy of aborting on any exception or panic. The reason is that after an error has happened and has been managed, it is impossible to go back to a clean state. Instead, we have a complex interaction with a faulty state and we introduce state extension, when the next state is post-error. We do not know whether this state is fully correct and there is a risk of branching into a new erroneous state from this state. The best strategy is to crash and recover the system, which implies that redundancy must be introduced.
 
-\section{Pasing BBqueue}
+\section{Passing BBqueue}
 
-The real-life experiment was challenging despite useful guidelines established in the control experiments.
+The real-life experiment was challenging despite the useful guidelines established in the control experiments.
 
 First, we established that all complex structures should be passed by pointer.
 Secondly, the identification and selection of the types were not trivial.
 Third, not only must the types correspond, but the layout too, and it was not the case in both implementations of BBqueue for historic reasons (simply, one implementation evolved for different needs).
 
-Nevertheless, we could use the experience to pass some information.
+Nevertheless, we could use the experience to pass on some information.
 
-This realistic experiment was useful to imagine which challenges an automated tool in a real life context must face:
-- cooperation while establishing the datastructures and design.
+This realistic experiment was useful to imagine which challenges an automated tool in a real-life context must face:
+- cooperation while establishing the data structures and design.
 
 
 
@@ -2404,11 +2416,11 @@ Furthermore, there is a sequence of atomic operations, as the queue is lock-free
 This allows all operations to be thread-safe and avoid undefined behavior. The producer and the consumer read the same atomic variables (in the header) and get authorization to touch the actual buffer of N bytes.
 
 
-To make it work beyond the FFI barrier in SPARK we need to to guarantee consistent layout across the FFI border, provide pointers to the grant and the content of the header, ensure the header content must be of the appropriate size and the appropriate atomic types, ensure the functions in SPARK touch the atomics in the exact described order. If the order is not respected, thread-safety cannot be guaranteed (the order is carefully designed to prevent consumer or producer from touching parts of data they should not have access to).
+To make it work beyond the FFI barrier in SPARK we need to guarantee consistent layout across the FFI border, provide pointers to the grant and the content of the header, and ensure the header content must be of the appropriate size and the appropriate atomic types, ensure the functions in SPARK touch the atomics in the exact described order. If the order is not respected, thread-safety cannot be guaranteed (the order is carefully designed to prevent consumer or producer from touching parts of data they should not have access to).
 
 There are no differences in the algorithm implementation but notable differences in the header in both Rust and SPARK, as well as how they are accessed.
 
-To respect the design decisions (buffer should be interracted with only through grants) me modelled the object on the SPARK side:
+To respect the design decisions (buffer should be interacted with only through grants) we modeled the the header and read grant on the SPARK side \Cref{lst:bbqueueinspark}. Some variables declared on the Rust side are not declared on the SPARK side, including pointer to the buffer. The reason is that the SPARK implementation passes this information in the Write/Read grant.
 
 \begin{listing}[ht!]
 \begin{minted}[framesep=2mm,
@@ -2481,43 +2493,37 @@ There are also differences in the parameters that the functions for atomic opera
 
 It was possible to reconstruct the memory carefully following the recommendations we came up with in the control study. 
 
-That is packing the object to be passed into an additional datastructure for which we know the layout, pass it by reference with appropriate types on the other sides. Ensure proper FFI clean out as per FFI citizens.
-
-
+That is packing the object to be passed into an additional data structure for which we know the layout, and pass it by reference with appropriate types on the other sides. Ensure proper FFI clean out as per FFI citizens.
 
 Nevertheless decisions design for the API were different enough to not be able to convert one queue in the other.
 
 \begin{figure}
-    \centering
-    \begin{minipage}{.45\textwidth}
-        \scalebox{0.8}{
-            \begin{bytefield}{52}
-            %\wordbox{1}{Some data} \\
-            %\wordbox[lrt]{1}{Lots of data} \\
-            %\skippedwords \\
-            %\wordbox[lrb]{1}{} 
-            \bigmemsection{..AD0}{..B0F}{36}{Header (64B) - 8 fields of 8 bytes with atomic variables \tikzmark{end}}\\
-    	    \bigmemsection{..B10}{..B9F}{16}{\tikzmark{end2} BBBuffer UnsafeCell<[u8; 128]> (128B+16B padding)}
-            \end{bytefield}
-        }
-        %\caption{Header (64 bytes)and inner buffer (144 bytes)}
-        \label{fig:hiddenbufferheader}
+    \begin{minipage}{.40\textwidth}
+        \begin{bytefield}{24}
+        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}\tikzmark{end}\\
+    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}
+        \end{bytefield}         \label{fig:hiddenbufferheader}
     \end{minipage}
-        \begin{minipage}{.45\textwidth}
-        \scalebox{0.8}{
-            \begin{bytefield}{6}
-            \tikzmark{start}\memsection{..BA0}{..BA7}{2}{0x..AD0: pointer to header}\\
-    	    \tikzmark{start2}\memsection{..BA8}{..BAF}{2}{0x..B10: pointer to BBBuffer}\\
-            \memsection{..BB0}{..BB7}{2}{length of read (4)}
-            \end{bytefield}
-        }
+    \begin{minipage}{.15\textwidth}\quad\quad    \end{minipage}%
+    \begin{minipage}{.40\textwidth}
+        \begin{bytefield}{6}
+        \begin{rightwordgroup}{Reconstruced \\ Read grant \\ passed to \\ SPARK}
+    \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}\\
+    	\memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}\\
+        \memsection{..BB0}{..BB7}{2}{length of read (4)}
+        \end{rightwordgroup}
+        \end{bytefield}
     \end{minipage}
     \begin{tikzpicture}[overlay,remember picture]
-        \draw[->] (pic cs:start) -- %([xshift=-3.5cm, yshift=-4cm]pic cs:end);
         (pic cs:end);
-        \draw[->] (pic cs:start2) -- (pic cs:end2);
+      \Connect{start}{end}
+      \Connect{start2}{end2}
     \end{tikzpicture}
-    \caption{BBqueue Read grant in memory}
+    \caption{BBqueue Read grant in memory (not to scale!) 
+    %\legendsquare{fill=green}~Memory allocated in Rust,
+    %\legendsquare{fill=color3bg}~Memory transferred to SPARK
+    }
+    
     \label{fig:memBBqueue}
 \end{figure}
 
