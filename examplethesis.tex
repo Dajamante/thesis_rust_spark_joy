@@ -1912,52 +1912,57 @@ The environment is fairly complex as it needs to function for Rust and SPARK in 
 \chapter{Experiments}
 \label{ch:whatYouDid}
 
-\todoinline{
-1. Describe experiments (done)
-2. Describe BBqueue 
-}
-  
-
 
 %What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?
 
-This section describes both control studies and real-world implementation with BBQueue, to provide recommendations for FFI bindings between Rust and SPARK. 
-
-
-
+This section describes both control studies and real-world implementation with BBQueue, intending to provide final recommendations for FFI bindings between Rust and SPARK. 
 
 
 \section{System}
+
+%Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
+
+%Distributor ID:	Ubuntu
+
+%Description:	Ubuntu 22.04.1 LTS
+
+%Release:	22.04
+
+%Codename:	jammy
+
 Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
-Distributor ID:	Ubuntu
-Description:	Ubuntu 22.04.1 LTS
+
+Description: Ubuntu 22.04.1 LTS
+
 Release:	22.04
-Codename:	jammy
 
 % the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
 \section[Environment for \& SPARK/Rust experiments]{Environment for SPARK/Rust experiments}
 
-We experimented with SPARK to/from Rust systems. For reproducibility purposes,  \Cref{sec:buildSystems} describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
+For reproducibility purposes,  \Cref{sec:buildSystems} describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
 
 \subsection{SPARK to Rust}
 
 \Cref{fig:sparkbuild} in \Cref{sec:buildSystems}
-shows the build process for a SPARK file using a Rust library. The process is straightforward (all files are in the same folder and a script runs the build).
+shows the build process for a SPARK file using a Rust library. The process is straightforward: all files are in the same folder, and a script runs the build. The script can be adjusted to include useful switches\footnote{\href{https://docs.adacore.com/gnat_ugn-docs/html/gnat_ugn/gnat_ugn/building_executable_programs_with_gnat.html}{documentation}} as described for example in \Cref{sec:compositetypes}. 
+
 \subsection{Rust to SPARK}
 
 \Cref{fig:rustbuild} in \Cref{sec:buildSystems} shows the build process for a Rust project using a SPARK project. 
 
-The main difference is the use of the crate \texttt{gpr} which is designed for bigger projects. While it introduces a more complexity for control studies, it also allows access to a richer toolset (\texttt{alire, cargo}) which is useful for more complicated experiments.  
+The main difference is using the crate \texttt{gpr, v0.1.2}\footnote{\href{https://crates.io/crates/gpr}{documentation on crates.io}}, designed for more complex projects\cite{kliemann_adding_2022}. While it introduces more complexity for control studies, it also allows access to a richer toolset (package managers alire and cargo for Ada and Rust respectively), which is useful to set up more complicated experiments and is used in the BBqueue experiment.  
 
 \section{Experiments on stack-types}
 
-A series of experiments were conducted on scalar and aggregate types\footnote{A scalar type is a type that can hold a single value at a time (\texttt{Integer, Float, enum...}). Conversely, a non-scalar type holds different values (\texttt{array...})}. Scalar types included Integer and arithmetic manipulations (by value and references). Non-scalar types included arrays and fieldless enums where the focus was on how to achieve compatibility and common source of errors.
+A series of experiments were conducted on scalar and aggregate types\footnote{A scalar type is a type that can hold a single value at a time (\texttt{Integer, Float, enum...}). Conversely, a non-scalar type holds different values (\texttt{array...})}. Scalar types included Integer and arithmetic manipulations (by value and references). Non-scalar types included arrays, structs and fieldless enums where the focus was on how to achieve compatibility and common source of errors.
 
-Those experiments demonstrated how to perform sound and safe operations in simple operations with stack-allocated data using \gls{FFI} for various use cases, such as passing integers, arrays, and enums, and handling memory allocation and deallocation. It also highlights potential issues and best practices for memory safety and type safety. The experiments cover:
+Those experiments demonstrated how to perform sound and safe operations with stack-allocated data using \gls{FFI}
+as well as best practices for memory safety and type safety. Ownership was usually not a concern as simple types are Copy.
+Various use cases were tested, such as passing integers, arrays, and enums, and handling memory allocation and deallocation. The experiments also highlight potential issues. The experiments cover:
 
 \begin{itemize}
     \item passing integers by reference and by copy, demonstrating type safety and memory safety as well as memory leaks.
-    \item allocating and deallocating memory through FFI, following the "good FFI citizen principles".
+    \item allocating and deallocating memory through FFI, following the "good FFI citizen principles"\cite{gjengset_rust_2021}: memory must be freed by the appropriate allocator.
     \item passing an aggregate type (array) to a foreign function to calculate a sum, illustrating memory errors in the process.
      \item passing an aggregate type (enums) to a foreign function to demonstrate the use of repr attributes for FFI-safe enums.
      \item passing composite types with different sizes
@@ -1965,16 +1970,15 @@ Those experiments demonstrated how to perform sound and safe operations in simpl
 \end{itemize}
  
 \section{Experiments on heap types}
-The heap-types experiments focused on more complex memory management scenarios, with an emphasis on representing heterogeneous data correctly, meeting layout expectations, and writing to specific locations, such as replacing bytes inside a String. These experiments demonstrated how to perform safe operations with heap-allocated data while minimizing unsafe code and delegating the operations to the language semantics - such as built-in ownership management.
+The heap-types experiments focused on more complex memory management scenarios, with an emphasis on representing heterogeneous data correctly, meeting layout expectations, and writing to specific locations, such as replacing bytes inside a String. These experiments demonstrated how to perform safe operations with heap-allocated data while minimizing unsafe code and delegating the operations to the language semantics - such as built-in ownership management. In other words we focused on separation of concerns between the language logic and the memory passing logic.
 
 The experiments covered:
 
 \begin{itemize}
-    \item Defining structs to hold complex datatypes, respecting their layout
-    \item Implementing methods for creating, accessing, modifying the complex datatypes, respecting the language rules for such types
-    \item Implementing safety control
-    \item Implementing traits for dereferencing and droping when the memory was not needed anymore
-    \item minimizing unsafe code: while still not focusing on defensive code, the unsafe operations were exported to a part of the code where those operations could be delegated to the language semantics.   
+    \item Defining structs to hold complex data types, respecting their layout and alignment.
+    \item Implementing methods/traits for creating, accessing, modifying the complex data types.
+    \item Implementing method/traits for dereferencing and dropping when the memory was not needed anymore
+    \item Minimizing unsafe code: while still not focusing on defensive code, the unsafe operations were exported to a part of the code where those operations could be delegated to the language semantics.   
 \end{itemize}
 
 
@@ -1982,20 +1986,16 @@ We run \texttt{valgrind} to show both sound bindings and bindings which have int
 
 \section{BBqueue}
 
-The BBqueue experiments consisted in taking the lesson learned form the control study to understand and model a more complex object.
-
+The BBqueue experiments consisted in testing the "lesson learned" form the control study to understand and model a more complex object.
 
 The work was divided in smaller steps.
 
-1. Analysing both datastructures and implementations.
-2. Using Rust, and getting the official version of bbqueue, sending and receiving some data in one thread.
-3. Multithreading.
-4. Switching to the unofficial, FFI-safe, bbqueue\_ipc, modifying stack allocated data. 
-5. Process to FFI exchanges with SPARK.
-6. Proceed to the reverse experiments, starting from SPARK and point 4.
-
-
-
+\begin{itemize}
+    \item Analysing data structures and implementations on both Rust and SPARK sides
+    \item Using Rust, and getting the official version of BBqueue, sending and receiving some data in one thread and multiple threads.
+    \item Switching to the unofficial, FFI-safe, bbqueue\_ipc, modifying stack allocated data. 
+    \item  Process to FFI exchanges with SPARK
+\end{itemize}
 
 \begin{comment}
     
@@ -2151,6 +2151,7 @@ type TwoEnum is (One, Two);
 
 \subsection{Heap types and pointers}
 
+\todoinline{memory allocation was not an issue as both rust and spark use malloc, it was not the case before. you can create your own allocator. some memory regions are not accessible outside of the heap!}
 The main point about pointers in Ada/SPARK and Rust is that they carry more information than C, and we thought about how to carry this information to the language across the FFI barrier.
 This subsection examines pointers. Pointers contain a lot of information in both Ada/SPARK and Rust. 
 In SPARK, they have nominal equality instead of structural equality; thus, the access to type T1 that is an access Integer will not be equal to type T2 that is an access Integer. 
@@ -2318,6 +2319,7 @@ end record;
 
 
 \subsubsection{Composite types}
+\label{sec:compositetypes} 
 
 As we found that both Rust and SPARK objects were "well-behaved" in the sense that they  were designed to interact with C and the outcome was predictable. But composite objects need closer examination as layout needed to be adjusted manually sometimes.
 GNAT has a series flags that allow to visualise an object in memory and adjust the Rust object accordingly, such as \inlinecode{-gnatRe2}\footnote{\href{https://docs.adacore.com/gnat_ugn-docs/html/gnat_ugn/gnat_ugn/building_executable_programs_with_gnat.html}{debugging control documentation}}. 
