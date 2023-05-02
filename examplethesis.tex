@@ -721,8 +721,6 @@ I would like to thank Cyrille for accepting to be my supervisor in the current p
 \printglossary[style=mylong, type=\acronymtype, title={List of acronyms and abbreviations}]
 %\printglossary[type=\acronymtype, title={List of acronyms and abbreviations}]
 %\printnoidxglossary[style=mylong, title={List of acronyms and abbreviations}]
-\engExpl{The list of acronyms and abbreviations should be in alphabetical order based on the spelling of the acronym or abbreviation.
-}
 
 \cleardoublepage
 %\glsaddall
@@ -791,7 +789,8 @@ All of the terms used in this introduction can be found in \Cref{sec:introductio
 
 \section{Background}
 \label{sec:background}
-\todo[inline]{There should be text here to introduce the subsections}
+%\todo[inline]{There should be text here to introduce the subsections}
+This background will cover memory unsafety, which is the underlying issue for this kind or research.
 
 %\generalExpl{Present the background for the area. Set the context for your project – so that your reader can understand both your project and this thesis. (Give detailed background information in Chapter 2 - together with related work.)
 %Sometimes it is useful to insert a system diagram here so that the reader knows what are the different elements and their relationship to each other. This also introduces the names/terms/… that you are going to use throughout your thesis (be consistent). This figure  also help you later delimit what you are going to do and what others have done or  do.}
@@ -820,19 +819,21 @@ Although some protections are deployed in common systems, such as ``\gls{ig:stac
 
 Several authors have explained why designing secure software is extremely challenging. While the best solution would be to avoid writing software in C/C++ altogether, this is impractical and impossible\,\cite{szekeres_sok_2013}. Other sources recommend safe languages for new projects\,\cite{scherer_engineering_2021}. But for many reasons (especially, cost and not reinventing the wheel when well-tested libraries exist), replacing unsafe languages is not on the map for most developers.
 
-Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to rely on software for their functionality and move from hardware-only to the cyber-physical space, they become vulnerable, which rings especially true for the \gls{safety-critical} industry. Furthermore, they warn that software complexity is increasing (see \Cref{fig:complexity}), aggravating challenges to software security.
+Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to rely on software for their functionality and move from hardware-only to the cyber-physical space, they become vulnerable, which rings especially true for the \gls{safety-critical} industry. Furthermore, they warn that software complexity is increasing exponentially (\cite{moy_when_2020}), aggravating challenges to software security.
 
- 
-\begin{figure}[!ht]
+\begin{comment}
+  \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=1\textwidth]{figures/complexity.png}
   \end{center}
   \caption[Software complexity, automotive/aerospace]{Software complexity in the automotive and aerospace industry from\,\cite{moy_when_2020}}
   \label{fig:complexity}
 \end{figure}
-\FloatBarrier
+\FloatBarrier  
+\end{comment}
 
-Moy and Aiello\,\cite{moy_when_2020} report security incidents which brought down AT\&T (at a cost of US\$60 million and long-lasting damage to the company's reputation), the \gls{FDA} warned against almost 500 thousand cardiac devices that put the patients in pain or at risk of death, and the infamous WannaCry ransomware attack that encrypted 200 thousand computers in 150 countries with a reported cost of USD\$ 8 billion.
+
+The authors\,\cite{moy_when_2020} report security incidents which brought down AT\&T (at a cost of US\$60 million and long-lasting damage to the company's reputation), the \gls{FDA} warned against almost 500 thousand cardiac devices that put the patients in pain or at risk of death, and the infamous WannaCry ransomware attack that encrypted 200 thousand computers in 150 countries with a reported cost of USD\$ 8 billion.
 
 Scherer\,\cite{scherer_engineering_2021} reports successful attacks against ``train schedule systems, entire energy grids, hospital networks, vehicular control software, and even critical aircraft systems". Scherer notes that security needs to be built into the software development process instead of being an add-on or an afterthought. Scherer also notes the ``continuously increasing rate of bugs with increasing project size amongst other factors in long-lived projects" and ``a slow turnaround time" for software improvement (1 to 10 years) causes problems to pile up.
 
@@ -934,7 +935,7 @@ This thesis covers manual bindings for basic types. This thesis does not impleme
 \section{Structure of the thesis}
 %\sweExpl{ Rapportens disposition}
 ~\Cref{ch:background} presents relevant background information about Rust and SPARK, and talks more about memory safety.  
-~\Cref{ch:relatedworks} discuss related works when it comes to \gls{FFI}.  \Cref{ch:methods} presents the methodology and method used to solve the problem. …
+~\Cref{ch:relatedworks} discuss related works when it comes to \gls{FFI}.  \Cref{ch:methods} presents the methodology and method used to solve the problem. ~\Cref{ch:resultsAndAnalysis} discuss the outcome of the experiments, and ~\Cref{ch:conclusionsAndFutureWork} present possible expansion of this work.
 
 \section{Terms in the introduction}\label{sec:introductiongloss}
 %\setglossarysection{section}
@@ -1417,9 +1418,7 @@ With that tool and expert advice, we identified which types are widely used and 
 
 The program counts occurrences of different patterns with Regex in the code bases, including numbers, arrays, references, strings, and various heap-allocated types. The detailed patterns and scripts will be provided in \Cref{sec:systemDocumentation}.
 
-\texttt{cloc 1.9} counted 26,754 Rust files (1,862 k\gls{LOC}) in popular and qualitative Rust repositories.
-
-It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
+\texttt{cloc 1.9} counted 26,754 Rust files (1,862 k\gls{LOC}) in popular and qualitative Rust repositories. It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
 
 \subsection{Regexes}
 This section covers Rust and SPARK regexes.
@@ -1432,7 +1431,17 @@ The Rust regex patterns are designed to match type declarations and literals, ex
     \begin{minted}{rust}
     let c = 3.14;
     \end{minted}
-    \item Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|): Matches array literals, excluding array declarations to avoid double matching. For example, this will be only one match:
+    \item Enums and Structs (\verb|struct| and \verb|enum|): both \texttt{struct}s and \texttt{enum}s are declared with a keyword. 
+    \begin{minted}{rust}
+    struct Point {
+        x: f32,
+        y: f32,
+    }
+    enum Color {
+        //...
+    }
+    \end{minted}
+    \item Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|): Matches array literals, excluding array declarations to avoid double matching and overreporting the type. For example, this will be only one match:
     \begin{minted}{rust}
     let a : [i32; 5] = [1, 2, 3, 4, 5];  
     \end{minted}
@@ -1523,10 +1532,11 @@ This pattern matches unconstrained arrays and instances of the Containers.Vector
 
 The data is collected via file parsing and \texttt{Regex} patterns\footnote{Using the Regex Rust crate \href{(documentation)}{https://crates.io/crates/regex}}. 
 
-One source of error can be that some data types can appear in comments instead of the code. This worry is legitimate but can be put aside given the gap between the used data types, where numbers clearly dominate. 
+One source of error can be that some data types can appear in comments instead of the code. This results in the counts being potentially higher than the actual numbers; however, a manual inspection of some matches indicates that the extent of numbers in comments is limited, and the numbers are fairly close to the actual occurrences of the counted type.
 
-Another source of error is that while the regex cover the most common cases, they do not cover edge cases.
-When it comes to Rust mutable and immutable references, admittedly references can point at any data structure. We mean that a \inlinecode{struct AStruct} can be declared and then referred by a number of \inlinecode{\&AStruct}. But this does not mean that we count the same object several times, rather then we study the use of references and how ownership is transmitted. 
+
+Another source of error is that while the regex covers the most common cases, they do not cover edge cases.
+%When it comes to Rust mutable and immutable references, admittedly references can point at any data structure, i.e, a \inlinecode{struct AStruct} can be declared and then referred by a number of \inlinecode{\&AStruct}. But this does not mean that we count the same object several times, rather then we study the use of references and how ownership is transmitted. 
 
 The presence of many references and pointers (\inlinecode{\&mut T} and \inlinecode{\&T}, as well as \inlinecode{Access} types in SPARK), rather confirms the need to study references and pointers.
 
@@ -1542,12 +1552,12 @@ Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger
 \begin{table}[ht!]
 \footnotesize
 \centering
-\caption{Most popular projects on crates.io (171,897 LOC)}
+\caption{Most popular projects on crates.io (171\,897 LOC)}
 \label{tab:crates_io}
 \begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
 \rowcolor{color1bg!20}
-Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
+\textbf{Package}& \textbf{Description} & \textbf{Git hash} \newline \textbf{(Reverse Dependencies)}&\textbf{Downloads} \newline \textbf{all time in millions} & \textbf{LOC}\\
 \hline
 libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 & 100,719\\
 \hline
@@ -1573,7 +1583,7 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab2
 \begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
 \hline
 \rowcolor{color1bg!20}
-Package& Description & Git hash \newline (Reverse Dependencies)&Downloads \newline all time in millions & LOC\\
+\textbf{Package}& \textbf{Description} & \textbf{Git hash} \newline \textbf{(Reverse Dependencies)}&\textbf{Downloads} \newline \textbf{all time in millions} & \textbf{LOC}\\
 \hline
 serde & Framework for serializing and deserializing & b80e722 & 151 & 30,681 \\
 \hline
@@ -1597,11 +1607,10 @@ When looking at types per project, we can see that the rust compiler is almost 5
 
 As we can see, numbers (Integers and Float) dominate the statistics \Cref{fig:repartitionrust}, which allows replying to the subsidiary research question: both numbers and references need to be tested when binding Rust and SPARK.
 
-Numbers size is known at compile time. They are expressive in their type and protected against overflow\footnote{The compiler warns against risks of overflow}. 
-
+The numbers size is known at compile time. They are expressive in their type and protected against overflow\footnote{The compiler warns against risks of overflow}. 
 This confirms that Rust is used as a low-level, systems programming language. 
 
-The second most common category are references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system - they are like pointers, but guarantee a valid owner - and are used in a fourth of the cases. Logically, heap types account for a minority of types.
+The second most common category are references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system -- they are like pointers, but guarantee a valid owner -- and are used in a fourth of the cases. Logically, heap types account for a minority of types.
 
 \pgfplotstableread{
 Rust_type crates_io lib_rs rustc
@@ -1842,6 +1851,8 @@ BBqueue is a bi-partite circular buffer that allows for contiguous data writes. 
 BBqueue is particularly useful for \glsxtrfull{DMA} in embedded microcontroller systems with memory-mapped peripherals. DMA allows hardware to directly read from or write to memory, minimizing the time needed for the CPU to copy data. This allows efficient data transfer, frees the CPU to execute other tasks or entering sleep-mode, saving energy.
 
 This structure is often used when a producer and consumer process must communicate with each other, this is why the Rust implementation has a wrapper Producer/Consumer. While the SPARK implementation does not use those wrappers, the underlying logic is the same.
+
+\todoinline{they use grants to communicate!}
 \begin{table}[ht!]
 \footnotesize
 \centering
@@ -1866,7 +1877,7 @@ For our experiments, it is important to note that all communications with the qu
 
 \begin{figure}[ht!]
   \centering 
-\includesvg[inkscapelatex=false, scale=0.7]{figures/figuressvg/bbqueuelogic.svg}
+\includesvg[inkscapelatex=false, scale=0.6]{figures/figuressvg/bbqueuelogic.svg}
 \caption{Communication flow in BBqueue}
 \end{figure}
 \FloatBarrier
@@ -1901,8 +1912,12 @@ The environment is fairly complex as it needs to function for Rust and SPARK in 
 %Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
 %\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
 
-\todoinline{Link to the different GitHub repos with a description of what they do including stats, do the README to be more friendly}
-
+\begin{itemize}
+    \item Control studies and BBqueue experiments are available are grouped in this \href{https://github.com/Dajamante/ada_rust_programs}{repository}.
+    \item The statistic tool is available \href{https://github.com/Dajamante/stat_ada_rust_code}{here}.
+    \item SPARK BBqueue is available \href{https://github.com/Fabien-Chouteau/bbqueue-spark}{here}.
+    \item BBqueue in Rust is available in its \href{https://github.com/jamesmunns/bbqueue}{official} and \href{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}{FFI safe version}.
+\end{itemize}
 %gpr-rust
 
 %statistic code
@@ -2089,52 +2104,51 @@ The work was divided in smaller steps.
 \cleardoublepage
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
-\sweExpl{svensk: Resultat och Analys}
-
-\engExpl{Sometimes this is split into two chapters.\\Keep in mind: How will you evaluate what you have done? What are your metrics?\\Analysis of your data and proposed solution\\Does this meet the goals which you had when you started?}
 
 
+%\engExpl{Sometimes this is split into two chapters.\\Keep in mind: How will you evaluate what you have done? What are your metrics?\\Analysis of your data and proposed solution\\Does this meet the goals which you had when you started?}
 
-The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that apply to an automated tool for bindings on the model of \texttt{bindgen}\,\cite{noauthor_bindgen_2022}. Correctness is evaluated if there is no memory error with \texttt{valgrind} -this does not prove the correctness but the absence of memory error.
 
-As a reminder, bindgen is a binding tool that generates bindings between Rust and C. The languages analyzed in this thesis have richer types than C, and the goal is to learn to take full advantage of their expressivity.
+The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that can be applied, for example, to create an automated tool for bindings on the model of \texttt{bindgen}\footnote{As a reminder, bindgen is a binding tool that generates bindings between Rust and C.}\,\cite{noauthor_bindgen_2022}. The languages analyzed in this thesis have richer types than C, and the goal is to take advantage of their expressivity. Both languages also implement type safety and ownership, and we study how those are passed or conserved through FFI.
 
-The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. It is necessary to establish that ownership, type safety, and memory safety are conserved for a binding to be considered correct.
+The binding is considered correct if the data is correctly passed and no memory error is found \texttt{valgrind} - this does not prove complete correctness but rather the absence of memory error. But our goal is pass the correct type through the FFI barrier, and rely on both languages guarantees once the FFI frontier is passed. 
+
+The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. 
 
 This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
 Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
 Control study programs can provide a foundation for automatic tooling.
 
-When the control studies are performed, an additional experiment is executed with a library in both languages.
-
-
-
-In this chapter, we present the results and discuss them.
-
-
-General:
-Use a compiler that has the same behavior for both languages. To guarantee consistent behavior between Rust and SPARK, we recommend using GNAT and rustc. This will help maintain consistency in type representation and avoid potential issues arising from heap assignments.
-
-One challenge was ensuring equivalences. What types can one rely on steadily to communicate accross the FFI barrier?
-We came through some guidelines an automated tool would need to implement:
+After the control studies are performed, an additional experiment is executed with a BBqueue, a complex library available in both languages. Porting BBqueue allowed to implement most of the "lesson learned" through the control studies.
 
 \section{Major results}
 
+Secure languages have strong expectations and passing data structures is complicated.
+The compiler behaviour is also crucial when passing data. To guarantee consistent behavior between Rust and SPARK, we recommend using the GNAT compiler. 
+
+
+We came through some guidelines an automated tool would need to implement:
+
+
 \subsection{Stack types}
 \subsubsection{Numbers}
-1. Ensure consistency between Rust and Ada/SPARK types: Rust types are explicit about their size (e.g., u64, i32). Make sure that corresponding Ada/SPARK types are the same size to avoid unexpected results, such as garbage being read. For instance, GNAT assumes that the Integer type in Ada/SPARK corresponds to i32 in Rust. This information can be found in the GNAT compiler documentation, but if using another compiler, this is not guaranteed.
+\label{sec:numbers}
+Numbers are straightforward to work with, provided that an appropriate type is provided. As numbers are copy, there is no need to ensure ownership. 
 
-2. Avoid machine-dependent types when they are unnecessary: types like usize and isize in Rust are machine-dependent and used for indexing rather than counting. When interfacing with Ada/SPARK, replace these types with appropriate, non-machine-dependent counterparts to ensure platform compatibility.
+Consistency must be ensure between Rust and Ada/SPARK types: Rust types are explicit about their size (e.g., \texttt{u64, i32}). Corresponding Ada/SPARK types must be the same size to avoid unexpected results, such as garbage being read. For SPARK, the necessary information is found in the compiler documentation\footnote{\href{https://docs.adacore.com/gnat_rm-docs/html/gnat_rm/gnat_rm/implementation_defined_characteristics.html}{GNAT compiler documentation.}}
+For instance, the GNAT reference manual states that the Integer type in Ada/SPARK is 32-bit signed, which corresponds to \texttt{i32} in Rust. This is not necessarily true if using another compiler.
 
-3. Numbers are well-behaved and can be passed by copy or reference. There is no need to worry about ownership as numbers are \texttt{Copy} in Rust. For passing references from Ada/SPARK, use in out.
+Additionally, the programmer should avoid machine-dependent types when they are unnecessary: types like \texttt{usize} and \texttt{isize} in Rust are machine-dependent and used for indexing rather than counting. When interfacing with SPARK, these types should be replaced with appropriate, non-machine-dependent counterparts to ensure platform compatibility.
 
-4. While SPARK verification (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
+Numbers are well-behaved and can be passed by copy or reference. There is no need to worry about ownership as numbers are \texttt{Copy} in Rust. For passing references from Ada/SPARK, it is recommended to use the modifiers \texttt{in out}. In combination with the \texttt{Import/Export} pragma, it guarantees a behaviour similar to C, which is \href{https://en.wikibooks.org/wiki/Ada_Programming/Types/access}{predictable}.
+
+%4. While SPARK verification (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
 
 \subsubsection{Enums}
 
-1. Working with fieldless enums is straightforward. 
-The enums we are testing have only discriminants. The primitive representations of fieldless enums set the size and alignment to be the same as the primitive type of the same name. \texttt{\#[repr(C)]} will guarantee the same layout as expected from C, but \texttt{\#[repr(u*)]}, with * being a number that covers the number of enum, is a better way to work with this kind of enums. Both will be resolved to a tag.
-\begin{minted}{rust}
+The primitive representations of fieldless enums set the size and alignment to be the same as the primitive type of the same name. \texttt{\#[repr(C)]} will guarantee the same layout as expected from C, but \texttt{\#[repr(u*)]}, with * being a number that covers the number of variants, is a better way to represent this structure. All variants will be resolved to a tag and can be passed simply. The enum must be reconstructed on the other side and can be accessed.
+\begin{comment}
+    \begin{minted}{rust}
 #[repr(u8)] 
 enum TwoEnum {
     One,
@@ -2145,41 +2159,24 @@ enum TwoEnum {
 \begin{minted}{ada}
 type TwoEnum is (One, Two);
 \end{minted}
+\end{comment}
 
-2. Giving them different sizes will end up in reading garbage.
+It is recommended to not give fieldless enums sizes. this is unecessary and giving different sizes will end up in reading garbage.
 
+\subsubsection{Arrays}
+
+Sized arrays can be passed by copy or reference. The size of the elements must be indicated on the side that is receiving the object, as described in \Cref{sec:numbers}.
 
 \subsection{Heap types and pointers}
 
-\todoinline{memory allocation was not an issue as both rust and spark use malloc, it was not the case before. you can create your own allocator. some memory regions are not accessible outside of the heap!}
-The main point about pointers in Ada/SPARK and Rust is that they carry more information than C, and we thought about how to carry this information to the language across the FFI barrier.
-This subsection examines pointers. Pointers contain a lot of information in both Ada/SPARK and Rust. 
-In SPARK, they have nominal equality instead of structural equality; thus, the access to type T1 that is an access Integer will not be equal to type T2 that is an access Integer. 
-In Ada/SPARK pointers cannot escape as they are protected by types. 
-
-In Rust, the \textbf{\&mut} type carries several assumptions: \first it is never null and \Second it points to valid data; therefore, the Rust program can be certain that it is never null. 
-
-Consider the String type. The String type in both Rust and SPARK is a complex type. The challenges are how to represent all the information carried by the fat pointers and how to rely on the language semantics to ensure all the security operations "for free".
-
-Rust strings are UTF-8 encoded, and even their length is not obvious as it depends on whether one is counting bytes, characters, or graphemes. Consider:
+This subsection examines pointers. Ada/SPARK access types and Rust references are fat pointers. They carry more information and have more assumptions than in the C language. This information must be carried appropriately throughout the FFI barrier. In those experiments, memory allocation for heap types was not an issue as both Rust\cite{santos_investigating_2022} and SPARK are using \texttt{malloc} on x86\_64.
 
 
-\begin{listing}[!ht]
-\begin{minted}[fontsize=\footnotesize]{rust} 
-fn main(){
-let mut good_morning = String::from("おはよう");
-let mut good_morning2 = String::from("お早う");
-//prints 12    
-println!("Lenth of good_morning {}", good_morning.len());
-//prints 9  
-println!("Lenth of good_morning2 {}", good_morning2.len());
-let e = String::from("è");
-//prints 2  
-println!("Lenth of c {}", e.len());
-\end{minted}
-\caption[BBqueue header in Rust]{BBqueue header in Rust}
-\label{lst:grapheme}
-\end{listing}
+In SPARK, pointers have nominal equality instead of structural equality; thus, \inlinecode{type T1 is access Integer} will not be equal to \inlinecode{type T2 is access Integer}, even if both are pointers to Integers. In Ada/SPARK pointers cannot escape as they are protected by their types. Rust references are also protected by their types. In addition there is a guarantee of a single mutable reference \texttt{\&mut T} or several immutable references \texttt{\&T}. References carry several assumptions: \first they are never null and \Second they points always to valid data.
+
+We used the String type to carry out a demonstration, which is complex in both SPARK and Rust. With the String type, we represented all the information carried by the fat pointer and how to rely on the language semantics to ensure all the security operations "for free".
+
+
 
 \begin{figure}[ht!]
     \centering
@@ -2189,12 +2186,12 @@ println!("Lenth of c {}", e.len());
     start chain=going right,
     tuborg/.style={decorate, decoration={brace, amplitude=3pt}, line width=1mm},
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
-    ]         \node[punktchain, join, draw=black,fill=color1bg!50!white] (string){Vec<u8> of UTF-8};  
+    ]         \node[punktchain, join, draw=black,fill=color1bg!30!white] (string){Vec<u8> of UTF-8};  
     % group 2
     \node[punktchain, join, draw=black,fill=color2bg!50!white] (vec){Vec<T>};
     \node[punktchain, join, draw=black,fill=color3bg!50!white] (rawvec){RawVec<T>};
     \end{tikzpicture}}
-  \caption{Rust String}
+  \caption{Rust String: it is build on three different internal types}
   \label{fig:ruststring}
 \end{figure}
 
@@ -2203,8 +2200,8 @@ println!("Lenth of c {}", e.len());
     \centering
     \scalebox{0.8}{
     \begin{tikzpicture}
-	\node [draw, rectangle, fill=color1bg!50!white, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
-	\node [draw, rectangle, fill=color1bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
+	\node [draw, rectangle, fill=color1bg!30!white, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
+	\node [draw, rectangle, fill=color1bg!30!white, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
 	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box2] (box3) {'h'};
 	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box3] (box4) {'e'};
 	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box4] (box5) {'l'};
@@ -2213,18 +2210,14 @@ println!("Lenth of c {}", e.len());
  	\draw [decorate, decoration={brace, mirror, amplitude=10pt}] (box1.south west) -- (box2.south east) node [midway, below=12pt] {Bounds (discrete type)};
     \end{tikzpicture}
  }
-  \caption{Ada/SPARK unconstrained String}
+  \caption[Ada/SPARK unconstrained String]{Ada/SPARK unconstrained String: it is a pointer to bounds, and an array. The bounds can be indexed by any discrete type.}
   \label{fig:sparkstring}
 \end{figure}
 
 
-SPARK string is a pointer to bounds, and an array. The bounds can be indexed by any discrete type.
+\subsection{Receiving and reading fat pointers}
 
-To communicate this information smoothly, we reconstructed the expected types on both sides.
-
-\subsection{Receiving Ada Fat pointers in Rust}
-
-On this side we reconstructed the type sent by Ada. Ada documentation informs that values of unconstrained array (which an unconstrained String array is) types stores the bounds ahead of the value. This is implementation defined but we are guaranteed by the language that the address of the first component will be passed{\footnote{\href{https://learn.adacore.com/courses/intro-to-embedded-sys-prog/chapters/multi_language_development.html}{documentation link}}}. But since we are trying to get all the benefit of a richer language and not go the C way, we can reconstruct the inner representation of a String in rust:
+Both sides needed to reconstruct the String type. For Ada, the documentation informs that values of unconstrained array (which an unconstrained String array is) types stores the bounds ahead of the value, but we are guaranteed by the language that the address of the first component will be passed{\footnote{\href{https://learn.adacore.com/courses/intro-to-embedded-sys-prog/chapters/multi_language_development.html}{documentation link}}}. Since we know how the internal representation looks like, we can now model the String in Rust, while passing a normal String from SPARK.
 
 \begin{listing}[!ht]
 \begin{minted}[fontsize=\footnotesize]{rust}
@@ -2233,12 +2226,10 @@ pub struct AdaBounds {
     first: i32,
     last: i32,
 }
-
 #[repr(C)]
-// Internal memory representation hidden for the user
-pub struct AdaStringPtr {
+pub struct AdaString {
     // internal memory allocation that must follow Ada convention
-    data: *mut ptr,
+    data: *mut u8,
     bounds: *const AdaBounds,
 }
 \end{minted}
@@ -2247,35 +2238,13 @@ pub struct AdaStringPtr {
 \end{listing}
 %\FloatBarrier
 
-One of the unexpected results was that we could not rely on the \&mut T type, despite the apparent guarantees (single ownership, no aliasing). We instead choose a design with a unique owner. Borrowing is a short term problem and should not be passed accross FFI borders. Instead we adopted the following design, with a Rust-like string facing the user, and a private String with unique pointers that managed communication across the FFI border.
 
+The Rust approach is somewhat different. A Rust string is not \texttt{\#[repr(C)]}, so first we need to break down the structure to return its inner fields in \Cref{lst:deconstructed_rust_string}. As a reminder, anything that is not tagged \texttt{\#[repr(C)]} cannot be passed safely: this tag request the compiler to arrange the data type as we would expect if from C. Since this tag is absent from the Rust String, this needs to be done by hand. In addition, since Rust memory is managed with ownership, Rust must "forget"\footnote{The procedure of forgetting is to request the compiler to not deallocate that memory, and let the programmer take responsibility for deallocating it} about the string and should not drop it when its owner goes out of scope. Meaning that for this experiment we must get around the safety guarantees and prevent the language to follow its design. 
 
-\begin{table}[ht!]
-\footnotesize
-\centering
-\caption{FFI Heap object logic (String)}
-\label{tab:ffistringlogic}
-\begin{tabular}{ |>{\raggedright\arraybackslash}m{5cm}|>{\raggedright\arraybackslash}m{5cm}| }
-\hline
-\rowcolor{color1bg!20}
-\multicolumn{1}{|>{\centering\arraybackslash}m{5cm}|}{pub String} &
-\multicolumn{1}{>{\centering\arraybackslash}m{5cm}|}{priv String} \\
-%pub String & priv String \\
-\hline
-1. Unique \newline 2. Can be borrowed \newline 3. Must implements language memory guarantees & 1. Fat pointer with data and bounds \newline 2. Hidden from the user \newline 3. Memory management relies on the programmer \\
-\hline
-\end{tabular}
-\end{table}
-
-In SPARK, the process was similar. The String containing the information needed to be broken down and reconstructed. We ensure the passing by reference as passing of smaller objects can be implementation defined.
-Again types definition is primordial so we need to find the corresponding equivalences such.
-A Rust string is not \texttt{\#[repr(C)]}, so first we need to break down the structure to return the fields. This is a major difference. As anything that is not \texttt{\#[repr(C)]} cannot be passed safely, we need to do it ourselves and in addition Rust must forget about the string, meaning that we must get around the safety guarantees and prevent the language to drop the data when it is out of scope. 
-
-As per previous considerations of being a good FFI citizen in \Cref{tab:ffistringlogic}, the Rust side must reconstruct the language and implement the drop behaviour.
+Since we now removed the language guarantee, we must reimplement this guarantee.
 
 \begin{listing}[!ht]
 \begin{minted}[fontsize=\footnotesize]{rust}
-#[derive(Debug)]
 #[repr(C)]
 struct RustFFIString {
     ptr: *mut c_char,
@@ -2290,8 +2259,10 @@ impl RustFFIString {
             len: s.len(),
             cap: s.capacity(),
         };
-
+        // forgetting allows the language to not drop 
+        // the object when it goes out of scope
         std::mem::forget(s);
+        // returning the object
         raw_str
     }
 }
@@ -2309,20 +2280,44 @@ type Rust_String is record
     len : Interfaces.Unsigned_64;
     cap : Interfaces.Unsigned_64;
   end record;
+  -- Forcing the compiler to treatr objects by reference
   pragma Convention (Ada_Pass_By_Reference, Rust_String);
 end record;
 \end{minted}
-\caption[Reconstructed Rust String]{Reconstructed Rust String}
+\caption[Reconstructed Rust String]{Reconstructed Rust String in SPARK}
 \label{lst:reconstructed_rust_string}
 \end{listing}
 \FloatBarrier
 
+Again, it was very important to get the types right. One of the unexpected results was that we could not rely on the \&mut T type, despite the apparent guarantees (single ownership, no aliasing). We instead choose a design with a unique owner. Borrowing is a short term solution and should not be passed across FFI borders. Instead we adopted the following design \Cref{tab:stringlogic}, with a Rust-like string facing the user, and a private String with unique pointers that managed communication across the FFI border.
 
-\subsubsection{Composite types}
+
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{FFI Heap object logic (String)}
+\label{tab:ffistringlogic}
+\begin{tabular}{ |>{\raggedright\arraybackslash}m{5cm}|>{\raggedright\arraybackslash}m{5cm}| }
+\hline
+\rowcolor{color1bg!20}
+\multicolumn{1}{|>{\centering\arraybackslash}m{5cm}|}{pub String} &
+\multicolumn{1}{>{\centering\arraybackslash}m{5cm}|}{priv String} \\
+%pub String & priv String \\
+\hline
+1. Unique \newline 2. Can be borrowed \newline 3. Must implements language memory guarantees & 1. Fat pointer with data and bounds \newline 2. Hidden from the user \newline 3. Memory management relies on the programmer \\
+\hline
+\end{tabular}
+\label{tab:stringlogic}
+\end{table}
+\FloatBarrier
+
+
+
+\subsection{Composite types}
 \label{sec:compositetypes} 
 
-As we found that both Rust and SPARK objects were "well-behaved" in the sense that they  were designed to interact with C and the outcome was predictable. But composite objects need closer examination as layout needed to be adjusted manually sometimes.
-GNAT has a series flags that allow to visualise an object in memory and adjust the Rust object accordingly, such as \inlinecode{-gnatRe2}\footnote{\href{https://docs.adacore.com/gnat_ugn-docs/html/gnat_ugn/gnat_ugn/building_executable_programs_with_gnat.html}{debugging control documentation}}. 
+As we found that both Rust and SPARK objects were "well-behaved" in the sense that they  were designed to interact with C and the outcome was predictable. But composite objects need closer examination as layout needs sometimes to be adjusted manually.
+GNAT has a series flags that allow to visualise an object in memory and adjust the Rust object accordingly, such as \inlinecode{-gnatRe2}\footnote{\href{https://docs.adacore.com/gnat_ugn-docs/html/gnat_ugn/gnat_ugn/building_executable_programs_with_gnat.html}{debugging control documentation}}. Using it on a composite object will give the output \Cref{lst:gnatrj}.
 
 \begin{listing}[!ht]
 \begin{minted}[
@@ -2330,7 +2325,7 @@ GNAT has a series flags that allow to visualise an object in memory and adjust t
 framesep=2mm,
 baselinestretch=1.2,
 fontsize=\footnotesize,
-linenos
+%linenos
 ]{ada}
 type Record_String_Int is record
     S : access String;
@@ -2338,7 +2333,9 @@ type Record_String_Int is record
     B : Boolean;
 end record;
 \end{minted}
+\label{lst:composite}
 \end{listing}
+\FloatBarrier
 
 \begin{listing}[!ht]
 \begin{minted}[
@@ -2359,6 +2356,7 @@ end record;
 \caption[mem layout output]{Console output for memory layout}
 \label{lst:gnatrj}
 \end{listing}
+\FloatBarrier
 
 This is the layout of the object in memory:
 
@@ -2374,55 +2372,138 @@ This is the layout of the object in memory:
   \label{fig:memlayout}
 \end{figure}
 
-After modelling it as per previous section, it is then possible to check that the object is correctly represented in Rust: AdaRecord \{ data: AdaString \{ inner\_string: 0x23f22a8, bounds: 0x23f22a0 \}, integer: 42 \}. As we can see the addresses and bounds come as expected (bounds 8 bytes before) when integer and bool are passed by copy.
+After modelling it as per previous section, it is then possible to check that the object is correctly represented in Rust by printing its inner representation: 
+\inlinecode{AdaRecord \{ data: AdaString \{ inner\_string: 0x23f22a8, bounds: 0x23f22a0 \}, integer: 42 \}}. As we can see the addresses and bounds come as expected (bounds 8 bytes before) when integer and bool are passed by copy.
 
 \section{Exception and panic management}
 
-\todoinline{add summary with florian and a graph of forbidden states}
+
 
 Exceptions can be handled in SPARK if the exception is expected, meaning it is covered by a choice in an exception handler. 
-Rust has also recoverable errors as \inlinecode{Result<>} and unrecoverable errors in the form of \inlinecode{panic!()}. In the experiments, we saw that exceptions should never unwind across the FFI boundary, as this is undefined behavior. 
-Even if exceptions and panics could theoretically be handled, we recommend the strategy of aborting on any exception or panic. The reason is that after an error has happened and has been managed, it is impossible to go back to a clean state. Instead, we have a complex interaction with a faulty state and we introduce state extension, when the next state is post-error. We do not know whether this state is fully correct and there is a risk of branching into a new erroneous state from this state. The best strategy is to crash and recover the system, which implies that redundancy must be introduced.
+Rust has also recoverable errors as \inlinecode{Result<>} and unrecoverable errors in the form of \inlinecode{panic!()}. In the experiments, we saw that exceptions should never unwind across the FFI boundary, as this is undefined behavior. Even if exceptions and panics could theoretically be handled, we recommend the strategy of aborting on any exception or panic. The reason is that after an error has happened and has been managed, it is impossible to go back to a clean state. Instead, we have a complex interaction with a faulty state and we introduce state extension, when the next state is post-error. We do not know whether this state is fully correct and there is a risk of branching into a new erroneous state. The best strategy is to crash and recover the system, which implies that some redundancy must be introduced.
+
+\begin{figure}[ht!]
+  \centering 
+\includesvg[inkscapelatex=false, scale=0.7]{figures/figuressvg/stateextension.svg}
+\caption[Faulty state extension]{Faulty state extension: there is no guarantee that the "post-exception" action reverted the system to state 1}
+\end{figure}
+\FloatBarrier
 
 \section{Passing BBqueue}
 
 The real-life experiment was challenging despite the useful guidelines established in the control experiments.
 
 First, we established that all complex structures should be passed by pointer.
-Secondly, the identification and selection of the types were not trivial.
-Third, not only must the types correspond, but the layout too, and it was not the case in both implementations of BBqueue for historic reasons (simply, one implementation evolved for different needs).
+Secondly, the identification and selection of the types were not trivial: BBqueue uses atomic types and statically allocated buffers (for embedded systems).
+Thirdly, both types and layout must match, and it was not the case in both implementations of BBqueue for historical reasons (simply, one implementation evolved for different needs).
 
-Nevertheless, we could use the experience to pass on some information.
+Nevertheless, we could still use the experience gained from control experiments to pass on some information through FFI. This realistic experiment was useful to gain som insights on what an automated tool in a real-life context would need, when it comes to library design.
 
-This realistic experiment was useful to imagine which challenges an automated tool in a real-life context must face:
-- cooperation while establishing the data structures and design.
+In Rust, BBqueue has two implementations. The official one is not \glsxtrshort{FFI} safe, and we will be using the version developed for \href{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}{mnemos OS} (a custom OS for embedded systems\footnote{https://mnemos.jamesmunns.com/intro.html}) for this experiment.  
 
+As we learned in the control study,  FFI safety is guaranteed by, firstly:  \texttt{\#[repr(C)]} which ensures a memory layout consequent with C, and prevents the compiler from optimizing. Secondly, the data structure must be modeled on the other side of the FFI barrier.
 
-
-
-
-
-In Rust, BBqueue has two implementations. The official one is not \glsxtrshort{FFI} safe, and we will be using the version developed for \href{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}{mnemos OS} for this experiment.  
-
-As we learned in the control study,  FFI safety is guaranteed by, firstly:  \texttt{\#[repr(C)]} which ensures a memory layout consequent with C, and prevents the compiler from optimizing. Secondly, the BBBuffer structure must be modeled on the other side of the FFI barrier.
-
-To keep correctness and safety, the inner buffer must be accessed only through the grants. The header should not be interacted with directly, but a pointer to the header is passed in the  \texttt{GrantW} and \texttt{GrantR}. 
-Furthermore, there is a sequence of atomic operations, as the queue is lock-free. This sequence of atomic operations must be exectuted in the same order for all four operations:
-\begin{itemize}
+As seeen in \Cref{sec:methodBBQueue}, to keep correctness and safety, the inner buffer must be accessed only through the grants. The header should not be interacted with directly, but a pointer to the header is passed in the  \texttt{GrantW} and \texttt{GrantR}. Furthermore, there is a sequence of atomic operations, as the queue is lock-free. This sequence of atomic operations must be executed in the same order for all four operations:
+\begin{enumerate}
     \item Get Write Grant
     \item Commit Write Grant
     \item Get Read Grant
     \item Release Read Grant
-\end{itemize}
+\end{enumerate}
    
-This allows all operations to be thread-safe and avoid undefined behavior. The producer and the consumer read the same atomic variables (in the header) and get authorization to touch the actual buffer of N bytes.
+This allows all operations to be thread-safe and avoid undefined behavior. The producer and the consumer read the same atomic variables (in the header) and get authorization to touch the actual buffer of \texttt{N} bytes.
 
 
 To make it work beyond the FFI barrier in SPARK we need to guarantee consistent layout across the FFI border, provide pointers to the grant and the content of the header, and ensure the header content must be of the appropriate size and the appropriate atomic types, ensure the functions in SPARK touch the atomics in the exact described order. If the order is not respected, thread-safety cannot be guaranteed (the order is carefully designed to prevent consumer or producer from touching parts of data they should not have access to).
 
 There are no differences in the algorithm implementation but notable differences in the header in both Rust and SPARK, as well as how they are accessed.
 
-To respect the design decisions (buffer should be interacted with only through grants) we modeled the the header and read grant on the SPARK side \Cref{lst:bbqueueinspark}. Some variables declared on the Rust side are not declared on the SPARK side, including pointer to the buffer. The reason is that the SPARK implementation passes this information in the Write/Read grant.
+\begin{listing}[!ht]
+\begin{minted}[fontsize=\footnotesize]{rust}
+#[repr(C)]
+pub struct BBBuffer {
+    buf: AtomicPtr<u8>,
+    buf_len: AtomicUsize,
+    write: AtomicUsize,
+    read: AtomicUsize,
+    last: AtomicUsize,
+    reserve: AtomicUsize,
+    read_in_progress: AtomicBool,
+    write_in_progress: AtomicBool,
+}
+\end{minted}
+\caption[BBqueue header in Rust]{BBqueue header in Rust}
+\label{lst:rust_bbqueue_header}
+\end{listing}
+\FloatBarrier
+
+\begin{listing}[!ht]
+\begin{minted}[fontsize=\footnotesize]{ada}
+ type Offsets_Only (Size : Buffer_Size) is limited record
+      Write : aliased Atomic_Count.Instance 
+      := Atomic_Count.Init (0);
+      Read  : aliased Atomic_Count.Instance 
+      := Atomic_Count.Init (0);
+      Last  : aliased Atomic_Count.Instance 
+      := Atomic_Count.Init (0);
+      Reserve  : aliased Atomic_Count.Instance 
+      := Atomic_Count.Init (0);
+      Read_In_Progress : aliased Atomic.Flag 
+      := Atomic.Init (False);
+      Write_In_Progress : aliased Atomic.Flag 
+      := Atomic.Init (False);
+      Granted_Write_Size : Count := 0;
+      Granted_Read_Size : Count := 0;
+   end record
+     with Invariant =>
+    -- series of invariants
+   ;
+\end{minted}
+\caption[BBqueue header in SPARK]{BBqueue header in SPARK}
+\label{lst:SPARK_bbqueue_header}
+\end{listing}
+\FloatBarrier
+
+To respect the design decisions (buffer should be interacted with only through grants) we modeled the the header and read grant on the SPARK side \Cref{lst:bbqueueheaderinspark} and \Cref{lst:bbqueuereadgrantinspark}. Some variables declared on the Rust side are not declared on the SPARK side, including the pointer to the buffer. The reason is that the SPARK implementation passes this information in the Write/Read grant. There are also significant differences in the parameters that the functions for atomic operations are taking.
+
+It was possible to reconstruct both the header (\Cref{lst:bbqueueheaderinspark}) and the read grant (\Cref{lst:bbqueuereadgrantinspark}) in SPARK, after assigning data through a write grant in Rust, following the recommendations we came up with in the control study. The memory layout was represented the same way as in \Cref{fig:memBBqueue}.
+
+
+\begin{figure}
+    \begin{minipage}{.40\textwidth}
+        \begin{bytefield}{24}
+        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}\tikzmark{end}\\
+    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}
+        \end{bytefield}         \label{fig:hiddenbufferheader}
+    \end{minipage}
+    \begin{minipage}{.15\textwidth}\quad\quad    \end{minipage}%
+    \begin{minipage}{.40\textwidth}
+        \begin{bytefield}{6}
+        %\begin{rightwordgroup}{Reconstruced \\ Read grant \\ passed to \\ SPARK}
+        \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}\\
+        \memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}\\
+        \memsection{..BB0}{..BB7}{2}{length of read (4)}\\
+        %\end{rightwordgroup}
+    \end{bytefield}
+    \end{minipage}
+    \begin{tikzpicture}[overlay,remember picture]
+        (pic cs:end);
+      \Connect{start}{end}
+      \Connect{start2}{end2}
+    \end{tikzpicture}
+    \caption{BBqueue Read grant in memory (not to scale!)\\
+    %\legendsquare{fill=green}~Memory allocated in Rust,
+    %\textcolor{red}{$\blacksquare$} & Memory allocated in Rust
+    \cbox{gray!80} Memory assigned in Rust.\quad \\
+    \cbox{gray!40} Memory passed to SPARK.\quad \\
+    %\legendsquare{fill=color3bg}~Memory transferred to SPARK
+    }
+    
+    \label{fig:memBBqueue}
+\end{figure}
+
+
+The control studies showed that it was better to wrap the object to be passed into an additional data structure with a layout of our design, and pass it by reference with appropriate types on the other side. It was then important to ensure proper memory clean-out as per the good FFI citizens principle. This was ensured as the queue was allocated in Rust and even if a pointer was passed to read (simulating an immutable read), the memory went out of scope in Rust.
 
 \begin{listing}[ht!]
 \begin{minted}[framesep=2mm,
@@ -2440,6 +2521,17 @@ type BBBuffer is record
     --Granted_Write_Size : Count := 0; missing!
     --Granted_Read_Size : Count := 0; missing!
     end record;
+\end{minted}
+\caption{Modelling the header}
+\label{lst:bbqueueheaderinspark}
+\end{listing}
+\FloatBarrier
+
+
+\begin{listing}[ht!]
+\begin{minted}[framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize]{ada}
 type RustReadGrant is record
     bbq: System.Address;
     inner_buf: System.Address;
@@ -2447,95 +2539,22 @@ type RustReadGrant is record
 end record;
 pragma Convention (Ada_Pass_By_Reference, RustReadGrant);
 \end{minted}
-\caption{Modelling the header and the Grant}
-\label{lst:bbqueueinspark}
+\caption{Modelling the Read Grant}
+\label{lst:bbqueuereadgrantinspark}
 \end{listing}
+\FloatBarrier
 
-\begin{listing}[!ht]
-\begin{minted}[fontsize=\footnotesize]{rust}
-#[derive(Debug)]
-#[repr(C)]
-pub struct BBBuffer {
-    buf: AtomicPtr<u8>,
-    buf_len: AtomicUsize,
-    write: AtomicUsize,
-    read: AtomicUsize,
-    last: AtomicUsize,
-    reserve: AtomicUsize,
-    read_in_progress: AtomicBool,
-    write_in_progress: AtomicBool,
-}
-\end{minted}
-\caption[BBqueue header in Rust]{BBqueue header in Rust}
-\label{lst:rust_bbqueue_header}
-\end{listing}
 
-\begin{listing}[!ht]
 
-\begin{minted}[fontsize=\footnotesize]{ada}
- type Offsets_Only (Size : Buffer_Size) is limited record
-      Write : aliased Atomic_Count.Instance := Atomic_Count.Init (0);
-      Read  : aliased Atomic_Count.Instance := Atomic_Count.Init (0);
-      Last  : aliased Atomic_Count.Instance := Atomic_Count.Init (0);
-      Reserve  : aliased Atomic_Count.Instance := Atomic_Count.Init (0);
-      Read_In_Progress : aliased Atomic.Flag := Atomic.Init (False);
-      Write_In_Progress : aliased Atomic.Flag := Atomic.Init (False);
-      Granted_Write_Size : Count := 0;
-      Granted_Read_Size : Count := 0;
-   end record
-     with Invariant =>
-    -- series of invariants
-   ;
-\end{minted}
-\caption[BBqueue header in SPARK]{BBqueue header in SPARK}
-\label{lst:SPARK_bbqueue_header}
-\end{listing}
 
-There are also differences in the parameters that the functions for atomic operations are taking.
-
-It was possible to reconstruct the memory carefully following the recommendations we came up with in the control study. 
-
-That is packing the object to be passed into an additional data structure for which we know the layout, and pass it by reference with appropriate types on the other sides. Ensure proper FFI clean out as per FFI citizens.
-
-Nevertheless decisions design for the API were different enough to not be able to convert one queue in the other.
-
-\begin{figure}
-    \begin{minipage}{.40\textwidth}
-        \begin{bytefield}{24}
-        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}\tikzmark{end}\\
-    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}
-        \end{bytefield}         \label{fig:hiddenbufferheader}
-    \end{minipage}
-    \begin{minipage}{.15\textwidth}\quad\quad    \end{minipage}%
-    \begin{minipage}{.40\textwidth}
-        \begin{bytefield}{6}
-        \begin{rightwordgroup}{Reconstruced \\ Read grant \\ passed to \\ SPARK}
-    \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}\\
-    	\memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}\\
-        \memsection{..BB0}{..BB7}{2}{length of read (4)}
-        \end{rightwordgroup}
-        \end{bytefield}
-    \end{minipage}
-    \begin{tikzpicture}[overlay,remember picture]
-        (pic cs:end);
-      \Connect{start}{end}
-      \Connect{start2}{end2}
-    \end{tikzpicture}
-    \caption{BBqueue Read grant in memory (not to scale!) 
-    %\legendsquare{fill=green}~Memory allocated in Rust,
-    %\legendsquare{fill=color3bg}~Memory transferred to SPARK
-    }
-    
-    \label{fig:memBBqueue}
-\end{figure}
+Nevertheless, even if reading from the queue and passing the data structure were possible following the recommendations found from the control studies, the design for the API were different enough to not be able to convert one queue in the other.
 
 \cleardoublepage
 
 \chapter{Conclusions and Future work}
 \label{ch:conclusionsAndFutureWork}
-\sweExpl{Slutsats och framtida arbete}
 
-\generalExpl{Add text to introduce the subsections of this chapter.}
+This chapter summarises possible future work
 
 \section{Conclusions}
 \label{sec:conclusions}
@@ -2543,7 +2562,6 @@ Nevertheless decisions design for the API were different enough to not be able t
 \engExpl{Describe the conclusions (reflect on the whole introduction given in Chapter 1).}
 
 
-  
 \engExpl{Discuss the positive effects and the drawbacks.\\
 Describe the evaluation of the results of the degree project.\\
 Did you meet your goals?\\
@@ -2551,15 +2569,18 @@ What insights have you gained?\\
 What suggestions can you give to others working in this area?\\
 What would you have done differently if you had it to do again?}
 
-\sweExpl{Uppfyllde du dina mål?\\
-Vilka insikter har du fått?\\
-Vilka förslag kan du ge till andra som arbetar inom detta område?
-Om du skulle göra detta igen, vad skulle du ha gjort annorlunda?}
+The positive effects were that in principle, such a tool is possible to implement. 
+One of the main difficulty was that the information is spread. There are language specifics, but also compiler specific issuess. Some goals were met, one personal goal was to understand memory management better.
+A more high-level approach would have been necessary. For example to port BBqueue, the role of the design is predominant.
+
 
 \section{Limitations}
 \label{sec:limitations}
 \sweExpl{Begränsande faktorer\\Vad gjorde du som begränsade dina ansträngningar? Vilka är begränsningarna i dina resultat?}
 \engExpl{What did you find that limited your efforts? What are the limitations of your results?}
+
+Obvious time limitations to really port all interesting data structures, for example there was no time for recursive types. 
+In addition a whole redesign of BBqueue in either Rust or SPARK would be necessary to make them fit each other and to allow us to port them and call methods of the one on the other.
 
 
 \section{Future work}
@@ -2569,28 +2590,21 @@ Om du skulle göra detta igen, vad skulle du ha gjort annorlunda?}
 Consider: What you have left undone? What are the next obvious things to be done? What hints can you give to the next person who is going to follow up on your work?}
 
 
-
 Due to the breadth of the problem, only some of the initial goals have been
 met. In these section we  focus on some of the remaining issues that
 should be addressed in future work. \ldots\ 
+Redesign of BBqueue for more consistent experiment.
+The port from SPARK to Rust was not completely done but there is no reason to assume it would not be as complicated.
+
+Even if we rely on the languages for safety, a consistent mesh of tests is necessary.
+
+More SPARK one challenge was that I did not know SPARK enough so there was no exploration on how to effectively use SPARK, instead it was a lot about Ada.
 
 \subsection{What has been left undone?}
 \label{what-has-been-left-undone}
 
-The prototype does not address the third requirement, \ie a yearly unavailability of less than 3 minutes, this remains an open problem. \ldots\ 
+The most interesting future work is clearly to implement an automated tool, that could port control study experiment.
 
-\subsubsection{Cost analysis}
-\generalExpl{Example of a missing component}
-The current prototype works, but the performance from a cost perspective makes this an impractical solution. Future work must reduce the cost of this solution, to do so a cost analysis needs to first be done. \ldots\ 
-
-\subsubsection{Security}
-\generalExpl{Example of a missing component}
-A future research effort is needed to address the security holes that results from using a self-signed certificate. Page filling text mass. Page filling text mass. \ldots\ 
-
-
-\subsection{Next obvious things to be done}
-
-In particular, the author of this thesis wishes to point out xxxxxx remains as a problem to be solved. Solving this problem is the next thing that should be done. \ldots\ 
 
 \section{Reflections}
 \label{sec:reflections}
@@ -2601,9 +2615,7 @@ In particular, the author of this thesis wishes to point out xxxxxx remains as a
 }
 
 
-One of the most important results is the reduction in the amount of
-energy required to process each packet while at the same time reducing the
-time required to process each packet.
+One of the most important results is that in a time where safe languages are recommended to be used, this is a step forward in using safer languages then C and C++.
 
 %The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by xxxx. 
 
@@ -2632,6 +2644,30 @@ time required to process each packet.
 \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
 \chapter{Supporting materials}
 \label{sec:supportingMaterial}
+
+\section{More on Rust string}
+Rust strings are UTF-8 encoded, and even their length is not obvious as it depends on whether one is counting bytes, characters, or graphemes. Consider:
+
+
+\begin{listing}[!ht]
+\begin{minted}[fontsize=\footnotesize]{rust} 
+fn main(){
+let mut good_morning = String::from("おはよう");
+let mut good_morning2 = String::from("お早う");
+//prints 12    
+println!("Lenth of good_morning {}", good_morning.len());
+//prints 9  
+println!("Lenth of good_morning2 {}", good_morning2.len());
+let e = String::from("è");
+//prints 2  
+println!("Lenth of c {}", e.len());
+\end{minted}
+\caption[BBqueue header in Rust]{BBqueue header in Rust}
+\label{lst:grapheme}
+\end{listing}
+\begin{comment}
+    
+
 \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
 Attach the BibTeX for your references to make it easy for a reader to find and use them
@@ -2664,7 +2700,7 @@ An argument for including supporting material in the PDF file is that it is avai
  \end{figure}
  \FloatBarrier
  \cleardoublepage
-
+\end{comment}
 \chapter{Build systems to reproduce experiments}
 \label{sec:buildSystems}
 
