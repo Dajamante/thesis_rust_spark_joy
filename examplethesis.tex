@@ -854,6 +854,9 @@ Unfortunately, the current answer to the question: Can we reach memory safety by
 
 While Mergendahl \etal\,\cite{mergendahl_cross-language_2022}) and organizations such as the \glsxtrfull{NSA}\,\cite{noauthor_nsa_2022} tout safe languages are ``as the solution" and Scherer\,\cite{scherer_engineering_2021} and Evans \etal\,\cite{evans_is_2020} state that language choice has a significant impact on project success and defect rates, as well as reliability, safety, and correctness,  and Skezeres \etal\,\cite{szekeres_sok_2013} recommend avoiding C/C++ for new projects, the current state of software development remains dependent on C/C++ for many reasons (legacy, dependencies, effectiveness, not reinventing the wheel for widely tested libraries, cost, \ldots\  ). But this is an effort in the right direction.
 
+\section{Sustainability considerations}
+
+Sustainability is an important concern while developing technology or advocating for its use. When it comes to the use of programming languages, considering energy consumption is essential and in line with SGD development goals 9 -- Industry, Innovation and Infrastructure --, 12 -- Responsible Consumption and Production -- and 13 -- Climate Action --\cite{noauthor_envision2030_nodate}. As studied by Pereira \etal\,\cite{pereira_energy_2017}, Ada and Rust energy consumption are comparable to C, and both languages are a good choice for energy-conscious development, when it comes to various aspects, such as time, memory, and energy usage. This is a point defended by companies such as AWS\,\cite{miller_sustainability_2022}, which pinpoints the increasing demand for data consumption and processing, emerging demand for \glsxtrshort{IoT} and ML applications. Broad adoption of energy-efficient programming languages could greatly reduce the energy consumption of computing by 50\%\cite{miller_sustainability_2022}.
 
 \section{Problem}
 \label{sec:problem}
@@ -904,28 +907,35 @@ The purpose is to provide safe and practical recommendations that could be used 
 
 %\generalExpl{State the goal/goals of this degree project.}
 
-The goal of this project is XXX. This has been divided into the following three sub-goals:
+The goal of this project is to study the safe combination of Rust and SPARK and provide guidelines. This has been divided into the following three sub-goals:
 
 \begin{enumerate}
-\item Subgoal 1 \sweExpl{för att tillfredsställa problemägaren – industrin?}
-\item Subgoal 2\sweExpl{för att tillfredsställa ingenjörssamfundet och vetenskapen – akademin) }
-\item Subgoal 3\sweExpl{eventuellt, för att uppfylla kursmålen – du som student}
+\item Subgoal 1 Select appropriate existing data types for control studies.
+\item Subgoal 2 Implement control studies in a series of safe bindings.
+\item Subgoal From lesson learned from Subgoal 2, provide safe binding in a more complex library.
 \end{enumerate}
 
 %\generalExpl{In addition to presenting the goal(s), you might also state what the deliverables and results of the project are.}
 
-\section{Research Methodology
+\section{Research Methodology}
 %\sweExpl{Undersökningsmetod}
 %\sweExpl{Här anger du vilken vilken övergripande undersökningsstrategi eller metod du skall använda för att försöka besvara den akademiska frågeställning och samtidigt lösa det e v ursprungliga problemet. Ofta kan man använda ”lösandet av ursprungsproblemet” som en fallstudie kring en akademisk frågeställning. Du undersöker någon intressant fråga i ”skarpt” läge och samlar resultat och erfarenhet ur detta.\\
 %Tänk på att företaget ibland måste stå tillbaka i sin önskan och förväntan på projektets resultat till förmån för ny eller kompletterande ingenjörserfarenhet och vetenskap (ditt examensarbete). Det är du som student som bestämmer och löser fördelningen mellan dessa två intressen men se till att alla är informerade. 
-}
+%}
 %\generalExpl{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen should be in methods. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
 %In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
+The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that can be applied, for example, to create an automated tool for bindings on the model of \texttt{bindgen}\footnote{As a reminder, bindgen is a binding tool that generates bindings between Rust and C.}\,\cite{noauthor_bindgen_2022}. The languages analyzed in this thesis have richer types than C, and the goal is to take advantage of their expressivity. Both languages also implement type safety and ownership, and we study how those are passed or conserved through FFI.
 
-Choice of methods:
-- combine basic blocs that are building blocks of bigger programs (every program uses Integers, Strings, arrays \, etc), find possible errors and discrepancies with regards to the memory and type safety, and how ownership is maintained or transferred.
+The binding is considered correct if the data is correctly passed and no memory error is found \texttt{valgrind} - this does not prove complete correctness but rather the absence of memory error. But our goal is pass the correct type through the FFI barrier, and rely on both languages guarantees once the FFI frontier is passed. 
 
-- apply those learning to a database that is not trivial and of used in the embedded systems community and low-level programming.
+The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. 
+
+This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
+Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
+Control study programs can provide a foundation for automatic tooling.
+
+After the control studies are performed, an additional experiment is executed with a BBqueue, a complex library available in both languages. Porting BBqueue allowed to implement most of the "lesson learned" through the control studies.
+
 
 \section{Delimitations}\sweExpl{Avgränsningar}
 %\generalExpl{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This  helps you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
@@ -1399,8 +1409,7 @@ Secondly, the qualitative research paradigm is applied when carefully selecting 
 
 Thirdly, the empirical research paradigm is also used. After guidelines are established through control studies, an applied experiment consists of following said guidelines to a larger code base. This step is appropriate as this is an experiment with real-life setting, and bugs and errors are expected to arise. This experiment is relevant as it is a first step in reproducibility and generalization.
 
-\section{Sustainability considerations}
-\todoinline{Add a short discussion on the sustainability of code, use the AWS source that speaks of Rust as an example.}
+
 
 \section{Choice of datatypes for control studies}
 \label{sec:dataCollection}
@@ -1552,24 +1561,24 @@ Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger
 \begin{table}[ht!]
 \footnotesize
 \centering
-\caption{Most popular projects on crates.io (171\,897 LOC)}
+\caption{Most popular projects on crates.io (\num{171897} LOC)}
 \label{tab:crates_io}
-\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
+\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}| S[table-format=7.0]| }
 \hline
 \rowcolor{color1bg!20}
-\textbf{Package}& \textbf{Description} & \textbf{Git hash} \newline \textbf{(Reverse Dependencies)}&\textbf{Downloads} \newline \textbf{all time in millions} & \textbf{LOC}\\
+\textbf{Package}& \textbf{Description} & \begin{tabular}{@{}l} \textbf{Git hash} \\ (\textbf{Reverse} \\ \textbf{Dependencies})\end{tabular}&\textbf{Downloads} \newline \textbf{(millions)} & \textbf{LOC}\\
 \hline
-libc & Raw FFI bindings to platform libraries like libc & 89ec881 (5,200) & 177 & 100,719\\
+libc & Raw FFI bindings to platform libraries like libc & 89ec881 (\num{5200}) & 177 & 100719\\
 \hline
-syn & Parser for Rust source code & 6365093 (5,501) & 191 & 50,801 \\
+syn & Parser for Rust source code & 6365093 (\num{5501}) & 191 & 50801 \\
 \hline
-rand and rand-core & Random number generators and other randomness functionality & 0f3eced (9,892) & 183 & 13,655\\
+rand and rand-core & Random number generators and other randomness functionality & 0f3eced (\num{9892}) & 183 & 13655\\
 \hline
-quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (5,498) & 177 & 2,154\\
+quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (\num{5498}) & 177 & 2154\\
 \hline
-cfg-if & Ergonomically defines an item depending on a large number of \#[cfg] & 2621a59 (1,147) & 175 & 144 \\
+cfg-if & Ergonomically defines an item depending on a large number of \#[cfg] & 2621a59 (\num{1147}) & 175 & 144 \\
 \hline
-procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (4,538) & 176 & 4,424\\
+procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (\num{4538}) & 176 & 4424\\
 \hline
 \end{tabular}
 \end{table}
@@ -1639,7 +1648,7 @@ String  445 1363 18613
             ylabel=Count of types,
             reverse legend=true,
             width=1\textwidth,
-            reverse legend=true,
+            reverse legend=false,
             legend style={draw=none},
             legend image post style={scale=2.0},
             legend style={
@@ -1684,7 +1693,8 @@ rustc 55.01 24.80 11.54 6.16 2.49
     \begin{tikzpicture}
     \begin{axis}[
         ybar stacked,
-        reverse legend,
+        %reverse legend,
+        reverse legend=false,
         %https://tex.stackexchange.com/questions/88892/pgfplots-bar-plot-spacing-inbetween-bars
         enlarge x limits=0.4,
 	    bar width=45pt,
@@ -1850,9 +1860,11 @@ BBqueue is a bi-partite circular buffer that allows for contiguous data writes. 
 
 BBqueue is particularly useful for \glsxtrfull{DMA} in embedded microcontroller systems with memory-mapped peripherals. DMA allows hardware to directly read from or write to memory, minimizing the time needed for the CPU to copy data. This allows efficient data transfer, frees the CPU to execute other tasks or entering sleep-mode, saving energy.
 
-This structure is often used when a producer and consumer process must communicate with each other, this is why the Rust implementation has a wrapper Producer/Consumer. While the SPARK implementation does not use those wrappers, the underlying logic is the same.
+This structure is often used when a producer and consumer process must communicate with each other, and this is why the Rust implementation has a wrapper Producer/Consumer. While the SPARK implementation does not use those wrappers, the underlying logic is the same.
 
-\todoinline{they use grants to communicate!}
+BBqueue uses Write and Read grants to communicate in Rust and SPARK implementation. A grant is a
+privileged way to access the inner buffer to make communication safe, as the grant engages atomic operations in a precise order. 
+
 \begin{table}[ht!]
 \footnotesize
 \centering
@@ -2105,21 +2117,7 @@ The work was divided in smaller steps.
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
 
-
-%\engExpl{Sometimes this is split into two chapters.\\Keep in mind: How will you evaluate what you have done? What are your metrics?\\Analysis of your data and proposed solution\\Does this meet the goals which you had when you started?}
-
-
-The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that can be applied, for example, to create an automated tool for bindings on the model of \texttt{bindgen}\footnote{As a reminder, bindgen is a binding tool that generates bindings between Rust and C.}\,\cite{noauthor_bindgen_2022}. The languages analyzed in this thesis have richer types than C, and the goal is to take advantage of their expressivity. Both languages also implement type safety and ownership, and we study how those are passed or conserved through FFI.
-
-The binding is considered correct if the data is correctly passed and no memory error is found \texttt{valgrind} - this does not prove complete correctness but rather the absence of memory error. But our goal is pass the correct type through the FFI barrier, and rely on both languages guarantees once the FFI frontier is passed. 
-
-The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. 
-
-This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
-Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
-Control study programs can provide a foundation for automatic tooling.
-
-After the control studies are performed, an additional experiment is executed with a BBqueue, a complex library available in both languages. Porting BBqueue allowed to implement most of the "lesson learned" through the control studies.
+The experiments (control study and more complex items passing) carried on during this thesis were useful to provide a set of recommendations for creating automated binding tools, for languages with richer types than C, while preserving type safety and ownership. Manual binding allows full control over layout and alignment, to explore safety issues.
 
 \section{Major results}
 
@@ -2375,6 +2373,10 @@ This is the layout of the object in memory:
 After modelling it as per previous section, it is then possible to check that the object is correctly represented in Rust by printing its inner representation: 
 \inlinecode{AdaRecord \{ data: AdaString \{ inner\_string: 0x23f22a8, bounds: 0x23f22a0 \}, integer: 42 \}}. As we can see the addresses and bounds come as expected (bounds 8 bytes before) when integer and bool are passed by copy.
 
+\section{Forbidden memory}
+
+\todoinline{it is recommended coming from ada to create your own types for pointers as it will go to the common heap}
+
 \section{Exception and panic management}
 
 
@@ -2472,17 +2474,17 @@ It was possible to reconstruct both the header (\Cref{lst:bbqueueheaderinspark})
 \begin{figure}
     \begin{minipage}{.40\textwidth}
         \begin{bytefield}{24}
-        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}\tikzmark{end}\\
-    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}
+        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}{color4bg!30}\tikzmark{end}\\
+    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}{color4bg!30}
         \end{bytefield}         \label{fig:hiddenbufferheader}
     \end{minipage}
     \begin{minipage}{.15\textwidth}\quad\quad    \end{minipage}%
     \begin{minipage}{.40\textwidth}
         \begin{bytefield}{6}
         %\begin{rightwordgroup}{Reconstruced \\ Read grant \\ passed to \\ SPARK}
-        \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}\\
-        \memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}\\
-        \memsection{..BB0}{..BB7}{2}{length of read (4)}\\
+        \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}{color1bg!30}\\
+        \memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}{color1bg!30}\\
+        \memsection{..BB0}{..BB7}{2}{length of read (4)}{color1bg!30}\\
         %\end{rightwordgroup}
     \end{bytefield}
     \end{minipage}
@@ -2494,8 +2496,8 @@ It was possible to reconstruct both the header (\Cref{lst:bbqueueheaderinspark})
     \caption{BBqueue Read grant in memory (not to scale!)\\
     %\legendsquare{fill=green}~Memory allocated in Rust,
     %\textcolor{red}{$\blacksquare$} & Memory allocated in Rust
-    \cbox{gray!80} Memory assigned in Rust.\quad \\
-    \cbox{gray!40} Memory passed to SPARK.\quad \\
+    \cbox{color4bg!30} Memory assigned in Rust.\quad \\
+    \cbox{color1bg!30} Memory passed to SPARK.\quad \\
     %\legendsquare{fill=color3bg}~Memory transferred to SPARK
     }
     

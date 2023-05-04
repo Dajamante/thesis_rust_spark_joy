@@ -106,15 +106,19 @@
 % facilitates the creation of memory maps. Start address at the bottom, end address at the top.
 % Addresses will be print with a leading '0x' and in upper case.
 % syntax: \memsection{end address}{start address}{height in lines}{text in box}
-\newcommand{\memsection}[4]{
+
+
+\newcommand{\memsection}[5]{
 	\bytefieldsetup{bitheight=#3\baselineskip}	% define the height of the memsection
 	\bitbox[]{8}{
 		\texttt{0x\uppercase{#1}}	 % print end address
 		\\ \vspace{#3\baselineskip} \vspace{-2\baselineskip} \vspace{-#3pt} % do some spacing
 		\texttt{0x\uppercase{#2}} % print start address
 	}
-	\bitbox{16}{#4} % print box with caption
+	\colorbox{#5}{\bitbox{16}{#4}} % print box with caption
 }
+
+
 
 
 \renewcommand\tikzmark[1]{%
@@ -122,7 +126,7 @@
 }
 \newcommand\Connect[3][]{%
 \tikz[remember picture,overlay]
-  \draw[->,red,>=latex,#1] (#2.north east) -- ( $ (#3.north west) + (-2pt,0) $ );%
+  \draw[->,red,>=latex,line width=0.5mm,#1] ( $(#2.north east) + (-8pt,0) $ )-- ( $ (#3.north west) + (-4pt,0) $ );%
 }
 %https://tex.stackexchange.com/questions/324008/patterned-legend-in-caption
 \newcommand{\legendsquare}[1]{%
@@ -130,3 +134,6 @@
 }
 %https://tex.stackexchange.com/questions/225740/how-to-make-a-custom-legend-with-a-squared-box-followed-by-a-text
 \newcommand{\cbox}[1]{\raisebox{\depth}{\fcolorbox{black}{#1}{\null}}}
+
+% Use grouping for numbers that are 4 or more digits long
+\sisetup{group-minimum-digits=4}
