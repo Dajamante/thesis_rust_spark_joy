@@ -427,51 +427,22 @@ eng
 %Write an abstract that is about 250 and 350 words (1/2 A4-page)  with the following components:
 % key parts of the abstract
 
-\begin{comment}   
-\begin{itemize}
-  \item What is the topic area? (optional) Introduces the subject area for the project.
-  \item Short problem statement
-  \item Why was this problem worth a Bachelor's/Master’s thesis project? (\ie, why is the problem both significant and of a suitable degree of difficulty for a Bachelor's/Master’s thesis project? Why has no one else solved it yet?)
-  \item How did you solve the problem? What was your method/insight?
-  \item Results/Conclusions/Consequences/Impact: What are your key results/\linebreak[4]conclusions? What are others do based on your results? What can be done now that you have finished - that could not be done before your thesis project was completed?
-\end{itemize}
-\end{comment}
 
 \begin{scontents}[store-env=abstracts,print-env=true]
 %\generalExpl{Enter your abstract here!}
 
 
-This thesis aims to explore the challenges of combining two memory-safe programming languages: Rust and SPARK.
+This thesis explores the challenges of combining two memory-safe programming languages: Rust and SPARK.
 
-SPARK is a subset of Ada, a programming language with a long track record in safety-critical applications. Rust is a multi-paradigm language that has gained great popularity since its emergence roughly a decade ago. Their ownership system and type-safety help in the development of safe and reliable software.
+SPARK is a subset of Ada, a programming language with a long track record in safety-critical applications. Rust is a multi-paradigm language that has gained great popularity since its emergence roughly a decade ago. Both languages ownership systems and type-safety help in the development of safe and reliable software.
 
-Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, Apple, and Google. While tools to avoid memory errors exist, code can not be made safe retroactively, which creates a need for languages such as Rust and SPARK, which were designed with safety in mind. 
+Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, Apple, and Google. While tools to avoid memory errors exist, code cannot be made safe retroactively, which creates a need for languages designed with safety in mind, such as Rust and SPARK. 
 
-Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis aims to identify best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how these properties are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
+Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis identifies best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how these properties are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
 
-This thesis fills a gap in existing research, which has primarily focused on the combination of safe and unsafe languages, and provides a valuable contribution to software security and safety-critical systems.
+This thesis fills a gap in existing research, which has primarily focused on the combination of safe and unsafe languages. It provides a valuable contribution to software security and safety-critical systems.
 
 \end{scontents}
-%\engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
-%Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textbackslash texttt:  \textit{x}, \textbf{x}, and \texttt{x}.
-
-%Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
-
-%Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example, 
-%the copyright symbol: \textbackslash textcopyright Maguire 2022 results in \textcopyright Maguire 2022. Additionally, here are some examples of text superscripts (which can be combined with some symbols): \textbackslash textsuperscript\{99m\}Tc, A\textbackslash textsuperscript\{*\}, A\textbackslash textsuperscript\{\textbackslash textregistered\}, and A\textbackslash texttrademark resulting in \textsuperscript{99m}Tc, A\textsuperscript{*}, A\textsuperscript{\textregistered}, and A\texttrademark. Two examples of subscripts are: H\textbackslash textsubscript\{2\}O and CO\textbackslash textsubscript\{2\} which produce  H\textsubscript{2}O and CO\textsubscript{2}.
-
-%You can use simple environments with begin and end: itemize and enumerate and within these use instances of \textbackslash item.
-
-%The following commands can be used: \textbackslash eg, \textbackslash Eg, \textbackslash ie, \textbackslash Ie, \textbackslash etc, and \textbackslash etal: \eg, \Eg, \ie, \Ie, \etc, and \etal.
-
-%The following commands for numbering with lowercase Roman numerals: \textbackslash first, \textbackslash Second, \textbackslash third, \textbackslash fourth, \textbackslash fifth, \textbackslash sixth, \textbackslash seventh, and \textbackslash eighth: \first, \Second, \third, \fourth, \fifth, \sixth, \seventh, and \eighth. Note that the second case is set with a capital 'S' to avoid conflicts with the use of second of as a unit in the \texttt{siunitx} package.
-
-%Equations using \textbackslash( xxxx \textbackslash) or \textbackslash[ xxxx \textbackslash] can be used in the abstract. For example: \( (C_5O_2H_8)_n \)
-%or \[ \int_{a}^{b} x^2 \,dx \]
-%Note that you \textbf{cannot} use an equation between dollar signs.
-
-%Even LaTeX comments can be handled, for example: \% comment.
-%Note that one can include percentages, such as: 51\% or \SI{51}{\percent}.
 
 \subsection*{Keywords}
 \begin{scontents}[store-env=keywords,print-env=true]
@@ -500,24 +471,29 @@ This thesis fills a gap in existing research, which has primarily focused on the
 \begin{scontents}[store-env=lang]
 swe
 \end{scontents}
-\warningExpl{Inside the following scontents environment, you cannot use a \textbackslash include{filename} as it does not end up in the for diva information. Additionally, you should not use a straight double quote character in the abstracts or keywords, use two single quote characters instead.}
+
 \begin{scontents}[store-env=abstracts,print-env=true]
-\generalExpl{Enter your Swedish abstract or summary here!}
-%\sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
-%Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
 
-\engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
-or Swedish abstract and English summary need not be literal translations of each other.}
+Denna avhandling syftar till att utforska utmaningarna med att kombinera två minnessäkra programmeringsspråk: Rust och SPARK.
+
+SPARK är en delmängd av Ada, ett programmeringsspråk med en lång meritlista inom säkerhetskritiska tillämpningar. Rust är ett flerparadigmatiskt språk som har fått stor popularitet sedan det dök upp för ungefär ett decennium sedan. Deras ägarskapssystem och typsäkerhet hjälper till att utveckla säker och tillförlitlig programvara.
+
+Minnessäkerhetsbuggar i kod skriven i C/C++ står för cirka 70 \% av de största sårbarheterna i branschen, enligt rapporter från organisationer som Microsoft, Apple och Google. Även om verktyg för att undvika minnesfel finns kan kod inte göras säker i efterhand, vilket skapar ett behov av språk som Rust och SPARK, som har utformats med säkerhet i åtanke.
+Att kombinera dessa två språk är en mycket lovande väg för lågnivå- och systemprogrammering, samt säkerhetskritiska applikationer (fordon, flygelektronik, medicinsk, ...). Denna avhandling syftar till att identifiera bästa praxis för säkra bindningar mellan Rust och SPARK, med fokus på att säkerställa minnessäkerhet, typsäkerhet och ägande, och analyserar sedan hur dessa egenskaper bibehålls eller överförs. Avhandlingen ger tydliga rekommendationer baserade på kontrollstudieprogram och ett verkligt exempel med hjälp av BBQueue, ett cirkulärt buffertbibliotek lämpligt för inbyggda system som implementerats i båda språken. De identifierade bästa praxis kan användas för säkra bindningar och automatiserade verktyg/kodgenerering.
+Denna avhandling fyller en lucka i befintlig forskning, som främst har fokuserat på kombinationen av säkra och osäkra språk, och ger ett värdefullt bidrag till programvarusäkerhet och säkerhetskritiska system.
 
 
-\engExpl{The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow}
+
+
+
 \end{scontents}
 \subsection*{Nyckelord}
 \begin{scontents}[store-env=keywords,print-env=true]
 % SwedishKeywords were set earlier, hence we can use alternative 2
 \InsertKeywords{swedish}
+Rust, Ada, SPARK, Foreign Function Interface (FFI), minnessäkerhet, typsäkerhet, ownership
 \end{scontents}
-\sweExpl{Nyckelord som beskriver innehållet i uppsatsen eller rapporten}
+
 \end{abstract}
 \babelpolyLangStop{swedish}
 
@@ -666,26 +642,9 @@ Eesti keeles kokkuvõte.
 \end{comment}
 \section*{Acknowledgments}
 \markboth{Acknowledgments}{}
-\sweExpl{Författarnas tack}
+\todoinline{rewrite and fix}
 
-\engExpl{It is nice to acknowledge the people that have helped you. It is
-  also necessary to acknowledge any special permissions that you have gotten –
-  for example, getting permission from the copyright owner to reproduce a
-  figure. In this case, you should acknowledge them and this permission here
-  and in the figure’s caption. \\
-  Note: If you do \textbf{not} have the copyright owner’s permission, then you \textbf{cannot} use any copyrighted figures/tables/\ldots . Unless stated otherwise all figures/tables/\ldots are generally copyrighted.
-}
-\sweExpl{I detta kapitel kan du ev nämna något om
-  din bakgrund om det påverkar rapporten på något sätt. Har du t ex inte
-  möjlighet att skriva perfekt svenska för att du är nyanländ till landet kan
-  det vara på sin plats att nämna detta här. OBS, detta får dock inte vara en
-  ursäkt för att lämna in en rapport med undermåligt språk, undermålig grammatik och
-  stavning (t ex får fel som en automatisk stavningskontroll och
-  grammatikkontroll kan upptäcka inte förekomma)\\
-En dualism som måste hanteras i hela rapporten och projektet
-}
-
-I would like to thank Cyrille for accepting to be my supervisor in the current penury of supervisors, and Chip for infinite patience, and Yannick and Flo for stuff (yes, this is going to be rewritten). And Johannes you are great!
+I would like to thank Cyrille for accepting to be my supervisor in the current penury of supervisors, and Elena for being my examinator. Chip for infinite patience and the magic template, and Yannick and Florian for advice (...this is going to be rewritten). And Johannes for his framework who simplified my work.
 
 
 \acknowlegmentssignature
@@ -790,7 +749,7 @@ All of the terms used in this introduction can be found in \Cref{sec:introductio
 \section{Background}
 \label{sec:background}
 %\todo[inline]{There should be text here to introduce the subsections}
-This background will cover memory unsafety, which is the underlying issue for this kind or research.
+This background will cover memory unsafety, which is the underlying issue of this research.
 
 %\generalExpl{Present the background for the area. Set the context for your project – so that your reader can understand both your project and this thesis. (Give detailed background information in Chapter 2 - together with related work.)
 %Sometimes it is useful to insert a system diagram here so that the reader knows what are the different elements and their relationship to each other. This also introduces the names/terms/… that you are going to use throughout your thesis (be consistent). This figure  also help you later delimit what you are going to do and what others have done or  do.}
@@ -805,7 +764,7 @@ This background will cover memory unsafety, which is the underlying issue for th
 
 %\restoregeometry
 
-This thesis mainly studies memory: its vulnerabilities in unsafe (typically C/C++) vs safe languages, and memory vulnerabilities, and how they are addressed respectively.  
+This thesis mainly studies memory: its vulnerabilities in unsafe (typically C/C++) vs safe languages and memory vulnerabilities, and how they are addressed respectively.  
 
 Attacks on memory in the literature and professional blogs list many exploits of software written in C/C++. The MITRE \glspl{CWE}\,\cite{noauthor_cwe_nodate} lists \gls{memory-safety} exploitation high on the list in parallel with improper input validation --- with examples, such as Out-of-bounds Write (1\textsuperscript{st}), Out-of-bounds Read (5\textsuperscript{th}) and use after free (7\textsuperscript{th}).
 
@@ -833,22 +792,24 @@ Moy and Aiello\,\cite{moy_when_2020} say that as products integrate and start to
 \end{comment}
 
 
-The authors\,\cite{moy_when_2020} report security incidents which brought down AT\&T (at a cost of US\$60 million and long-lasting damage to the company's reputation), the \gls{FDA} warned against almost 500 thousand cardiac devices that put the patients in pain or at risk of death, and the infamous WannaCry ransomware attack that encrypted 200 thousand computers in 150 countries with a reported cost of USD\$ 8 billion.
+The authors\,\cite{moy_when_2020} report security incidents which brought down AT\&T (at the cost of US\$\,60 million and long-lasting damage to the company's reputation), the \gls{FDA} warned against almost 500 thousand cardiac devices that put the patients in pain or at risk of death, and the infamous WannaCry ransomware attack that encrypted 200 thousand computers in 150 countries with a reported cost of USD\$\,8 billion.
 
 Scherer\,\cite{scherer_engineering_2021} reports successful attacks against ``train schedule systems, entire energy grids, hospital networks, vehicular control software, and even critical aircraft systems". Scherer notes that security needs to be built into the software development process instead of being an add-on or an afterthought. Scherer also notes the ``continuously increasing rate of bugs with increasing project size amongst other factors in long-lived projects" and ``a slow turnaround time" for software improvement (1 to 10 years) causes problems to pile up.
 
 \subsection{Exploitation: Not if, but when}
 \label{sec:exploitationwhen}
 
+\todoinline{put in related works}
 In addition to complexity, Chapman and Moy\,\cite{chapman_adacore_2018} remind us that we evolve in a malicious environment. Writing secure software is equivalent to ``Programming Satan’s computer", as coined by Anderson and Needham: Satan’s computer is rumored to fail intelligently, in the worst possible way and time, and in manners that the programmer does not yet know about. Exploitation techniques are well-known and constantly applied\,\cite{pal_memory_2016}.
 
-When it comes to security, the software developer faces a series of asymmetries\,\cite{chapman_adacore_2018}. An asymmetry of capability, meaning that the malicious actors' capabilities do not grow in a predictable and linear way. An asymmetry of effort: while the programmer has to secure all possible security, the malicious actor needs to find just one to breach the system. Asymmetry of knowledge, which is self-explanatory in the context of the rapid progress of knowledge and technical support. And lastly, an asymmetry of impact, as the impact and destructive impact of a security failure is in principle unpredictable. 
+Regarding security, the software developer faces a series of asymmetries\,\cite{chapman_adacore_2018}. An asymmetry of capability, meaning that the malicious actors' capabilities do not grow predictably and linearly. An asymmetry of effort: while the programmer has to secure all possible security, the malicious actor needs to find just one to breach the system. Asymmetry of knowledge, which is self-explanatory in the context of the rapid progress of knowledge and technical support. And lastly, an asymmetry of impact, as the impact and destructive impact of a security failure are in principle unpredictable. 
 
 Scherer notes that a defect is guaranteed to be exploited when discovered as malicious actors systematically screen for defects. As a result, ``the chance for a defect to be discovered by the attacker is significantly higher than the randomized detection happening during testing"\,\cite{scherer_engineering_2021}.
 
 
 \subsection{Can we achieve memory safety by using safe languages?}
 \label{sec:CanMemorySafety}
+\todoinline{put in related works}
 
 Unfortunately, the current answer to the question: Can we reach memory safety by using safe languages? Is ``Yes, but\ldots".
 
@@ -856,7 +817,7 @@ While Mergendahl \etal\,\cite{mergendahl_cross-language_2022}) and organizations
 
 \section{Sustainability considerations}
 
-Sustainability is an important concern while developing technology or advocating for its use. When it comes to the use of programming languages, considering energy consumption is essential and in line with SGD development goals 9 -- Industry, Innovation and Infrastructure --, 12 -- Responsible Consumption and Production -- and 13 -- Climate Action --\cite{noauthor_envision2030_nodate}. As studied by Pereira \etal\,\cite{pereira_energy_2017}, Ada and Rust energy consumption are comparable to C, and both languages are a good choice for energy-conscious development, when it comes to various aspects, such as time, memory, and energy usage. This is a point defended by companies such as AWS\,\cite{miller_sustainability_2022}, which pinpoints the increasing demand for data consumption and processing, emerging demand for \glsxtrshort{IoT} and ML applications. Broad adoption of energy-efficient programming languages could greatly reduce the energy consumption of computing by 50\%\cite{miller_sustainability_2022}.
+Sustainability is an important concern while developing technology or advocating for its use. When it comes to the use of programming languages, considering energy consumption is essential and in line with SGD development goals 9 -- Industry, Innovation and Infrastructure --, 12 -- Responsible Consumption and Production -- and 13 -- Climate Action --\cite{noauthor_envision2030_nodate}. As studied by Pereira \etal\,\cite{pereira_energy_2017}, Ada and Rust energy consumption are comparable to C, and both languages are a good choice for energy-conscious development when it comes to various aspects, such as time, memory, and energy usage. This is a point defended by companies such as AWS\,\cite{miller_sustainability_2022}, which pinpoints the increasing demand for data consumption and processing, emerging demand for \glsxtrshort{IoT} and ML applications. Broad adoption of energy-efficient programming languages could greatly reduce the energy consumption of computing by 50\%\cite{miller_sustainability_2022}.
 
 \section{Problem}
 \label{sec:problem}
@@ -869,7 +830,7 @@ Research and technical blogs recommend that programmers use memory-safe language
 
 \subsection{Assignment provider and objective}
 
-The research project is conducted with in cooperation between Ferrous Systems and AdaCore. Both companies are engaged in an effort to provide a certified version of the Rust compiler through the Ferrocene initiative\,\cite{noauthor_ferrocene_2023}. This initiative would greatly benefit the \gls{safety-critical} industry by bringing Rust guarantees to software that \emph{should never} fail.
+The research project is conducted in cooperation between Ferrous Systems and AdaCore. Both companies are engaged in an effort to provide a certified version of the Rust compiler through the Ferrocene initiative\,\cite{noauthor_ferrocene_2023}. This initiative would greatly benefit the \gls{safety-critical} industry by bringing Rust guarantees to software that \emph{should never} fail.
 
 % Research Question
 \subsection{Research question}
@@ -877,7 +838,7 @@ The research project is conducted with in cooperation between Ferrous Systems an
 
 What are the best practices for secure bindings between Rust and SPARK code?
 
-Sub questions: How can we ensure that 1. \gls{memory-safety}, 2. \gls{type-safety}, and 3. \gls{ownership} are maintained in these bindings?
+Sub questions: How can we ensure that \first \gls{memory-safety}, \Second \gls{type-safety}, and \third \gls{ownership} are maintained in these bindings?
 
 \subsection{Hypothesis}
 We make the hypothesis that the internal coherency of both languages can be maintained if we can provide recommendations for the safe use of combined Rust/SPARK code.
@@ -909,10 +870,10 @@ The purpose is to provide safe and practical recommendations that could be used 
 
 The goal of this project is to study the safe combination of Rust and SPARK and provide guidelines. This has been divided into the following three sub-goals:
 
-\begin{enumerate}
-\item Subgoal 1 Select appropriate existing data types for control studies.
-\item Subgoal 2 Implement control studies in a series of safe bindings.
-\item Subgoal From lesson learned from Subgoal 2, provide safe binding in a more complex library.
+\begin{enumerate}[leftmargin=*, label=\textbf{Subgoal \arabic*}, ref={Subgoal \arabic*}]
+\item\label{sg:selectdatatypes} Select appropriate existing data types for control studies.
+\item\label{sg:safebindings} Implement control studies in a series of safe bindings.
+\item\label{sg:providesafebindings} From lesson learned from \ref{sg:safebindings}, provide safe binding in a more complex library.
 \end{enumerate}
 
 %\generalExpl{In addition to presenting the goal(s), you might also state what the deliverables and results of the project are.}
@@ -924,23 +885,23 @@ The goal of this project is to study the safe combination of Rust and SPARK and 
 %}
 %\generalExpl{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen should be in methods. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
 %In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
-The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that can be applied, for example, to create an automated tool for bindings on the model of \texttt{bindgen}\footnote{As a reminder, bindgen is a binding tool that generates bindings between Rust and C.}\,\cite{noauthor_bindgen_2022}. The languages analyzed in this thesis have richer types than C, and the goal is to take advantage of their expressivity. Both languages also implement type safety and ownership, and we study how those are passed or conserved through FFI.
+The objective of this thesis is to procure a series of recommendations ("\textit{Do's}") that can be applied, for example, to create an automated tool for bindings on the model of \texttt{bindgen}\footnote{As a reminder, bindgen is a binding tool that generates bindings between Rust and C.}\,\cite{noauthor_bindgen_2022}. The languages analyzed in this thesis have richer types than C, and the goal is to take advantage of their expressivity. Both languages also implement type safety and ownership, and we study how those are passed or conserved through \gls{FFI}.
 
-The binding is considered correct if the data is correctly passed and no memory error is found \texttt{valgrind} - this does not prove complete correctness but rather the absence of memory error. But our goal is pass the correct type through the FFI barrier, and rely on both languages guarantees once the FFI frontier is passed. 
+The binding is considered correct if the data is correctly passed and no memory error is found \texttt{valgrind} - this does not prove complete correctness but rather the absence of memory error. But our goal is to pass the correct type through the \gls{FFI} barrier, and rely on both languages' guarantees once the \gls{FFI} frontier is passed. 
 
-The method chosen is manually doing those bindings through control studies and analyzing them with help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. 
+The method chosen is manually doing those bindings through control studies and analyzing them with the help of the documentation for each type as well as memory tools to ensure the binding is correct and that there is no memory leak. 
 
-This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, FFI research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
+This method is reliable and appropriate as big programs are built from smaller modular pieces. In addition, \gls{FFI} research is carried out from control studies in surveyed literature. Possible issues, including safety issues, are demonstrated with the help of control studies. Control studies allow replicating the necessary complexity that is needed for illustration purposes. Control studies also allow full control over layout and alignment when passing chosen data types and data structures.
 Small control study programs are useful when illustrating best practices for memory safety, type safety, and studying how ownership s transferred or maintained.
 Control study programs can provide a foundation for automatic tooling.
 
 After the control studies are performed, an additional experiment is executed with a BBqueue, a complex library available in both languages. Porting BBqueue allowed to implement most of the "lesson learned" through the control studies.
 
 
-\section{Delimitations}\sweExpl{Avgränsningar}
+\section{Delimitations}
 %\generalExpl{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This  helps you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
 
-This thesis covers manual bindings for basic types. This thesis does not implement an automated tool.
+This thesis will go through manual bindings for increasingly complex types and will not implement an automated tool, which is future work.
 
 \section{Structure of the thesis}
 %\sweExpl{ Rapportens disposition}
@@ -955,8 +916,10 @@ This thesis covers manual bindings for basic types. This thesis does not impleme
 %\glsaddall[types={introductiongloss}] 
 \printglossary[type=introductiongloss, style=mydefs, 
 %toctitle={Terms in the introduction}, 
-%title={Terms in the introduction}
+%title={Terms in the int• The statistic tool is available here.roduction}
 ]
+
+\todoinline{integrate those terms in the intro instead of here}
 
 \cleardoublepage\chapter{Background}
 \label{ch:background}
@@ -980,7 +943,7 @@ This section covers Rust and SPARK and describes what makes them memory safe acc
 Rust was designed as a systems programming language\,\cite{mergendahl_cross-language_2022}, to interact with other low-level languages. Rust focuses on speed, \gls{memory-safety}, and concurrency. Thus, Rust is multi-paradigm and combines features from imperative \textit{and} functional programming. It is fully open-source and has a six-week release cycle, with backward compatibility guaranteed\,\cite{poveda_ruiz_bounded_2019,noauthor_rust_nodate}. Rust is characterized by its ``strong performance and safety properties". In addition, the language combines a strong type system enforced at compile-time, and other compile-time checks, to prevent ``large classes of memory bugs"\,\cite{mergendahl_cross-language_2022}. Furthermore, Rust ensures spatial safety by performing compile-time checks for statically-sized objects. For dynamically sized objects, instructions are passed to the binary, to delay those checks until runtime.
 
 For temporal safety, Rust relies on its concept of ownership --- a concept shared by SPARK. As described by Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, Scherer\,\cite{scherer_engineering_2021}, and Poveda Ruiz\,\cite{poveda_ruiz_bounded_2019} as well as the official documentation\,\cite{noauthor_rust_nodate}, a unique owner for a value can exist at a time and the value is destroyed when the unique owner goes out of scope.  This implies that when a value is destroyed, the reference is nullified, without the need for garbage collection. The Rust compiler adds lifetimes to all values, which is a ``tag" guaranteeing the value is still valid. The borrow checker ensures that no value outlives its lifetime.
-
+ 
 To relax this strictness, Rust can temporarily transfer ownership, known as borrowing. More importantly, Rust allows one mutable reference \inlinecode{\& mut T} or multiple immutable references to co-exist \inlinecode{\&T} simultaneously --- these two scenarios are exclusive. This  protects against type-related errors at compile-time, as rustc (the rust compiler) warns of any error. An example of code\footnote{A note on special syntax: \texttt{!} is used to use a macro, here is a \texttt{Vector}. \texttt{\{:?\}} is used to print variables in \texttt{Debug} format.} that shifts ownership is shown in \Cref{lst:rust_ownership}.
 
 \begin{listing}[!ht]
@@ -1000,7 +963,7 @@ In addition, Rust’s type system statically rules out data races. At its heart,
 
 The system of ownership is not applied to simple types for which the compiler knows their size at compile-time. Those types are known to implement the \texttt{Copy trait}. This trait means that the compiler can copy those types \emph{without} needing to transfer ownership. Some simple types implementing the copy traits are integers, for example, ``i32" or ``u64".
 
-Rust allows unsafe operations that are fenced by the keyword ``\texttt{unsafe\{\}}". Inside unsafe brackets, operations such as raw pointer manipulation, or initialization of unsafe objects are possible, under the programmer's responsibility. Unsafe blocks are used mainly to interact with low-level code.
+Rust allows unsafe operations that are fenced by the keyword \texttt{unsafe\{\}}. Inside unsafe brackets, operations such as raw pointer manipulation, or initialization of unsafe objects are possible, under the programmer's responsibility. Unsafe blocks are used mainly to interact with low-level code.
 
 Rust does not implement exceptions, but has an error management system, distinguishing between recoverable and unrecoverable errors. Recoverable errors can be managed by the program, while unrecoverable errors make the program stop and unwind the stack --- resulting in a so-called \texttt{panic}. The programmer decides when an error is handled gracefully and when the program should panic.
 
@@ -1036,7 +999,6 @@ In contrast, if we frame the variable ``SHARED" inside \texttt{unsafe} blocks, t
 
 \begin{listing}[!ht]
 \begin{minted}[
-%frame=lines,
 framesep=2mm,
 baselinestretch=1.2,
 fontsize=\footnotesize,
@@ -1166,6 +1128,13 @@ These errors can be leveraged into full-fledged attacks, as ``every exploit star
 
 C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom they give to the programmer. Szekeres \etal\,\cite{szekeres_sok_2013} call the \gls{memory-corruption} bugs in low-level languages ``one of the oldest problems" in security. Memory errors have been exploited for 30 years, while real-world exploits prove that protections can always be defeated. The authors established that not only does a completely secure system not exist, but protection mechanisms never achieve wide adoption by the software engineering community. The reason is that protection mechanisms present a significant overhead, in terms of performance (\eg garbage collectors are costly in systems relying on speed, not even to mention changing the programming language, and the trade-off is not worth the benefit of the protection) or more simply the cost of replacing billions of lines of existing C/C++ is too expensive. According to Skezeres \etal\,\cite{szekeres_sok_2013} the issues may be that the protection is not robust enough or there exist problems of incompatibility with legacy code and dependencies.
 
+\begin{figure}[!ht]  \centering 
+\includesvg[inkscapelatex=false, scale=0.4]{figures/figuressvg/redrawn_memory_attack.svg}
+\caption{Redrawn figure}
+\end{figure}
+\FloatBarrier
+
+
 \begin{sidewaysfigure}[!ht]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{figures/sok.png}
@@ -1180,6 +1149,8 @@ To mitigate these problems, various tools have been introduced\,\cite{mergendahl
 Unfortunately, those tools provide very limited protection, in part because the software engineering community is facing professionalization and an increase in complexity from the attacking side\,\cite{scherer_engineering_2021, chapman_adacore_2018}. 
 According to Mergendahl \etal\,\cite{mergendahl_cross-language_2022}, ``sanitizers suffer from coverage limitations", with many missed bugs as a consequence, while ``enforcement-based exploit mitigation techniques" can still allow attacks that do not violate their policies as they are ``relaxed enough", and randomization techniques remain susceptible to information leakage.
 \FloatBarrier
+
+
 
 \subsection{The monopoly of C/C++}
 
@@ -1354,18 +1325,18 @@ Figure~\ref{fig:researchprocess} decomposes the steps to carry on this project.
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
     ]
     % group 1
-         \node[punktchain, join, draw=black,fill=color1bg!30!white] (lit){Literature study};
-         \node[punktchain, join, draw=black,fill=color1bg!30!white] (consult){Consultation with experts};
-         \node[punktchain, join, draw=black,fill=color1bg!30!white] (scope){Scope limitation};  
+         \node[punktchain, join, draw=black,fill=color1bg_fill] (lit){Literature study};
+         \node[punktchain, join, draw=black,fill=color1bg_fill] (consult){Consultation with experts};
+         \node[punktchain, join, draw=black,fill=color1bg_fill] (scope){Scope limitation};  
     % group 2
-         \node[punktchain, join, draw=black,fill=color2bg!50!white] (typselec){Type selection};
-         \node[punktchain, join, draw=black,fill=color2bg!50!white] (stats){Statistics};
+         \node[punktchain, join, draw=black,fill=color2bg_fill] (typselec){Type selection};
+         \node[punktchain, join, draw=black,fill=color2bg_fill] (stats){Statistics};
     % group 3
-         \node[punktchain, join, draw=black,fill=color3bg!50!white] (cs){Control studies};
-         \node[punktchain, join, draw=black,fill=color3bg!50!white] (analys){Analysis};   
-         \node[punktchain, join, draw=black,fill=color3bg!50!white] (memver){Verification of correctness};   
+         \node[punktchain, join, draw=black,fill=color3bg_fill] (cs){Control studies};
+         \node[punktchain, join, draw=black,fill=color3bg_fill] (analys){Analysis};   
+         \node[punktchain, join, draw=black,fill=color3bg_fill] (memver){Verification of correctness};   
     % group 4
-         \node[punktchain, join, draw=black, fill=color4bg!50!white] (bbq){BBQueue implementation};
+         \node[punktchain, join, draw=black, fill=color4bg_fill] (bbq){BBQueue implementation};
     %% No. 1
     \draw[tuborg, decoration={brace}] let \p1=(lit.north), \p2=(scope.south) in
         ($(3, \y1)$) -- ($(3, \y2)$) node[tubnode] {Preparation};
@@ -1472,7 +1443,7 @@ The Rust regex patterns are designed to match type declarations and literals, ex
     \end{minted}
 \end{enumerate}
  
-\subsection{SPARK regexes}
+\subsubsection{SPARK regexes}
 
 These focus on type declarations.
 The patterns cover the following constructs:
@@ -1563,22 +1534,23 @@ Thirdly, the compiler (git hash 66a2d62), with a code base almost 5 times bigger
 \centering
 \caption{Most popular projects on crates.io (\num{171897} LOC)}
 \label{tab:crates_io}
-\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}| S[table-format=7.0]| }
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{ |l|>{\raggedright}p{4cm}|>{\raggedright}p{3cm}|>{\centering\arraybackslash}p{1.8cm}|S[table-format=7.0]| }
 \hline
-\rowcolor{color1bg!20}
+\rowcolor{color1bg_fill}
 \textbf{Package}& \textbf{Description} & \begin{tabular}{@{}l} \textbf{Git hash} \\ (\textbf{Reverse} \\ \textbf{Dependencies})\end{tabular}&\textbf{Downloads} \newline \textbf{(millions)} & \textbf{LOC}\\
 \hline
-libc & Raw FFI bindings to platform libraries like libc & 89ec881 (\num{5200}) & 177 & 100719\\
+libc & Raw FFI bindings to platform libraries like libc & \#89ec881 (\num{5200}) & 177 & \num{100719}\\
 \hline
-syn & Parser for Rust source code & 6365093 (\num{5501}) & 191 & 50801 \\
+syn & Parser for Rust source code & \#6365093 (\num{5501}) & 191 & \num{50801} \\
 \hline
-rand and rand-core & Random number generators and other randomness functionality & 0f3eced (\num{9892}) & 183 & 13655\\
+rand and rand-core & Random number generators and other randomness functionality & \#0f3eced (\num{9892}) & 183 & \num{13655}\\
 \hline
-quote & Macro for turning Rust syntax tree data structures into tokens of source code & ca98b65 (\num{5498}) & 177 & 2154\\
+quote & Macro for turning Rust syntax tree data structures into tokens of source code & \#ca98b65 (\num{5498}) & 177 & \num{2154}\\
 \hline
-cfg-if & Ergonomically defines an item depending on a large number of \#[cfg] & 2621a59 (\num{1147}) & 175 & 144 \\
+cfg-if & Ergonomically defines an item depending on a large number of \#[cfg] & \#2621a59 (\num{1147}) & 175 & \num{144} \\
 \hline
-procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab25487 (\num{4538}) & 176 & 4424\\
+procmacro2 & A substitute implementation of the compiler's proc\_macro API & \#ab25487 (\num{4538}) & 176 & \num{4424}\\
 \hline
 \end{tabular}
 \end{table}
@@ -1589,22 +1561,23 @@ procmacro2 & A substitute implementation of the compiler's proc\_macro API & ab2
 \centering
 \caption{Most popular projects on lib.rs 172,059 LOC}
 \label{tab:lib_rs}
-\begin{tabular}{ |l|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{3cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}| }
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{ |l|>{\raggedright}p{4cm}|>{\raggedright}p{3cm}|>{\centering\arraybackslash}p{1.8cm}| S[table-format=7.0]| }
 \hline
-\rowcolor{color1bg!20}
+\rowcolor{color1bg_fill}
 \textbf{Package}& \textbf{Description} & \textbf{Git hash} \newline \textbf{(Reverse Dependencies)}&\textbf{Downloads} \newline \textbf{all time in millions} & \textbf{LOC}\\
 \hline
-serde & Framework for serializing and deserializing & b80e722 & 151 & 30,681 \\
+serde & Framework for serializing and deserializing & \#b80e722 (\num{26571}) & \num{151} & \num{30681} \\
 \hline
-serde-json & A JSON serialization file format & a15bd09 & 126 & 15,553 \\
+serde-json & A JSON serialization file format & \#a15bd09 (\num{17799}) & \num{126} & \num{15553} \\
 \hline
-clap & Command line args parser & 8469554 & 106 & 49,799 \\
+clap & Command line args parser & \#8469554 (\num{10933}) & \num{106} & \num{49799} \\
 \hline
-log & A lightweight logging facade for Rust & dc32ab9 & 135 & 3,322 \\
+log & A lightweight logging facade for Rust & \#dc32ab9 (\num{12709}) & \num{135} & \num{3322} \\
 \hline
-thiserror & Error handler & 0e45dde & 83 & 2,812 \\
+thiserror & Error handler & \#0e45dde (\num{9779}) & \num{83} & \num{2812} \\
 \hline
-tokio & Non-blocking platform for asynchronous I/O backed applications & 1df874e & 89 & 69,892 \\
+tokio & Non-blocking platform for asynchronous I/O backed applications & \#1df874e (\num{12745}) & \num{89} & \num{69892} \\
 \hline
 \end{tabular}
 \end{table}
@@ -1765,7 +1738,7 @@ rustc 55.01 24.80 11.54 6.16 2.49
     \newlength\lena
     \newlength\lenb
       {black,fill=gray,mark=none}
-    \foreach \p/\t/\pat\c in {56.06/Numbers/crosshatch/color1bg!90!white, 24.71/Refs/vertical lines/color2bg!90!white, 11.18/Struct\&Enum/grid/color3bg!90!white, 8.05/others (heap)/horizontal lines/color4bg!90!white}
+    \foreach \p/\t/\pat\c in {56.06/Numbers/crosshatch/color1bg_dark_fill, 24.71/Refs/vertical lines/color2bg_dark_fill, 11.18/Struct\&Enum/grid/color3bg_dark_fill, 8.05/others (heap)/horizontal lines/color4bg_dark_fill}
        {
         \global\lena=\lenb
         \global\lenb=\dimexpr\lenb+\dimexpr\p pt\relax
@@ -1780,7 +1753,7 @@ rustc 55.01 24.80 11.54 6.16 2.49
               %{black!\p}
       }
     \end{tikzpicture}}
-  \caption{Rust types repartition for all Rust projects}
+  \caption{Rust types repartition}
   \label{fig:repartitionrust}
 \end{figure}
 \FloatBarrier
@@ -1803,7 +1776,7 @@ We checked a total number of 504 files and a total of 27 k\gls{LOC}.
   \scalebox{0.9}{
     \begin{tikzpicture}[scale=3]
     \centering    
-    \foreach \p/\t\pat\c in {58.69/Numbers/crosshatch/color1bg!90!white, 27.78/Access/vertical lines/color2bg!90!white, 12.65/Record\&Enum/grid/color3bg!90!white, 0.88/others (0.88\%)/crosshatch/color4bg!90!white}   
+    \foreach \p/\t\pat\c in {58.69/Numbers/crosshatch/color1bg_dark_fill, 27.78/Access/vertical lines/color2bg_dark_fill, 12.65/Record\&Enum/grid/color3bg_dark_fill, 0.88/others (0.88\%)/crosshatch/color4bg_dark_fill}   
       {
        \pgfmathtruncatemacro\intp{\p}
     
@@ -1872,10 +1845,10 @@ privileged way to access the inner buffer to make communication safe, as the gra
 \label{tab:bbqueue}
 \begin{tabular}{ |m{5cm}|m{5cm}| }
 \hline
-\rowcolor{color1bg!20}
+\rowcolor{color1bg_fill}
 \multicolumn{2}{|c|}{BBQueue (SPARK)} \\
 \hline
-\rowcolor{color1bg!20}
+\rowcolor{color1bg_fill}
 \centering Producer (Rust) & \centering Consumer (Rust) \tabularnewline
 \hline
 1. \textbf{Grant} \newline Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. & 3. \textbf{Read} \newline Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. \tabularnewline
@@ -1927,7 +1900,7 @@ The environment is fairly complex as it needs to function for Rust and SPARK in 
 \begin{itemize}
     \item Control studies and BBqueue experiments are available are grouped in this \href{https://github.com/Dajamante/ada_rust_programs}{repository}.
     \item The statistic tool is available \href{https://github.com/Dajamante/stat_ada_rust_code}{here}.
-    \item SPARK BBqueue is available \href{https://github.com/Fabien-Chouteau/bbqueue-spark}{here}.
+    \item SPARK BBqueue is available \href{https://github.com/Fabien-Chouteau/bbqueue-spark}{https://github.com/Fabien-Chouteau/bbqueue-spark}.
     \item BBqueue in Rust is available in its \href{https://github.com/jamesmunns/bbqueue}{official} and \href{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}{FFI safe version}.
 \end{itemize}
 %gpr-rust
@@ -1947,15 +1920,6 @@ This section describes both control studies and real-world implementation with B
 
 \section{System}
 
-%Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
-
-%Distributor ID:	Ubuntu
-
-%Description:	Ubuntu 22.04.1 LTS
-
-%Release:	22.04
-
-%Codename:	jammy
 
 Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
 
@@ -1967,6 +1931,28 @@ Release:	22.04
 \section[Environment for \& SPARK/Rust experiments]{Environment for SPARK/Rust experiments}
 
 For reproducibility purposes,  \Cref{sec:buildSystems} describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
+\section{Presentation of experiments}
+
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{stuff stuff}
+\label{tab:stuffstuff}
+\begin{tabular}{ |p{5cm}|p{5cm}|p{5cm}| }
+\hline
+\rowcolor{color1bg_fill}
+\multicolumn{3}{|l|}{BBQueue (SPARK)} \\
+\hline
+\rowcolor{color1bg_fill}
+\centering Producer (Rust) & \centering Consumer (Rust) & \centering Consumer (Rust) \tabularnewline
+\hline
+1.  Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. & stuff & stuff\tabularnewline
+\hline
+ \textbf{Commit}  Makes memory available to read. & 4.\newline Frees the memory and gives the space back. & stuff \tabularnewline
+\hline
+\end{tabular}
+\end{table}
+\FloatBarrier
 
 \subsection{SPARK to Rust}
 
@@ -2020,98 +2006,10 @@ The work was divided in smaller steps.
 \begin{itemize}
     \item Analysing data structures and implementations on both Rust and SPARK sides
     \item Using Rust, and getting the official version of BBqueue, sending and receiving some data in one thread and multiple threads.
-    \item Switching to the unofficial, FFI-safe, bbqueue\_ipc, modifying stack allocated data. 
+    \item Switching to the unofficial, FFI-safe, bbqueue\_ipc, modifying stack-allocated data. 
     \item  Process to FFI exchanges with SPARK
 \end{itemize}
 
-\begin{comment}
-    
-\section{Old figures}
-
-
-
-
-
-
-\tikzset{
-    processBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, font=\sffamily, draw=black, fill=red!20},
-    largeBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=4cm,text centered, draw=black}
-}
-\begin{figure}[!ht]
-\resizebox{1.1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=left,node distance=2cm]
-
-\node (document) [tape,tape bend top=none,draw,font=\sffamily] {PDF\\Document};
-\node (GDM) [processBox,  right=0.5cm of document] {OCR};
-\node (OCRoutput) [largeBox, right=1cm of GDM] {OCR output};
-
-\node (kvp) [tape,tape bend top=none,draw,font=\sffamily, below=0.25cm of OCRoutput.north] {key-value\\pairs};
-\node (entities) [tape,tape bend top=none,draw,font=\sffamily, above=0.35cm of OCRoutput.south] {Entities};
-\node (Manual) [processBox, right=1cm of kvp] {Analyze the extracted\\key-value pairs};
-\draw [-latex](document) --  (GDM);
-\draw [-latex](kvp) --  (Manual);
-\path[ draw
-     , -latex'] let \p1=(GDM.east), \p2=(kvp.west) in (GDM.east) -- +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x2-0.5*\x1, \y2) -- (kvp.west);
-\path[ draw
-     , -latex'] let \p1=(GDM.east), \p2=(kvp.west), \p3=(entities.west) in (GDM.east) --  +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x3-0.5*\x1, \y3) -- (entities.west);
-\end{tikzpicture}
-}
-\caption{The processing of key-value extraction from a PDF document using Azure's Form Recognizer}
-  \label{fig:processAnInvoice}
-\end{figure}
-\FloatBarrier
-\subsubsection{Hyper-V with Containers}
- \Cref{fig:hyperVcontainers} shows how Hyper-V deals with containers.
- 
- \tikzset{
-    container/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
-    containerization/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
-    hypervisor/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=red!20},
-    os/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
-    guestos/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=orange!40},
-    infrastructure/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=green!20},
-    hos/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
-    kernel/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=purple!20},
-    services/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=pink!20]}
-}
-
-\begin{figure}[ht!]
-    \centering
-\resizebox{1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=center,node distance=2cm]
-
-\node (Infrastructure) [infrastructure, text width=13cm, text centered] {Infrastructure};
-\node (OS1) [hos, anchor=north west, align=left, above=1.5cm of Infrastructure.north west, anchor=north west, text width=6cm, text centered] {Host OS};
-
-\node (OS2) [hos, anchor= west, align=left, right=0.5cm of OS1.east, text width=6cm, anchor= west, text centered] {Host OS};
-
-\node (Kernel1) [kernel, anchor=north west, align=left, above=1.5cm of OS1.north east, anchor=north east, text width=3cm, text centered] {Kernel};
-
-\node (Kernel2) [kernel, anchor=north west, align=left, above=1.5cm of OS2.north east, anchor=north east, text width=3cm, text centered] {Kernel};
-
-\node (ServiceA) [container, anchor=east, above=1 cm of Kernel1.east, anchor=east] {Services};
-\node (AppA) [container,  left=0.25cm of ServiceA] {App 1};
-
-\node (ServiceB) [container, anchor=east, above=1 cm of Kernel2.east, anchor=east] {Services};
-\node (AppB) [container,  left=0.25cm of ServiceB] {App 2};
-%\node (AppC) [container,  right=0.25cm of AppB] {App 3};
-
-\draw[black,thick,dashed] ($(OS2.north west)+(-0.3,3.75)$)  rectangle ($(OS2.south east)+(0.5,-0.3)$);
-\node[text width=5cm, text=red, above=0.1cm of ServiceB] 
-    {\textbf{Container}};
-
-\draw[red,thick,dotted] ($(Kernel2.north west)+(-0.3,1.6)$)  rectangle ($(Kernel2.south east)+(0.3,-0.3)$);
-\node[text width=5cm, text=black, above=0.8cm of ServiceB] 
-    {\textbf{VM}};
-\end{tikzpicture}
-}
-    \caption{Hyper-V with containers}
-    \label{fig:hyperVcontainers}
-\end{figure}
-\FloatBarrier
-\end{comment}
 
 \cleardoublepage
 \chapter{Results and Analysis}
@@ -2184,10 +2082,10 @@ We used the String type to carry out a demonstration, which is complex in both S
     start chain=going right,
     tuborg/.style={decorate, decoration={brace, amplitude=3pt}, line width=1mm},
     tubnode/.style={midway, right=2pt, align=left, font=\large, text width=4cm, xshift=4mm},
-    ]         \node[punktchain, join, draw=black,fill=color1bg!30!white] (string){Vec<u8> of UTF-8};  
+    ]         \node[punktchain, join, draw=black,fill=color1bg_fill] (string){Vec<u8> of UTF-8};  
     % group 2
-    \node[punktchain, join, draw=black,fill=color2bg!50!white] (vec){Vec<T>};
-    \node[punktchain, join, draw=black,fill=color3bg!50!white] (rawvec){RawVec<T>};
+    \node[punktchain, join, draw=black,fill=color2bg_fill] (vec){Vec<T>};
+    \node[punktchain, join, draw=black,fill=color3bg_fill] (rawvec){RawVec<T>};
     \end{tikzpicture}}
   \caption{Rust String: it is build on three different internal types}
   \label{fig:ruststring}
@@ -2198,13 +2096,13 @@ We used the String type to carry out a demonstration, which is complex in both S
     \centering
     \scalebox{0.8}{
     \begin{tikzpicture}
-	\node [draw, rectangle, fill=color1bg!30!white, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
-	\node [draw, rectangle, fill=color1bg!30!white, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
-	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box2] (box3) {'h'};
-	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box3] (box4) {'e'};
-	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box4] (box5) {'l'};
-	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box5] (box6) {'l'};
-	\node [draw, rectangle, fill=color2bg!50!white, minimum width=1cm, minimum height=1cm, right=0cm of box6] (box7) {'o'};
+	\node [draw, rectangle, fill=color1bg_fill, minimum width=1cm, minimum height=1cm] (box1) at (0,0) {first};
+	\node [draw, rectangle, fill=color1bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box1] (box2) {last};
+	\node [draw, rectangle, fill=color2bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box2] (box3) {'h'};
+	\node [draw, rectangle, fill=color2bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box3] (box4) {'e'};
+	\node [draw, rectangle, fill=color2bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box4] (box5) {'l'};
+	\node [draw, rectangle, fill=color2bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box5] (box6) {'l'};
+	\node [draw, rectangle, fill=color2bg_fill, minimum width=1cm, minimum height=1cm, right=0cm of box6] (box7) {'o'};
  	\draw [decorate, decoration={brace, mirror, amplitude=10pt}] (box1.south west) -- (box2.south east) node [midway, below=12pt] {Bounds (discrete type)};
     \end{tikzpicture}
  }
@@ -2239,7 +2137,8 @@ pub struct AdaString {
 
 The Rust approach is somewhat different. A Rust string is not \texttt{\#[repr(C)]}, so first we need to break down the structure to return its inner fields in \Cref{lst:deconstructed_rust_string}. As a reminder, anything that is not tagged \texttt{\#[repr(C)]} cannot be passed safely: this tag request the compiler to arrange the data type as we would expect if from C. Since this tag is absent from the Rust String, this needs to be done by hand. In addition, since Rust memory is managed with ownership, Rust must "forget"\footnote{The procedure of forgetting is to request the compiler to not deallocate that memory, and let the programmer take responsibility for deallocating it} about the string and should not drop it when its owner goes out of scope. Meaning that for this experiment we must get around the safety guarantees and prevent the language to follow its design. 
 
-Since we now removed the language guarantee, we must reimplement this guarantee.
+Since we now removed the language guarantee, we must re-implement this guarantee. 
+
 
 \begin{listing}[!ht]
 \begin{minted}[fontsize=\footnotesize]{rust}
@@ -2297,7 +2196,7 @@ Again, it was very important to get the types right. One of the unexpected resul
 \label{tab:ffistringlogic}
 \begin{tabular}{ |>{\raggedright\arraybackslash}m{5cm}|>{\raggedright\arraybackslash}m{5cm}| }
 \hline
-\rowcolor{color1bg!20}
+\rowcolor{color1bg_fill}
 \multicolumn{1}{|>{\centering\arraybackslash}m{5cm}|}{pub String} &
 \multicolumn{1}{>{\centering\arraybackslash}m{5cm}|}{priv String} \\
 %pub String & priv String \\
@@ -2375,7 +2274,37 @@ After modelling it as per previous section, it is then possible to check that th
 
 \section{Forbidden memory}
 
-\todoinline{it is recommended coming from ada to create your own types for pointers as it will go to the common heap}
+Coming from SPARK, we found that when creating access-to-object types to be passed to Rust, those access types must be named and must come from the same storage pool. In that case, the object and the access type will share the same area of storage created by the same allocator \footnote{\href{https://www.adaic.org/resources/add_content/standards/05aarm/html/AA-3-10.html}{documentation}}. This is an important point that an automated tool must control.  
+
+
+\begin{listing}[!ht]
+\begin{minted}[fontsize=\footnotesize]{ada}
+package body Ok is
+    type String_Access is access String;
+  
+    function Replace return String_Access is
+        -- memory allocated in the same pool
+        Hello : String_Access := new String'("hello");
+
+    begin
+        -- sending the pointer to Rust
+        return Hello;
+    end Replace;
+
+package Not_Ok is
+    function Replace return access String is
+        -- This will give a segmentation fault
+        Hello : access String := new String'("hello");
+
+    begin
+        return Hello;
+    end Replace;
+\end{minted}
+\caption[Access pool]{Access must be named}
+\label{lst:samepool}
+\end{listing}
+\FloatBarrier
+
 
 \section{Exception and panic management}
 
@@ -2474,17 +2403,17 @@ It was possible to reconstruct both the header (\Cref{lst:bbqueueheaderinspark})
 \begin{figure}
     \begin{minipage}{.40\textwidth}
         \begin{bytefield}{24}
-        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}{color4bg!30}\tikzmark{end}\\
-    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}{color4bg!30}
+        \memsection{..AD0}{..B0F}{4}{Header (64B) - 8 fields of 8 bytes with atomic variables}{color4bg_fill}\tikzmark{end}\\
+    	\memsection{..B10}{..B9F}{20}{ BBBuffer       \\ UnsafeCell<[u8; 128]> \tikzmark{end2}\\ (128B+16B padding)}{color4bg_fill}
         \end{bytefield}         \label{fig:hiddenbufferheader}
     \end{minipage}
     \begin{minipage}{.15\textwidth}\quad\quad    \end{minipage}%
     \begin{minipage}{.40\textwidth}
         \begin{bytefield}{6}
         %\begin{rightwordgroup}{Reconstruced \\ Read grant \\ passed to \\ SPARK}
-        \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}{color1bg!30}\\
-        \memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}{color1bg!30}\\
-        \memsection{..BB0}{..BB7}{2}{length of read (4)}{color1bg!30}\\
+        \memsection{..BA0}{..BA7}{2}{\tikzmark{start} 0x..AD0: pointer to header}{color1bg_fill}\\
+        \memsection{..BA8}{..BAF}{2}{\tikzmark{start2} 0x..B10: pointer to BBBuffer}{color1bg_fill}\\
+        \memsection{..BB0}{..BB7}{2}{length of read (4)}{color1bg_fill}\\
         %\end{rightwordgroup}
     \end{bytefield}
     \end{minipage}
@@ -2493,11 +2422,11 @@ It was possible to reconstruct both the header (\Cref{lst:bbqueueheaderinspark})
       \Connect{start}{end}
       \Connect{start2}{end2}
     \end{tikzpicture}
-    \caption{BBqueue Read grant in memory (not to scale!)\\
+    \caption[BBqueue Read grant in memory]{BBqueue Read grant in memory (not to scale!)\\
     %\legendsquare{fill=green}~Memory allocated in Rust,
     %\textcolor{red}{$\blacksquare$} & Memory allocated in Rust
-    \cbox{color4bg!30} Memory assigned in Rust.\quad \\
-    \cbox{color1bg!30} Memory passed to SPARK.\quad \\
+    \cbox{color4bg_fill} Memory assigned in Rust.\quad \\
+    \cbox{color1bg_fill} Memory passed to SPARK.\quad \\
     %\legendsquare{fill=color3bg}~Memory transferred to SPARK
     }
     
@@ -2539,6 +2468,7 @@ type RustReadGrant is record
     inner_buf: System.Address;
     buf_len: Interfaces.Unsigned_64;
 end record;
+-- Reminding the compiler the object must be passed by reference
 pragma Convention (Ada_Pass_By_Reference, RustReadGrant);
 \end{minted}
 \caption{Modelling the Read Grant}
@@ -2547,10 +2477,10 @@ pragma Convention (Ada_Pass_By_Reference, RustReadGrant);
 \FloatBarrier
 
 
+Nevertheless, even if reading from the queue and passing the data structure were possible following the recommendations found from the control studies, the design for the API were not similar enough to use the methods of SPARK on the Rust side of the memory.
 
 
-Nevertheless, even if reading from the queue and passing the data structure were possible following the recommendations found from the control studies, the design for the API were different enough to not be able to convert one queue in the other.
-
+\todoinline{in other words there is much more work with rust who has more layers to peel, ada is clearly well thought to work for interaction with C (ownership is deeply nested in Rust so you need to do things like reconstruct the objects) on the other hand the rust compiler is your friend and tells you when you are trying to pass FFI unsafe stuff. what i found is that nothing is insurmountable, correct types require more research and design is super important at a higher level for smooth porting. also, use the compiler wisely repr(C) no mangle and pass by references were not made for dogs}
 \cleardoublepage
 
 \chapter{Conclusions and Future work}
@@ -2596,6 +2526,9 @@ Due to the breadth of the problem, only some of the initial goals have been
 met. In these section we  focus on some of the remaining issues that
 should be addressed in future work. \ldots\ 
 Redesign of BBqueue for more consistent experiment.
+
+\todoinline{study moer the existing tool like bindgen and look up ada tool}
+
 The port from SPARK to Rust was not completely done but there is no reason to assume it would not be as complicated.
 
 Even if we rely on the languages for safety, a consistent mesh of tests is necessary.
@@ -2667,42 +2600,7 @@ println!("Lenth of c {}", e.len());
 \caption[BBqueue header in Rust]{BBqueue header in Rust}
 \label{lst:grapheme}
 \end{listing}
-\begin{comment}
-    
 
-\generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
-
-Attach the BibTeX for your references to make it easy for a reader to find and use them
-The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
-
-Attach source code file(s) or add a URL to the github or other repository
-Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
-
-Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
-
-An argument for including supporting material in the PDF file is that it is available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
-
-\warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you  probably want to use one of the data repositories. For additional help about this, contact KTH Library via  \href{mailto:researchdata@kth.se}{researchdata@kth.se}.}
-
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
-  \end{center}
-  \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
-  \label{fig:PDFreaderPaperclipExample}
-\end{figure}
-\FloatBarrier
-
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
-  \end{center}
-  \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
-  \label{fig:PDFreaderPushpinExample}
- \end{figure}
- \FloatBarrier
- \cleardoublepage
-\end{comment}
 \chapter{Build systems to reproduce experiments}
 \label{sec:buildSystems}
 
@@ -2712,65 +2610,61 @@ Both files reside in the same root folder and this is a straightforward process.
 The SPARK file is compiled without optimizations for debugging purposes and the Rust library is compiled as a static library for simplicity. 
 Gnatbind then checks whether the SPARK program is consistent and the linking with the Rust library is done in the last step.
 The process is designed to fail if a step does not compile properly and provides useful information for debugging.
-\begin{figure}[ht!]
+
+\begin{figure*}[ht!]
     \centering
-    \scalebox{0.8}{
     \begin{tikzpicture}[node distance=2cm, font=\small]
-    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1cm, text centered, text width=6cm, fill=white, rounded corners=10,thick]
-    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=2.5cm, minimum height=0.8cm, text centered, text width=2.2cm, fill=white, rounded corners=5,thick]
+    \tikzstyle{process} = [draw, rectangle, minimum width=5cm, minimum height=1.5cm, text centered, text width=6cm, fill=white, rounded corners=10,thick, inner sep=5pt]
+    \tikzstyle{smallprocess} = [draw, rectangle, minimum width=2.5cm, minimum height=1cm, text centered, text width=2.2cm, fill=white, rounded corners=5,thick]
     \tikzstyle{arrow} = [->, >=stealth, thick]
-    \node (step1) [process, fill=red!30] {Common root folder
-    \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
-    \node (main) [smallprocess, fill=red!20] {main.adb};
-    \node (lib) [smallprocess, fill=red!20, right of=main, xshift=1cm] {lib.rs};
+    \node (step1) [process, fill=color1bg_fill] {Common root folder 
+    \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=10pt]
+    \node (main) [smallprocess, fill=color2bg_fill] {main.adb};
+    \node (lib) [smallprocess, fill=color2bg_fill, right of=main, xshift=1cm] {lib.rs};
     \end{tikzpicture}
     };
-    \node (step2) [process, below of=step1,fill=orange!30] {Compile SPARK main};
+    \node (step2) [process, below of=step1,fill=color3bg_fill] {Compile SPARK main};
     \node (step3) [process, ,fill=orange!20, below of=step2] {Compile Rust lib as static lib};
-    \node (step4) [process, fill=yellow!30, below of=step3] {Control consistency};
-    \node (step5) [process, fill=yellow!30, below of=step4] {Link Ada and Rust objects};
- 
+    \node (step4) [process, fill=color4bg_fill, below of=step3] {Control consistency};
+    \node (step5) [process, fill=color5bg_fill, below of=step4] {Link Ada and Rust objects};
     \draw [arrow] (step1) -- (step2) node[midway, right] {gcc -O0};
     \draw [arrow] (step2) -- (step3) node[midway, right] {rustc staticlib};
     \draw [arrow] (step3) -- (step4) node[midway, right] {gnatbind};
     \draw [arrow] (step4) -- (step5) node[midway, right] {gnatlink SPARK, Rust and system libs};
-\end{tikzpicture}}
+\end{tikzpicture}
 \caption{Process for SPARK code using Rust library}
 \label{fig:sparkbuild}
-\end{figure}
+\end{figure*}
+\FloatBarrier
 
 \section{Build systems Rust to Ada}
 An entire Rust project was built with \texttt{cargo new <proj>}, the Rust packet manager. Then a library project was built inside the Rust project with \texttt{alire}, the GNAT packet manager \texttt{alr init --lib <newlib>}. The library path is provided to the Rust \texttt{build.rs} file. This approach requires some familiarity with Rust and Ada packet managers.
 Even in this case, we made the build fail if one step is not successful, to avoid to inadvertently run an experiment with an old version of the library.
 
-\begin{figure}[ht!]
+\begin{figure*}[ht!]
 \centering
-\scalebox{0.8}{
-    \begin{tikzpicture}[node distance=2.5cm, font=\small]
-    \tikzstyle{process} = [draw, rectangle, minimum width=6cm, minimum height=1cm, text centered, text width=5.5cm, fill=white, rounded corners=10,thick]
+    \begin{tikzpicture}[node distance=2.8cm, font=\small]
+    \tikzstyle{process} = [draw, rectangle, minimum width=6cm, minimum height=1.5cm, text centered, text width=5.5cm, fill=white, rounded corners=10,thick]
     \tikzstyle{smallprocess} = [draw, rectangle, minimum width=3.5cm, minimum height=0.8cm, text centered, text width=3.2cm, fill=white, rounded corners=5,thick]
     \tikzstyle{arrow} = [->, >=stealth, thick]
-        \node (step1) [process, fill=red!30] {Cargo project \
+        \node (step1) [process, fill=color1bg_fill] {Cargo project \
         \begin{tikzpicture}[font=\footnotesize, scale=0.2, inner sep=2pt]
-        \node (lib.adb) [smallprocess, fill=red!20] {lib.adb};
+        \node (lib.adb) [smallprocess, fill=color2bg_fill] {lib.adb};
         \end{tikzpicture}
         };
-        \node (step2) [process, below of=step1,fill=orange!30] {Load SPARK project file with gpr crate};
-        \node (step3) [process, ,fill=orange!20, below of=step2] {Build SPARK project with gprbuild command};
-        \node (step4) [process, fill=yellow!30, below of=step3] {Generate linker search path and flags for Cargo};
-        \node (step5) [process, fill=yellow!20, below of=step4] {Output "rerun-if-changed" directive for Cargo};
-        \node (step6) [process, fill=brown!20, below of=step5] {Build and link Rust executable};
-        
+        \node (step2) [process, below of=step1,fill=color3bg_fill] {Load SPARK project file with gpr crate};
+        \node (step3) [process, ,fill=color4bg_dark_fill, below of=step2] {Build SPARK project with gprbuild command};
+        \node (step4) [process, fill=color4bg_fill, below of=step3] {Generate linker search path and flags for Cargo};
+        \node (step5) [process, fill=color5bg_fill, below of=step4] {Build and link Rust executable};
         \draw [arrow] (step1) -- (step2) node[midway, right] {cargo run + path to LD\_LIBRARY\_PATH};
         \draw [arrow] (step2) -- (step3) node[midway, right] {Call gprbuild};
         \draw [arrow] (step3) -- (step4) node[midway, right, align=center] {Extract library directory \\ and name from project object};
-        \draw [arrow] (step4) -- (step5) node[midway, right] {Iterate over source directories};
-        \draw [arrow] (step5) -- (step6) node[midway, right, , align=center] {Use linker search path and flags \\ to build and link executable};
-    \end{tikzpicture}}
+        \draw [arrow] (step4) -- (step5) node[midway, right,  align=center] {Use linker search path and flags \\ to build and link executable};
+    \end{tikzpicture}
 \caption{Process for Rust code building a SPARK library}
 \label{fig:rustbuild}
-\end{figure}
-Efforts were put into going away from in between C types and going away from C as a protocol.
+\end{figure*}
+\FloatBarrier
 % \textcolor{black}{black} {\color{black} \rule{\linewidth}{1mm} }
 
 % Include an example of using nomenclature

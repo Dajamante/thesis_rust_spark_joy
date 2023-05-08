@@ -217,12 +217,26 @@
 %#c44601, #ffffff
 %#008e4a, #000000
 %#026526, #ffffff
+%https://latex-tutorial.com/color-latex/
 \definecolor{color1bg}{HTML}{1954a6}
-\definecolor{color2bg}{HTML}{24a0d8}
-\definecolor{color3bg}{HTML}{d85497}
-\definecolor{color4bg}{HTML}{b0c92b}
-\definecolor{color5bg}{HTML}{63666a}
+\colorlet{color1bg_fill}{color1bg!30!white}
+\colorlet{color1bg_dark_fill}{color1bg!90!white}
 
+\definecolor{color2bg}{HTML}{24a0d8}
+\colorlet{color2bg_fill}{color2bg!30!white}
+\colorlet{color2bg_dark_fill}{color2bg!90!white}
+
+\definecolor{color3bg}{HTML}{d85497}
+\colorlet{color3bg_fill}{color3bg!30!white}
+\colorlet{color3bg_dark_fill}{color3bg!90!white}
+
+\definecolor{color4bg}{HTML}{b0c92b}
+\colorlet{color4bg_fill}{color4bg!30!white}
+\colorlet{color4bg_dark_fill}{color4bg!90!white}
+
+\definecolor{color5bg}{HTML}{63666a}
+\colorlet{color5bg_fill}{color5bg!30!white}
+\colorlet{color5bg_dark_fill}{color5bg!90!white}
 
 \pgfplotscreateplotcyclelist{rustcolors}{
   {color1bg,mark=none, pattern=
