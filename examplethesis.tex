@@ -744,7 +744,6 @@ I would like to thank Cyrille for accepting to be my supervisor in the current p
 %\newpage
 At the time of writing, Rust is still a relatively new programming language with a growing community (12 years old in 2023). Ada and SPARK have an established reputation in the safety-critical industry. Both languages provide \gls{memory-safety} guarantees through their \gls{ownership}-based paradigm. While there exist many frameworks and guidelines to combine both safe languages with C/C++ through \gls{foreign-function-interface}, there is little research or framework on how to effectively combine those two memory-safe languages to fully benefit from their strength and avoid pitfalls that can happen when using \glsxtrshort{FFI}. As our world becomes more interconnected, exploring the challenges of combining Rust and SPARK to provide clear recommendations for safe bindings is a timely and valuable contribution to the field of software security, systems programming, embedded and \gls{IoT}, and \gls{safety-critical} systems.
 
-All of the terms used in this introduction can be found in \Cref{sec:introductiongloss} on page \pageref{sec:introductiongloss}.
 
 \section{Background}
 \label{sec:background}
@@ -772,7 +771,8 @@ In a very widely cited blog article on memory safety issues in large code bases 
 
 Gaynor provides other examples; however, the range of 65 to 70\% is consistent with academic literature\,\cite{mergendahl_cross-language_2022,scherer_engineering_2021, li_improving_2014}) and security blogs, such as the \gls{NSA} Software Memory Safety report published in 2022\,\cite{noauthor_nsa_2022}, or security white papers and software security books, such as~\cite{chapman_adacore_2018}.
 
-Although some protections are deployed in common systems, such as ``\gls{ig:stack-cookie}, \gls{ig:EHV}, \gls{ig:DEP} and \gls{ig:ASLR}" -- several attack vectors are still effective"\,\cite{szekeres_sok_2013}, and it is impossible to make C/C++ code safe \emph{retroactively}. 
+Although some protections are deployed in common systems, such as stack-cookies (which use an additional random placeholder value on the stack to detect memory changes), exception handler validation (which tests whether an exception is in a list
+of valid handlers before it is executed), data execution prevention (security feature that makes certain areas in memory non-executable), and address space layout randomization (consists in mangling the address space of a vulnerable process like libraries, main, heap, and stack, as well as memory-mapped files), several attack vectors are still effective"\,\cite{szekeres_sok_2013}, and it is impossible to make C/C++ code safe \emph{retroactively}. 
 
 \subsection{Challenges to designing secure software}
 
@@ -796,24 +796,8 @@ The authors\,\cite{moy_when_2020} report security incidents which brought down A
 
 Scherer\,\cite{scherer_engineering_2021} reports successful attacks against ``train schedule systems, entire energy grids, hospital networks, vehicular control software, and even critical aircraft systems". Scherer notes that security needs to be built into the software development process instead of being an add-on or an afterthought. Scherer also notes the ``continuously increasing rate of bugs with increasing project size amongst other factors in long-lived projects" and ``a slow turnaround time" for software improvement (1 to 10 years) causes problems to pile up.
 
-\subsection{Exploitation: Not if, but when}
-\label{sec:exploitationwhen}
+Regarding security, the software developer also faces a series of asymmetries\,\cite{chapman_adacore_2018}, in capability (the attackers skills do not grow linearity), in efforts, knowledge and impact (the destructive impact of security failures are unpredictable). Scherer notes that any defect is guaranteed to be exploited when discovered as malicious actors systematically screen for issues. As a result, the risk that said defect is found the attacker is much higher than detection during testing\,\cite{scherer_engineering_2021}.
 
-\todoinline{put in related works}
-In addition to complexity, Chapman and Moy\,\cite{chapman_adacore_2018} remind us that we evolve in a malicious environment. Writing secure software is equivalent to ``Programming Satan’s computer", as coined by Anderson and Needham: Satan’s computer is rumored to fail intelligently, in the worst possible way and time, and in manners that the programmer does not yet know about. Exploitation techniques are well-known and constantly applied\,\cite{pal_memory_2016}.
-
-Regarding security, the software developer faces a series of asymmetries\,\cite{chapman_adacore_2018}. An asymmetry of capability, meaning that the malicious actors' capabilities do not grow predictably and linearly. An asymmetry of effort: while the programmer has to secure all possible security, the malicious actor needs to find just one to breach the system. Asymmetry of knowledge, which is self-explanatory in the context of the rapid progress of knowledge and technical support. And lastly, an asymmetry of impact, as the impact and destructive impact of a security failure are in principle unpredictable. 
-
-Scherer notes that a defect is guaranteed to be exploited when discovered as malicious actors systematically screen for defects. As a result, ``the chance for a defect to be discovered by the attacker is significantly higher than the randomized detection happening during testing"\,\cite{scherer_engineering_2021}.
-
-
-\subsection{Can we achieve memory safety by using safe languages?}
-\label{sec:CanMemorySafety}
-\todoinline{put in related works}
-
-Unfortunately, the current answer to the question: Can we reach memory safety by using safe languages? Is ``Not quite".
-
-While Mergendahl \etal\,\cite{mergendahl_cross-language_2022}) and organizations such as the \glsxtrfull{NSA}\,\cite{noauthor_nsa_2022} tout safe languages are ``as the solution" and Scherer\,\cite{scherer_engineering_2021} and Evans \etal\,\cite{evans_is_2020} state that language choice has a significant impact on project success and defect rates, as well as reliability, safety, and correctness,  and Skezeres \etal\,\cite{szekeres_sok_2013} recommend avoiding C/C++ for new projects, the current state of software development remains dependent on C/C++ for many reasons (legacy, dependencies, effectiveness, not reinventing the wheel for widely tested libraries, cost, \ldots\  ). But this is an effort in the right direction.
 
 \section{Sustainability considerations}
 
@@ -906,7 +890,7 @@ This thesis will go through manual bindings for increasingly complex types and w
 ~\Cref{ch:background} presents relevant background information about Rust and SPARK, and talks more about memory safety.  
 ~\Cref{ch:relatedworks} discuss related works when it comes to \gls{FFI}.  \Cref{ch:methods} presents the methodology and method used to solve the problem. ~\Cref{ch:resultsAndAnalysis} discuss the outcome of the experiments, and ~\Cref{ch:conclusionsAndFutureWork} present possible expansion of this work.
 
-\section{Terms in the introduction}\label{sec:introductiongloss}
+
 %\setglossarysection{section}
 % The following line removes the glossary title.
 \renewcommand{\glossarysection}[2][]{}
@@ -917,7 +901,6 @@ This thesis will go through manual bindings for increasingly complex types and w
 %title={Terms in the int• The statistic tool is available here.roduction}
 ]
 
-\todoinline{integrate those terms in the intro instead of here}
 
 \cleardoublepage\chapter{Background}
 \label{ch:background}
@@ -1119,18 +1102,22 @@ The literature around the state of software security does  generally agree about
 
 Skezeres \etal\,\cite{szekeres_sok_2013} (in ``SoK: Eternal War in Memory") and Pal \etal\,\cite{pal_memory_2016} (in ``Memory Corruption-Basic Attacks and Counter Measures") define \gls{memory-safety} in terms of protection against \gls{memory-error}s. 
 In the C++ standard, writing out-of-bounds of an array, dereferencing null pointers, or reading uninitialized variables results in undefined behavior. Buffer overflows (writing outside of the allocated space in memory), double-frees (freeing the memory twice), and use after free (accessing a memory that has been freed before) are very common errors\,\cite{szekeres_sok_2013,scherer_engineering_2021}. 
-These errors can be leveraged into full-fledged attacks, as ``every exploit starts by triggering a memory error"\,\cite{szekeres_sok_2013}. The attack process is two-fold. The first is to make a pointer invalid, and the second is dereferencing this invalid pointer. Attackers can exploit either dangling pointers (\ie temporal errors) or an out-of-bound pointer (\ie a spatial error). These attack techniques can be combined and chained for successful exploitation, as illustrated in detail in \Cref{fig:sok}.
+These errors can be leveraged into full-fledged attacks, as ``every exploit starts by triggering a memory error"\,\cite{szekeres_sok_2013}. The attack process is two-fold. The first is to make a pointer invalid, and the second is dereferencing this invalid pointer. Attackers can exploit either dangling pointers (\ie temporal errors) or an out-of-bound pointer (\ie a spatial error). These attack techniques can be combined and chained for successful exploitation. 
+%as illustrated in detail in \Cref{fig:sok}.
 
 \Needspace*{17\baselineskip}
-\subsection{The Memory Wars}.
+\subsection{The `Memory Wars"}.
 
 C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom they give to the programmer. Szekeres \etal\,\cite{szekeres_sok_2013} call the \gls{memory-corruption} bugs in low-level languages ``one of the oldest problems" in security. Memory errors have been exploited for 30 years, while real-world exploits prove that protections can always be defeated. The authors established that not only does a completely secure system not exist, but protection mechanisms never achieve wide adoption by the software engineering community. The reason is that protection mechanisms present a significant overhead, in terms of performance (\eg garbage collectors are costly in systems relying on speed, not even to mention changing the programming language, and the trade-off is not worth the benefit of the protection) or more simply the cost of replacing billions of lines of existing C/C++ is too expensive. According to Skezeres \etal\,\cite{szekeres_sok_2013} the issues may be that the protection is not robust enough or there exist problems of incompatibility with legacy code and dependencies.
 
-\begin{figure}[!ht]  \centering 
+\begin{comment}
+  \begin{figure}[!ht]  \centering 
 \includesvg[inkscapelatex=false, scale=0.4]{figures/figuressvg/redrawn_memory_attack.svg}
 \caption{Redrawn figure}
 \end{figure}
-\FloatBarrier
+\FloatBarrier  
+
+
 
 
 \begin{sidewaysfigure}[!ht]
@@ -1141,7 +1128,7 @@ C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom 
   \caption[Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,]{Attack model demonstrating four exploit types and policies mitigating the attacks in different stages by Szekeres \etal\,\cite{szekeres_sok_2013}  \textcopyright2013 IEEE}
   \label{fig:sok}
 \end{sidewaysfigure}
-
+\end{comment}
 
 To mitigate these problems, various tools have been introduced\,\cite{mergendahl_cross-language_2022}. Dynamic analysis tools observe the program while it is running, while static analysis tools analyze the source code. Such tools are for example Valgrind, sanitizers (dynamic analysis), or the Clang static analyzer. Even if writing analysis tools is, to say the least, ``non-trivial"\,\cite{scherer_engineering_2021}, some authors studied in the frame of this thesis wrote their own (FFIChecker by Li \etal\,\cite{li_detecting_2022} and Scherer who participated to the project Miri\,\cite{noauthor_miri_2023}). Tools have limitations: dynamic analysis tools are time-consuming and specific to the input, and static analysis tools have false positives\,\cite{li_improving_2014}.
 Unfortunately, those tools provide very limited protection, in part because the software engineering community is facing professionalization and an increase in complexity from the attacking side\,\cite{scherer_engineering_2021, chapman_adacore_2018}. 
@@ -1304,8 +1291,6 @@ This chapter provides an overview of the research method and experimentation, as
 %\Cref{sec:methodBBQueue} covers our work on BBQueue. Finally, Section~\ref{sec:systemDocumentation}
 %describes the system to ensure reproducibility.
 
-
-\todoinline{ADD a section to detail the experiments on BBQueue later when it comes to that.}
 \section{Research Process}
 \label{sec:researchProcess}
 
@@ -1883,36 +1868,28 @@ Other tools we tried were \texttt{FFI-checker}\cite{li_detecting_2022}, \texttt{
 For some types that are copy, we used graphs generators to visualize control flow.
 
 
-\section{Environment}
-
-The environment is fairly complex as it needs to function for Rust and SPARK in interaction. A  Dockerfile was prepared for this usage (more details in \Cref{sec:systemDocumentation}).
-
-
 \section{System documentation}
 \label{sec:systemDocumentation}
-%\sweExpl{Systemdokumentation\\
-%Med vilka dokument och hur skall en konstruerad prototyp dokumenteras? Detta blir ofta bilagor till rapporten och det som problemägaren till det ursprungliga problemet (industrin) ofta vill ha.\\
-%Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
-%\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
 
 \begin{itemize}
-    \item Control studies and BBqueue experiments are available are grouped in this \href{https://github.com/Dajamante/ada_rust_programs}{repository}.
-    \item The statistic tool is available \href{https://github.com/Dajamante/stat_ada_rust_code}{here}.
-    \item SPARK BBqueue is available \href{https://github.com/Fabien-Chouteau/bbqueue-spark}{https://github.com/Fabien-Chouteau/bbqueue-spark}.
-    \item BBqueue in Rust is available in its \href{https://github.com/jamesmunns/bbqueue}{official} and \href{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}{FFI safe version}.
+    \item Control studies and BBqueue experiments: 
+        \url{https://github.com/Dajamante/ada_rust_programs}.
+    \item Statistic tool : 
+        \url{https://github.com/Dajamante/stat_ada_rust_code}.
+    \item SPARK BBqueue 
+        \url{https://github.com/Fabien-Chouteau/bbqueue-spark}.
+    \item Official Rust BBQueue 
+        \url{https://github.com/jamesmunns/bbqueue}
+    \item FFI safe Rust BBQueue
+        \url{https://github.com/tosc-rs/mnemos/tree/main/source/abi/src/bbqueue_ipc}.
 \end{itemize}
-%gpr-rust
 
-%statistic code
-
-%control study
 \cleardoublepage
 \chapter{Experiments}
 \label{ch:whatYouDid}
 
 \section{Presentation of experiments}
 
-%What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?
 
 This section describes both control studies and real-world implementation with BBQueue, intending to provide final recommendations for FFI bindings between Rust and SPARK, while the code is available in \Cref{sec:systemDocumentation}. 
 
@@ -1963,7 +1940,7 @@ The experiments covered:
 
 We run \texttt{valgrind} to show both sound bindings and bindings which have intentional memory leaks, as a demonstration.
 
-\section{Tables of experiments}
+\section{List and description of experiments}
 
 
 \begin{table}[ht!]
@@ -2044,17 +2021,8 @@ ada\_string\_overwriter & Sending and accessing String created in SPARK, with de
 \todoinline{\href{https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=c9e4d27feaf842c54d9ffc2e5557b1f7}{link to enum stuff}}
 \section{BBqueue}
 
-The BBqueue experiments consisted in testing the "lesson learned" form the control study to understand and model a more complex object.
-
-The work was divided in smaller steps.
-
-\begin{itemize}
-    \item Analysing data structures and implementations on both Rust and SPARK sides
-    \item Using Rust, and getting the official version of BBqueue, sending and receiving some data in one thread and multiple threads.
-    \item Switching to the unofficial, FFI-safe, bbqueue\_ipc, modifying stack-allocated data. 
-    \item  Process to FFI exchanges with SPARK
-\end{itemize}
-
+The BBqueue experiments consisted in testing the `lesson learned" form the control study to understand and model a more complex object. The work was divided in smaller steps. Firstly, we looked at data structures and algorithm implementations on both Rust and SPARK sides. Secondly, we tested the Rust official version of BBQueue for single-threading and multi-threading usage. Thirdly, we switched to the unofficial, FFI-safe, bbqueue\_ipc implementation, modifying stack-allocated data. 
+Finally, we proceeded to the \glsxtrshort{FFI} implementation with SPARK.
 
 \cleardoublepage
 \chapter{Results and Analysis}
@@ -2062,19 +2030,14 @@ The work was divided in smaller steps.
 
 The experiments (control study and more complex items passing) carried on during this thesis were useful to provide a set of recommendations for creating automated binding tools, for languages with richer types than C, while preserving type safety and ownership. Manual binding allows full control over layout and alignment, to explore safety issues.
 
-\section{Major results}
+%Secure languages have strong expectations and passing data structures is complicated.
+%The compiler behaviour is also crucial when passing data. To guarantee consistent behavior between Rust and SPARK, we recommend using the GNAT compiler. 
+%We came through guidelines an automated tool would need to implement.
 
-Secure languages have strong expectations and passing data structures is complicated.
-The compiler behaviour is also crucial when passing data. To guarantee consistent behavior between Rust and SPARK, we recommend using the GNAT compiler. 
-
-
-We came through some guidelines an automated tool would need to implement:
-
-
-\subsection{Stack types}
-\subsubsection{Numbers}
+\section{Stack types}
+\subsection{Numbers}
 \label{sec:numbers}
-Numbers are straightforward to work with, provided that an appropriate type is provided. As numbers are copy, there is no need to ensure ownership. 
+Numbers are straightforward to work with, provided that the appropriate type is provided. As numbers are copy, there is no need to ensure ownership. 
 
 Consistency must be ensure between Rust and Ada/SPARK types: Rust types are explicit about their size (e.g., \texttt{u64, i32}). Corresponding Ada/SPARK types must be the same size to avoid unexpected results, such as garbage being read. For SPARK, the necessary information is found in the compiler documentation\footnote{\href{https://docs.adacore.com/gnat_rm-docs/html/gnat_rm/gnat_rm/implementation_defined_characteristics.html}{GNAT compiler documentation.}}
 For instance, the GNAT reference manual states that the Integer type in Ada/SPARK is 32-bit signed, which corresponds to \texttt{i32} in Rust. This is not necessarily true if using another compiler.
@@ -2085,7 +2048,7 @@ Numbers are well-behaved and can be passed by copy or reference. There is no nee
 
 %4. While SPARK verification (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
 
-\subsubsection{Enums}
+\subsection{Enums}
 
 The primitive representations of fieldless enums set the size and alignment to be the same as the primitive type of the same name. \texttt{\#[repr(C)]} will guarantee the same layout as expected from C, but \texttt{\#[repr(u*)]}, with * being a number that covers the number of variants, is a better way to represent this structure. All variants will be resolved to a tag and can be passed simply. The enum must be reconstructed on the other side and can be accessed.
 \begin{comment}
@@ -2104,13 +2067,13 @@ type TwoEnum is (One, Two);
 
 It is recommended to not give fieldless enums sizes. this is unecessary and giving different sizes will end up in reading garbage.
 
-\subsubsection{Arrays}
+\subsection{Arrays}
 
 Sized arrays can be passed by copy or reference. The size of the elements must be indicated on the side that is receiving the object, as described in \Cref{sec:numbers}.
 
-\subsection{Heap types and pointers}
+\section{Heap types and pointers}
 
-This subsection examines pointers. Ada/SPARK access types and Rust references are fat pointers. They carry more information and have more assumptions than in the C language. This information must be carried appropriately throughout the FFI barrier. In those experiments, memory allocation for heap types was not an issue as both Rust\cite{santos_investigating_2022} and SPARK are using \texttt{malloc} on x86\_64.
+Ada/SPARK access types and Rust references are fat pointers. They carry more information and have more assumptions than in the C language. This information must be conveyed appropriately throughout the FFI barrier. In those experiments, memory allocation for heap types was not an issue as both Rust\cite{santos_investigating_2022} and SPARK are using \texttt{malloc} on x86\_64, but we must also underline that some memory regions are inaccessible to \gls{FFI}.
 
 
 In SPARK, pointers have nominal equality instead of structural equality; thus, \inlinecode{type T1 is access Integer} will not be equal to \inlinecode{type T2 is access Integer}, even if both are pointers to Integers. In Ada/SPARK pointers cannot escape as they are protected by their types. Rust references are also protected by their types. In addition there is a guarantee of a single mutable reference \texttt{\&mut T} or several immutable references \texttt{\&T}. References carry several assumptions: \first they are never null and \Second they points always to valid data.
