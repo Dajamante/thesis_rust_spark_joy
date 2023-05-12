@@ -438,7 +438,7 @@ SPARK is a subset of Ada, a programming language with a long track record in saf
 
 Memory-safety bugs in code written in C/C++ account for about \SI{70}{\percent} of major vulnerabilities in the industry, as reported by organizations such as Microsoft, Apple, and Google. While tools to avoid memory errors exist, code cannot be made safe retroactively, which creates a need for languages designed with safety in mind, such as Rust and SPARK. 
 
-Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical, \ldots). This thesis identifies best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how these properties are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
+Combining those two languages is a very promising path for low-level and systems programming, as well as safety-critical applications (automotive, avionics, medical \ldots). This thesis identifies best practices for safe bindings between Rust and SPARK, focusing on ensuring memory safety, type safety, and ownership, and then analyzes how these properties are maintained or transferred. The thesis provides clear recommendations based on control study programs and a real-world example using BBQueue, a circular buffer library suitable for embedded systems implemented in both languages. The identified best practices can be used for safe bindings and automated tools/code generation. 
 
 This thesis fills a gap in existing research, which has primarily focused on the combination of safe and unsafe languages. It provides a valuable contribution to software security and safety-critical systems.
 
@@ -811,18 +811,16 @@ Scherer notes that a defect is guaranteed to be exploited when discovered as mal
 \label{sec:CanMemorySafety}
 \todoinline{put in related works}
 
-Unfortunately, the current answer to the question: Can we reach memory safety by using safe languages? Is ``Yes, but\ldots".
+Unfortunately, the current answer to the question: Can we reach memory safety by using safe languages? Is ``Not quite".
 
 While Mergendahl \etal\,\cite{mergendahl_cross-language_2022}) and organizations such as the \glsxtrfull{NSA}\,\cite{noauthor_nsa_2022} tout safe languages are ``as the solution" and Scherer\,\cite{scherer_engineering_2021} and Evans \etal\,\cite{evans_is_2020} state that language choice has a significant impact on project success and defect rates, as well as reliability, safety, and correctness,  and Skezeres \etal\,\cite{szekeres_sok_2013} recommend avoiding C/C++ for new projects, the current state of software development remains dependent on C/C++ for many reasons (legacy, dependencies, effectiveness, not reinventing the wheel for widely tested libraries, cost, \ldots\  ). But this is an effort in the right direction.
 
 \section{Sustainability considerations}
 
-Sustainability is an important concern while developing technology or advocating for its use. When it comes to the use of programming languages, considering energy consumption is essential and in line with SGD development goals 9 -- Industry, Innovation and Infrastructure --, 12 -- Responsible Consumption and Production -- and 13 -- Climate Action --\cite{noauthor_envision2030_nodate}. As studied by Pereira \etal\,\cite{pereira_energy_2017}, Ada and Rust energy consumption are comparable to C, and both languages are a good choice for energy-conscious development when it comes to various aspects, such as time, memory, and energy usage. This is a point defended by companies such as AWS\,\cite{miller_sustainability_2022}, which pinpoints the increasing demand for data consumption and processing, emerging demand for \glsxtrshort{IoT} and ML applications. Broad adoption of energy-efficient programming languages could greatly reduce the energy consumption of computing by 50\%\cite{miller_sustainability_2022}.
+Sustainability is an important concern while developing technology or advocating for its use. When it comes to the use of programming languages, considering energy consumption is essential and in line with SGD development goals 9 -- Industry, Innovation and Infrastructure --, 12 -- Responsible Consumption and Production -- and 13 -- Climate Action --\cite{noauthor_envision2030_nodate}. As studied by Pereira \etal\,\cite{pereira_energy_2017}, Ada and Rust energy consumption are comparable to C, and both languages are a good choice for energy-conscious development when it comes to various aspects, such as time, memory, and energy usage. This point is defended by companies such as AWS\,\cite{miller_sustainability_2022}, which pinpoints the increasing demand for data consumption and processing, emerging demand for \glsxtrshort{IoT} and ML applications. Broad adoption of energy-efficient programming languages could greatly reduce the energy consumption of computing by 50\%\cite{miller_sustainability_2022}.
 
 \section{Problem}
 \label{sec:problem}
-%\sweExpl{svensk: Problemdefinition eller Frågeställning\\
-%Lyft fram det ursprungliga problemet om det finns något och definiera därefter den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur projektet. }
 
 Research and technical blogs recommend that programmers use memory-safe languages for new projects. They also recommend being extremely careful when using \glsxtrfull{FFI} as the boundary between two programming languages, as assumptions on both sides may not hold. 
 
@@ -841,7 +839,7 @@ What are the best practices for secure bindings between Rust and SPARK code?
 Sub questions: How can we ensure that \first \gls{memory-safety}, \Second \gls{type-safety}, and \third \gls{ownership} are maintained in these bindings?
 
 \subsection{Hypothesis}
-We make the hypothesis that the internal coherency of both languages can be maintained if we can provide recommendations for the safe use of combined Rust/SPARK code.
+We hypothesize that the internal coherency of both languages can be maintained if we can provide recommendations for the safe use of combined Rust/SPARK code.
 
 \subsection{Objectives}
 The tasks must be fulfilled to answer the research question:
@@ -1912,47 +1910,15 @@ The environment is fairly complex as it needs to function for Rust and SPARK in 
 \chapter{Experiments}
 \label{ch:whatYouDid}
 
+\section{Presentation of experiments}
 
 %What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?
 
-This section describes both control studies and real-world implementation with BBQueue, intending to provide final recommendations for FFI bindings between Rust and SPARK. 
+This section describes both control studies and real-world implementation with BBQueue, intending to provide final recommendations for FFI bindings between Rust and SPARK, while the code is available in \Cref{sec:systemDocumentation}. 
 
 
-\section{System}
 
 
-Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
-
-Description: Ubuntu 22.04.1 LTS
-
-Release:	22.04
-
-% the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
-\section[Environment for \& SPARK/Rust experiments]{Environment for SPARK/Rust experiments}
-
-For reproducibility purposes,  \Cref{sec:buildSystems} describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
-\section{Presentation of experiments}
-
-\begin{table}[ht!]
-\footnotesize
-\centering
-\caption{stuff stuff}
-\label{tab:stuffstuff}
-\begin{tabular}{ |p{5cm}|p{5cm}|p{5cm}| }
-\hline
-\rowcolor{color1bg_fill}
-\multicolumn{3}{|l|}{BBQueue (SPARK)} \\
-\hline
-\rowcolor{color1bg_fill}
-\centering Producer (Rust) & \centering Consumer (Rust) & \centering Consumer (Rust) \tabularnewline
-\hline
-1.  Gives space to write bytes. Space is guaranteed to have single ownership and be continuous in memory. Gives a mutable slice to read (continuous in memory), but the custom use is an immutable read. & stuff & stuff\tabularnewline
-\hline
- \textbf{Commit}  Makes memory available to read. & 4.\newline Frees the memory and gives the space back. & stuff \tabularnewline
-\hline
-\end{tabular}
-\end{table}
-\FloatBarrier
 
 \subsection{SPARK to Rust}
 
@@ -1997,6 +1963,85 @@ The experiments covered:
 
 We run \texttt{valgrind} to show both sound bindings and bindings which have intentional memory leaks, as a demonstration.
 
+\section{Tables of experiments}
+
+
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{Experiments from SPARK to Rust}
+\label{tab:fromsparktorust}
+\begin{tabular}{ |p{3cm}|p{4cm}|p{7cm}| }
+%\begin{tabularx}{0.8\textwidth} { 
+%  | >{\raggedright\arraybackslash}X 
+%  | >{\centering\arraybackslash}X 
+%  | >{\raggedleft\arraybackslash}X | }
+% \hline
+\hline
+\rowcolor{color1bg_fill}
+\multicolumn{3}{|c|}{\centering From SPARK to Rust} \\
+\hline
+\rowcolor{color1bg_fill}
+\centering Name & \centering Description & \centering Test or Issue addressed \tabularnewline
+\hline
+adder\_ada & Sending and reading \texttt{Integers} & Sending and accessing scalar types, both by copy and reference. \newline Verifying if the \texttt{in out} annotation functions to pass things by reference \tabularnewline
+\hline
+swap\_ada & Swapping \texttt{in out Integers} by reference & Sending, accessing and manipulating simple data types by reference \tabularnewline
+\hline
+array\_sender & Iteration through an \texttt{Integer} array  & Iterating through a type for which size is known at compile time. \newline Trying to trigger compiler error by going out of bounds (OOB) \newline Introducing sanitizers \texttt{-Z sanitizer=address} on the Rust and \texttt{ -fsanitize=address} on SPARK side. \tabularnewline
+\hline
+fat\_pointer & Sending and accessing composite data type (Struct with String and Integer) & Reconstructing a composite datatype, using layout information. \tabularnewline
+\hline
+print\_enum & Sending and accessing enum with size & Verifying enums behave as expected like Copy types. \newline Comparing \texttt{\#[repr(u8)]} and \texttt{Size => 8}. \tabularnewline
+\hline
+fat\_pointer\_overwrite & Sending and accessing composite data type as above and writing over the sent String & Same as above, but with additional implementation of separation of concerns between pointer logic (FFI side) and business logic (user side) \tabularnewline
+\hline
+mem\_violation & Passing created String type and reading out of bounds & Verifying what happens when an error unwinds across FFI barriers. \tabularnewline
+\hline
+panics & Calling explicitly a Rust \texttt{panic!()} & Same as above. \tabularnewline
+\hline
+p pointer & Passing non-anonymous access type to a \texttt{Struct} with two \texttt{Integer} and increment both fields & Verify that non-anonymous pointers can be passed and received in Rust as references, as anonymous types can be considered local. \tabularnewline
+\hline
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+
+\begin{table}[ht!]
+\footnotesize
+\centering
+\caption{Experiments from Rust to SPARK}
+\label{tab:fromrusttospark}
+\begin{tabular}{ |p{3cm}|p{4cm}|p{7cm}| }
+\hline
+\rowcolor{color2bg_fill}
+\multicolumn{3}{|c|}{\centering From SPARK to Rust} \\
+\hline
+\rowcolor{color2bg_fill}
+\centering Name & \centering Description & \centering Test or Issue addressed \tabularnewline
+\hline
+num\_swapper & Swapping \texttt{Integers} sent by copy & accessing and manipulating simple data types by copy \tabularnewline
+\hline
+ada\_adder & Sending and reading \texttt{Integers} by copy and reference, to read or increment & Sending and accessing scalar types, both by copy and reference. This experiment was also used to analyze the compiler's behavior with miri\footnote{\href{https://github.com/rust-lang/miri/}{miri} is an interpreter for mid-level intermediate representation (MIR) for the rust language. It tests certain types of undefined behavior. It is not available for pure FFI projects}. \tabularnewline
+\hline
+ada\_divider & Passing \texttt{Integers} by copy & Manipulating integers and returning a new copy object. \newline Testing undefined behavior and unwinding a program at the FFI boundaries. \tabularnewline
+\hline
+enum\_sender & Sending and accessing enum with fixed size & Verifying enums behave as expected. \newline Verify enums can be reconstructed on the other side \newline Comparing \texttt{\#[repr(u8)]} and \texttt{Size => 8}. \tabularnewline
+\hline
+array\_sender & Iteration through an array  & Iterating through a type for which size is known at compile time and verify it behaves as expected. The chosen array type was bounded String. \tabularnewline
+\hline
+ada\_forbidden\_mem & Sending \texttt{String} dynamically allocated in different regions and trying to recover them on the Rust side & Understanding where non-anonymous/anonymous access types are allocated in SPARK and what kind of memory pointers are possible to pass.\tabularnewline
+\hline
+num\_allocator & Allocating and deleting \texttt{Integer}s on the heap in SPARK & Managing heap allocated memory according to good FFI citizen principles: the memory owner (allocator) is in charge of the deletion. \tabularnewline
+\hline
+ada\_string\_overwriter & Sending and accessing String created in SPARK, with deallocation managed according to the good FFI citizen principle & Same as above, with some additions: separation of concerns between pointer and user data, and implementing traits that are found in the original Rust String \tabularnewline
+\hline
+\end{tabular}
+\end{table}
+\FloatBarrier
+\todoinline{undefined behavior - do not rely on sanitizers - an automated tool should absolutely check the size of the array}
+
+\todoinline{\href{https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=c9e4d27feaf842c54d9ffc2e5557b1f7}{link to enum stuff}}
 \section{BBqueue}
 
 The BBqueue experiments consisted in testing the "lesson learned" form the control study to understand and model a more complex object.
@@ -2577,6 +2622,7 @@ One of the most important results is that in a time where safe languages are rec
 \cleardoublepage
 \appendix
 \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
+\begin{comment}
 \chapter{Supporting materials}
 \label{sec:supportingMaterial}
 
@@ -2600,9 +2646,25 @@ println!("Lenth of c {}", e.len());
 \caption[BBqueue header in Rust]{BBqueue header in Rust}
 \label{lst:grapheme}
 \end{listing}
+\end{comment}
+
 
 \chapter{Build systems to reproduce experiments}
 \label{sec:buildSystems}
+
+
+\section{System}
+
+Linux 5.19.0-051900-generic \#202207312230 SMP PREEMPT\_DYNAMIC Sun Jul 31 22:34:11 UTC 2022 x86\_64 GNU/Linux
+
+Description: Ubuntu 22.04.1 LTS
+
+Release:	22.04
+
+% the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
+\section[Environment for \& SPARK/Rust experiments]{Environment for SPARK/Rust experiments}
+
+For reproducibility purposes,  \Cref{sec:buildSystems} describes the setup from a high-level perspective while the source code is available in \Cref{sec:systemDocumentation}.
 
 \section{Build systems Ada to Rust}
 
