@@ -1081,11 +1081,8 @@ As an example from AdaCore documentation (\Cref{lstlisting:spark_illegal_transfe
     \label{lstlisting:spark_illegal_transfer}
 \end{listing}
 
+Pointer ownership in SPARK took inspiration from Rust\,\cite{dross_using_2019}, with some differences. In SPARK, only read aliasing is allowed, as per the Concurrent-Read-Exclusive-Write (CREW) model \cite{moy_proof_2019}. SPARK checks the absence of aliasing on write at the call site. Pointer assignment operates as a transfer of ownership, where the source object loses permission to the underlying object as per \Cref{lstlisting:spark_illegal_transfer}. Once ownership is transferred, the original owner is not valid. Begning aliasing, or local handles on data with pointers ``borrow" for read, called \emph{observability}.
 
-Ownership in SPARK is different from ownership in Rust. In SPARK, only read aliasing is allowed, when both names are only used to read the data. Assignment between access (access is the Ada pointer type) operates as a transfer of ownership, where the source object loses permission to the underlying object.
-
-SPARK 2014 has pointers inspired by Rust\,\cite{dross_using_2019}: there is single ownership for pointers, as we can see in the example \Cref{lstlisting:spark_illegal_transfer}. Once ownership is transferred, the original owner is not valid. This effectively avoids aliasing.
-SPARK allows beginning aliasing (the possibility to read) that it calls \textit{observability}.
 
 \subsection{Summary on Rust and SPARK}
 
@@ -1096,7 +1093,7 @@ The concept of type safety and ownership, and why these traits are considered de
 \section{Background: Software Safety}
 \label{sec:software_safety}
 
-The literature around the state of software security does  generally agree about the threats caused by memory-safety issues and the underlying reasons for those threats, namely unsafe languages. 
+The literature around the state of software security generally agrees about the threats caused by memory-safety issues and the underlying reasons for those threats, namely unsafe languages. 
 
 \subsection{Memory safety}
 
@@ -1110,7 +1107,8 @@ These errors can be leveraged into full-fledged attacks, as ``every exploit star
 
 C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom they give to the programmer. Szekeres \etal\,\cite{szekeres_sok_2013} call the \gls{memory-corruption} bugs in low-level languages ``one of the oldest problems" in security. Memory errors have been exploited for 30 years, while real-world exploits prove that protections can always be defeated. The authors established that not only does a completely secure system not exist, but protection mechanisms never achieve wide adoption by the software engineering community. The reason is that protection mechanisms present a significant overhead, in terms of performance (\eg garbage collectors are costly in systems relying on speed, not even to mention changing the programming language, and the trade-off is not worth the benefit of the protection) or more simply the cost of replacing billions of lines of existing C/C++ is too expensive. According to Skezeres \etal\,\cite{szekeres_sok_2013} the issues may be that the protection is not robust enough or there exist problems of incompatibility with legacy code and dependencies.
 
-
+\begin{comment}
+    
   \begin{figure}[!ht]  \centering 
 \includesvg[inkscapelatex=false, scale=0.4]{figures/figuressvg/redrawn_memory_attack.svg}
 \caption{Redrawn figure}
@@ -1129,6 +1127,7 @@ C/C++ are especially susceptible to \gls{memory-error}s, because of the freedom 
   \label{fig:sok}
 \end{sidewaysfigure}
 
+\end{comment}
 
 To mitigate these problems, various tools have been introduced\,\cite{mergendahl_cross-language_2022}. Dynamic analysis tools observe the program while it is running, while static analysis tools analyze the source code. Such tools are for example Valgrind, sanitizers (dynamic analysis), or the Clang static analyzer. Even if writing analysis tools is, to say the least, ``non-trivial"\,\cite{scherer_engineering_2021}, some authors studied in the frame of this thesis wrote their own (FFIChecker by Li \etal\,\cite{li_detecting_2022} and Scherer who participated to the project Miri\,\cite{noauthor_miri_2023}). Tools have limitations: dynamic analysis tools are time-consuming and specific to the input, and static analysis tools have false positives\,\cite{li_improving_2014}.
 Unfortunately, those tools provide very limited protection, in part because the software engineering community is facing professionalization and an increase in complexity from the attacking side\,\cite{scherer_engineering_2021, chapman_adacore_2018}. 
@@ -1383,119 +1382,7 @@ The program counts occurrences of different patterns with Regex in the code base
 
 \texttt{cloc 1.9} counted 26,754 Rust files (1,862 k\gls{LOC}) in popular and qualitative Rust repositories. It covered 504 Ada files in open-source SPARK repositories, totalizing 27 kLOC.
 
-\subsection{Regexes}
-This section covers Rust and SPARK regexes.
-\subsubsection{Rust regexes}
-
-The Rust regex patterns are designed to match type declarations and literals, except for the number pattern. The number pattern focuses on matching numeric literals. Since the Rust compiler is generally efficient at deducing the types, writing a type declaration is generally omitted. The patterns cover the following constructs:
-
-\begin{enumerate}
-    \item Numbers (\verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b|): 
-    
-    Matches integer and floating-point literals, including those with underscores. For example:
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let c = 3.14;
-    \end{minted}
-    \item Enums and Structs (\verb|struct| and \verb|enum|): both \texttt{struct}s and \texttt{enum}s are declared with a keyword. 
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    struct Point {
-        x: f32,
-        y: f32,
-    }
-    enum Color {
-        //...
-    }
-    \end{minted}
-    \item Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|):
-    
-    Matches array literals, excluding array declarations to avoid double matching and overreporting the type. For example, this will be only one match:
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let a : [i32; 5] = [1, 2, 3, 4, 5];  
-    \end{minted}
-    \item References (\verb|&[mut\s]*\w+|): Matches mutable and immutable reference types. It will match \texttt{\&T} and \texttt{\&mut T}.
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let y = &mut x;  
-    \end{minted}
-    \item Heap Types (\verb|Box<[<>]+>| \verb|Rc<[<>]+>|\verb|Arc<[<>]+>|): Matches Box, Rc, and Arc heap-allocated type declarations. For example:
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let boxed_value: Box<i32>
-    \end{minted}
-    \item Dynamic Vectors (\verb|vec!|Vec::new|): 
-    
-    Matches dynamic vector types declaration in Rust and the vec![] macro.
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let v = Vec::new();
-    \end{minted}
-    \item Strings (\verb|String::|.to\_string|format!|): 
-    Matches String creation and manipulation through various methods and macros.
-    \begin{minted}[fontsize=\footnotesize]{rust}
-    let girl_name = "Mouneissa".to_string();
-    \end{minted}
-\end{enumerate}
- 
-\subsubsection{SPARK regexes}
-
-These focus on type declarations.
-The patterns cover the following constructs:
-
-\begin{enumerate}
-    \item Numbers 
-(\verb|: Integer ||| \verb|range \d.. \d| || \verb|is digits|).
-
-This pattern uses Ada keywords for numbers (\texttt{Integer, Float, Modular...}) and matches various numeric types such as integer, float, fixed, decimal, modular, natural, positive, long, and range, but not an array declaration where the type is used for indexing or as the type contained in the array. We choose to proceed differently and list all possible types as SPARK requires initialization. It matches predefined types and custom declarations but not when array of numbers are declared
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    -- matches:
-    X : Integer := 42;
-    Y : Short_Integer := 5;
-    type My_Integer is range -100 .. 100;
-    -- does not match:
-    type Integer_Array is array (1 .. 5) of Integer;
-    \end{minted}
-
-    \item Structs (\verb|type\s\+\w\+\s\+is\s\+record|). This pattern matches record types, which are similar to structs in other languages.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    type Point is record
-        -- ...
-    end record;
-    \end{minted}
-
-    \item Enums: (\verb|type\s\+\w\+\s\+is\s\+\(|). Matches enumeration types in SPARK.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    type Color is (Red,Orange,Green);
-    \end{minted}
-
-    \item Arrays: (\verb|type\s+[a-zA-Z\_]+\s+is\s+array\s*(\d+)|). Matches array declarations.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    type Int_Array is array (1 .. 10) of Integer;
-    \end{minted}
-
-    \item Dynamic Vectors: (Combines \verb|range <>|, \verb|Containers.Vector| and \verb|Containers|).
-This pattern matches unconstrained arrays and instances of the Containers.Vector package.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    type Int_Vector is array (Integer range <>) of Integer;
-    \end{minted}
-
-    \item References: (Combines: \verb|type\s+\w+\s+is\s+access\s+\w+| and \verb|new\s+\w+)|). This pattern matches access types (pointers) and memory allocations using 'new'.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    type Int_Ptr is access Integer;
-    \end{minted}
-
-    \item Unbounded Strings: (\verb|Strings.Unbounded|). This matches unbounded strings from the Ada.Strings.Unbounded package.
-
-    \begin{minted}[fontsize=\footnotesize]{ada}
-    S : Unbounded_String;
-    begin
-    S := "Some string";
-    \end{minted}
-\end{enumerate}
-
- 
+The detailed list of regexes used for statistics is available in \Cref{sec:regexes}.
 
 \subsection{Reliability and validity of the statistics}
 
@@ -1574,15 +1461,18 @@ tokio & Non-blocking platform for asynchronous I/O backed applications & \#1df87
 
 \subsection{Results}
 
-When looking at types per project, we can see that the rust compiler is almost 5 times bigger than crates.io and lib.rs combined (\Cref{fig:barplottypesrust}). We have 172 k\gls{LOC} for lib.rs,  171 kLOC for crates.io and 1,518 kLOC in the rust compiler, but the repartition is quite similar with a domination of numbers \Cref{fig:stackedrust}. 
+When looking at types per project, the rust compiler is almost 5 times bigger than crates.io and lib.rs combined.
+%(\Cref{fig:barplottypesrust}). 
+lib.rs is 172 k\gls{LOC}, crates.io is 171 kLOC and the compiler is 1,518 kLOC, but the type repartition is similar \Cref{fig:stackedrust}. 
 
-As we can see, numbers (Integers and Float) dominate the statistics \Cref{fig:repartitionrust}, which allows replying to the subsidiary research question: both numbers and references need to be tested when binding Rust and SPARK.
+As we can see, numbers dominate the statistics \Cref{fig:repartitionrust} followed by references, which allows replying to the subsidiary research question: both numbers and pointers need to be tested when binding Rust and SPARK.
 
-The numbers size is known at compile time. They are expressive in their type and protected against overflow\footnote{The compiler warns against risks of overflow}. 
-This confirms that Rust is used as a low-level, systems programming language. 
+A number size is known at compile time. They are expressive in their type and protected against overflow\footnote{The compiler warns against risks of overflow}. This confirms that Rust is used as a low-level systems programming language. 
 
-The second most common category are references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system -- they are like pointers, but guarantee a valid owner -- and are used in a fourth of the cases. Logically, heap types account for a minority of types.
+The second most common category is references, \inlinecode{\&mut T} and \inlinecode{\&T}. References are a key element of Rust's ownership system -- to the difference of pointers, references guarantee a valid ``owner" to the data-- and are used in a fourth of the cases. 
+%Logically, heap types account for a minority of types.
 
+\begin{comment}
 \pgfplotstableread{
 Rust_type crates_io lib_rs rustc
 Numbers  44715 22470 305087
@@ -1632,7 +1522,7 @@ String  445 1363 18613
 %https://tex.stackexchange.com/questions/188147/how-to-put-legend-below-the-chart
 \clearpage
 
-
+\end{comment}
 
 
 \pgfplotstableread{
@@ -1862,11 +1752,11 @@ BBqeue is a BipBuffer, which is a circular buffer commonly used in embedded syst
 
 The data structure uses pointers that simulates a circular buffer connected end to end, even if the underlying buffer is of course a fixed size buffer of size N (decided by the user.)  
 
-It has a series of atomic pointers to for both safety and efficiency. Atomic variables ensure thread safety and permit concurrency, as two threads should never access the same memory chunks at the same time. The atomic pointers track where data should be written and where it should be read from. It also has extra pointers for inverted condition (when the write mark is before the read), a watermark to ensure continuity of the written data (making the queue wrap around if there is not enough space at the end of the buffer).  The write operation is in charge of write and watermark pointers, and the read operation is in charge the read pointer. It also has atomic variables to indicate read/write in progress, returning errors to be handled. More information are available from \cite{chouteau_rust_2021, munns_design_2019}.
+It has a series of atomic pointers to for both safety and efficiency. Atomic variables ensure thread safety and permit concurrency, as two threads should never access the same memory chunks at the same time. The atomic pointers track where data should be written and where it should be read from. It also has extra pointers for inverted condition (when the write mark is before the read), a watermark to ensure continuity of the written data (making the queue wrap around if there is not enough space at the end of the buffer).  The write operation is in charge of write and watermark pointers, and the read operation is in charge the read pointer. It also has atomic variables to indicate read/write in progress, returning errors to be handled. More information is available from \cite{chouteau_rust_2021, munns_design_2019}.
 
 \section{Summary}
 
-This chapter presented the selection of types, the libraries on which statistics were carried on as well as the regexes used for said statistics. In addition, this chapter contains a high-level presentation of the BBqueue library as well as its algorithm.
+This chapter presented the selection of types, the libraries on which statistics were carried on, and the regexes used for said statistics. In addition, this chapter contains a high-level presentation of the BBqueue library and its algorithm.
 
 \cleardoublepage
 \chapter{Experiments}
@@ -1875,12 +1765,12 @@ This chapter presented the selection of types, the libraries on which statistics
 \section{Presentation of experiments}
 
 This section describes both control studies and real-world implementation with BBQueue, intending to provide final recommendations for FFI bindings between Rust and SPARK. The experiments are listed in \Cref{tab:listexperiments}
-while the github links to the code is available in \Cref{sec:systemDocumentation}. 
+while the GitHub links to the code are available in \Cref{sec:systemDocumentation}. 
 
 \section{List and description of experiments}
 \label{tab:listexperiments}
 
-\Cref{tab:fromsparktorust} and \Cref{tab:fromrusttospark} list the control studies and the behaviour being tested. The experiment in BBQueue gathers the lessons learned from control studies.\Cref{sec:experimentstack} describe our focus with types allocated on the stack, and \Cref{sec:experimentsheap} describe our focus for dynamically allocated types.
+\Cref{tab:fromsparktorust} and \Cref{tab:fromrusttospark} list the control studies and the behaviour being tested. The experiment in BBQueue gathers the lessons learned from control studies. \Cref{sec:experimentstack} summarize the experiments's goals for stack-allocated types, and \Cref{sec:experimentsheap} covers the heap-allocated types.
 
 \begin{table}[ht!]
 \footnotesize
@@ -1888,11 +1778,6 @@ while the github links to the code is available in \Cref{sec:systemDocumentation
 \caption{Experiments from SPARK to Rust}
 \label{tab:fromsparktorust}
 \begin{tabular}{ |p{3cm}|p{4cm}|p{7cm}| }
-%\begin{tabularx}{0.8\textwidth} { 
-%  | >{\raggedright\arraybackslash}X 
-%  | >{\centering\arraybackslash}X 
-%  | >{\raggedleft\arraybackslash}X | }
-% \hline
 \hline
 \rowcolor{color1bg_fill}
 \multicolumn{3}{|c|}{\centering From SPARK to Rust} \\
@@ -1900,23 +1785,23 @@ while the github links to the code is available in \Cref{sec:systemDocumentation
 \rowcolor{color1bg_fill}
 \centering Name & \centering Description & \centering Test or Issue addressed \tabularnewline
 \hline
-adder\_ada & Sending and reading \texttt{Integer}s & Sending and accessing scalar types, both by copy and reference. \newline Verifying if the \texttt{in out} parameter annotation can be safely used to pass objects by reference to Rust \tabularnewline
+adder\_ada & Sending and reading \texttt{Integer}s & Sending and accessing scalar types by copy and reference. \newline Verifying if the \texttt{in out} parameter annotation can be used to pass objects, which value is initialy defined, by reference to Rust as in a usual SPARK/Ada subprogram \tabularnewline
 \hline
-swap\_ada & Swapping \texttt{in out Integer}s by reference & Sending, accessing and manipulating simple data types by reference \tabularnewline
+swap\_ada & Swapping \texttt{in out Integer}s by reference & Sending, accessing and manipulating simple data types by reference, still using \texttt{in out} and without declaring a new access type \tabularnewline
 \hline
-array\_sender & Iteration through an \texttt{Integer} array  & Iterating through a type for which size is known at compile time. \newline Triggering compiler error by going out of bounds (OOB). \newline Introducing sanitizers \texttt{-Z sanitizer=address} on the Rust and \texttt{ -fsanitize=address} on SPARK side. \tabularnewline
+array\_sender & Iteration through an \texttt{Integer} array  & Iterating through a type for which size is known at compile time. \newline Triggering compiler error by going out of bounds (OOB). \newline Introducing sanitizers \texttt{-Z sanitizer=address} on the Rust and \texttt{ -fsanitize=address} on SPARK side to test for undefined behaviour. \tabularnewline
 \hline
-fat\_pointer & Sending and accessing composite data type (Struct with String and Integer) & Reconstructing a composite datatype, using layout information provided by the compiler. \tabularnewline
+fat\_pointer & Sending and accessing composite data type (\texttt{Struct} with \texttt{String} and \texttt{Integer}) & Reconstructing a composite datatype, using layout information provided by the compiler. \tabularnewline
 \hline
 print\_enum & Sending and accessing \texttt{enum}s with a given size & Verifying \texttt{enum}s behave as expected (as \gls{copy-type}). \newline Comparing Rust's \texttt{\#[repr(u8)]} and SPARK \texttt{Size => 8}. \tabularnewline
 \hline
-fat\_pointer\_overwrite & As above, sending and accessing composite data type and writing over the sent \texttt{String} & Same as above, but with additional implementation of separation of concerns between pointer logic (FFI side hidden from user) and business logic (user side) \tabularnewline
+fat\_pointer\_overwrite & As above, sending and accessing composite data type and writing over the sent \texttt{String} & Same as above, but with additional implementation of separation of concerns between pointer logic (\glsxtrshort{FFI} side hidden from user) and business logic (user side) \tabularnewline
 \hline
-mem\_violation & Passing created \texttt{String} type and reading OOB & Verifying what happens when an error unwinds across FFI frontier. \tabularnewline
+mem\_violation & Passing created \texttt{String} type and reading OOB & Verifying what happens when an error unwinds across the FFI frontier. \tabularnewline
 \hline
 panics & Calling explicitly a Rust \texttt{panic!()} & Same as above. \tabularnewline
 \hline
-p pointer & Passing non-anonymous access type to a \texttt{Struct} with two \texttt{Integer} and increment both fields & Verify that non-anonymous pointers can be passed and received in Rust as references, as anonymous types can be considered local. \tabularnewline
+p pointer & Passing non-anonymous access type to a \texttt{Struct} with two \texttt{Integer} and increment both fields & Verify that non-anonymous pointers can be passed and received in Rust as references, and study the behaviour of anonymous access types. \tabularnewline
 \hline
 \end{tabular}
 \end{table}
@@ -1930,13 +1815,13 @@ p pointer & Passing non-anonymous access type to a \texttt{Struct} with two \tex
 \label{tab:fromrusttospark}
 \begin{tabular}{ |p{3cm}|p{4cm}|p{7cm}| }
 \hline
-\rowcolor{color2bg_fill}
+\rowcolor{color1bg_fill}
 \multicolumn{3}{|c|}{\centering From SPARK to Rust} \\
 \hline
 \rowcolor{color2bg_fill}
 \centering Name & \centering Description & \centering Test or Issue addressed \tabularnewline
 \hline
-num\_swapper & Swapping \texttt{Integer}s sent by copy & accessing and manipulating simple data types by copy \tabularnewline
+num\_swapper & Swapping \texttt{Integer}s sent by copy & Accessing and manipulating simple data types by copy \tabularnewline
 \hline
 ada\_adder & Sending and reading \texttt{Integers} by copy and reference & Sending and accessing scalar types, both by copy and reference, to be read or incremented. This experiment was also used to analyze the compiler's behavior with miri\footnote{\href{https://github.com/rust-lang/miri/}{miri} is an interpreter for mid-level intermediate representation (MIR) for the rust language. It tests certain types of undefined behavior. It is not available for pure FFI projects}. \tabularnewline
 \hline
@@ -1948,7 +1833,7 @@ array\_sender & Iteration through an array & Iterating through a type for which 
 \hline
 ada\_forbidden\_mem & Sending \texttt{String} dynamically allocated in different regions and trying to recover the object on the Rust side & Understanding where non-anonymous/anonymous access types are allocated in SPARK and what kind of memory pointers are possible to pass.\tabularnewline
 \hline
-num\_allocator & Allocating and deleting \texttt{Integer}s on the heap in SPARK & Managing heap allocated memory according to good FFI citizen principles: the memory owner (allocator) is in charge of the deletion. \tabularnewline
+num\_allocator & Allocating and deleting \texttt{Integer}s on the heap in SPARK & Managing heap allocated memory according to good FFI citizen principles. Writing appropriate allocation and deallocation functions. \tabularnewline
 \hline
 ada\_string\_overwriter & Sending and accessing String created in SPARK, with deallocation managed according to the good FFI citizen principle & Same as above, with some additions: separation of concerns between pointer and user data, and implementing traits that are found in the original Rust String \tabularnewline
 \hline
@@ -1960,7 +1845,7 @@ ada\_string\_overwriter & Sending and accessing String created in SPARK, with de
 
 \section{Experiments on stack-types}
 \label{sec:experimentstack}
-A series of experiments were conducted on scalar and aggregate types\footnote{A scalar type is a type that can hold a single value at a time (\texttt{Integer, Float, enum...}). Conversely, a non-scalar type holds different values (\texttt{array...})}. Scalar types included Integer and arithmetic manipulations (by value and references). Non-scalar types included arrays, structs and fieldless enums where the focus was on how to achieve compatibility and common source of errors.
+A series of experiments were conducted on scalar and aggregate types\footnote{A scalar type is a type that can hold a single value at a time (\texttt{Integer, Float, enum...}). Conversely, a non-scalar type holds different values (\texttt{array...})}. Scalar types included Integer and arithmetic manipulations (by value and references). Non-scalar types included arrays, structs and fieldless enums where the focus was on how to achieve compatibility. Errors were also explored.
 
 Those experiments demonstrated how to perform sound and safe operations with stack-allocated data using \gls{FFI}
 as well as best practices for memory safety and type safety. Ownership was usually not a concern as simple types are \gls{copy-type}.
@@ -1968,46 +1853,52 @@ Various use cases were tested, such as passing integers, arrays, and enums, and 
 
 \begin{itemize}
     \item passing integers by reference and by copy, demonstrating type safety and memory safety as well as memory leaks.
-    \item allocating and deallocating memory through FFI, following the "good FFI citizen principles"\cite{gjengset_rust_2021}: memory must be freed by the appropriate allocator.
+    \item passing composite types with different sizes
     \item passing an aggregate type (array) to a foreign function to calculate a sum, illustrating memory errors in the process.
-     \item passing an aggregate type (enums) to a foreign function to demonstrate the use of repr attributes for FFI-safe enums.
-     \item passing composite types with different sizes
-     \item various memory violations and undefined behavior, demonstrating how the guarantees offered by safe languages do not hold anymore.
+    \item passing an aggregate type (enums) to a foreign function to demonstrate the use of repr attributes for FFI-safe enums.
+    \item allocating and deallocating memory through FFI, following the "good FFI citizen principles"\cite{gjengset_rust_2021}: memory must be freed by the appropriate allocator.   
+    \item testing for various memory violations and undefined behavior, demonstrating how the guarantees offered by safe languages no longer hold.
 \end{itemize}
  
 \section{Experiments on heap types}
 \label{sec:experimentsheap}
 
-The heap-types experiments focused on more complex memory management scenarios, with an emphasis on representing heterogeneous data correctly, meeting layout expectations, and writing to specific locations
+The heap-types experiments focused on more complex memory management scenarios, with an emphasis on representing heterogeneous data correctly, meeting layout expectations, and writing to specific locations.
 %, such as replacing bytes inside a String
-. These experiments demonstrated how to perform safe operations with heap-allocated data while minimizing unsafe code and delegating the operations to the language semantics - such as built-in ownership management. In other words we focused on separation of concerns between the language logic and the memory passing logic.
+These experiments demonstrated how to perform safe operations with heap-allocated data while minimizing unsafe code and delegating the operations to the language semantics - such as built-in ownership management, or separation of concerns between the language logic and the FFI logic.
 
 The experiments covered:
 
 \begin{itemize}
     \item Defining structs to hold complex data types, respecting their layout and alignment.
-    \item Implementing methods/traits for creating, accessing, modifying the complex data types.
+    \item Implementing methods/traits for creating, accessing, modifying complex data types.
     \item Implementing method/traits for dereferencing and dropping when the memory was not needed anymore
     \item Minimizing unsafe code: while still not focusing on defensive code, the unsafe operations were exported to a part of the code where those operations could be delegated to the language semantics.   
 \end{itemize}
 
 
-We run \texttt{valgrind} to show both sound bindings and bindings which have intentional memory leaks, as a demonstration.
+%We run \texttt{valgrind} to show both sound bindings and bindings which have intentional memory leaks, as a demonstration.
 
 
 \section{BBqueue}
 
-The BBqueue experiments consisted in testing the `lesson learned" form the control study to understand and model a more complex object. The work was divided in smaller steps. Firstly, we looked at data structures and algorithm implementations on both Rust and SPARK sides. Secondly, we tested the Rust official version of BBQueue for single-threading and multi-threading usage. Thirdly, we switched to the unofficial, FFI-safe, bbqueue\_ipc implementation, modifying stack-allocated data. 
+The BBqueue experiments consisted in testing the `lesson learned" from the control study to understand and model a more complex object. The work was divided in smaller steps. Firstly, we looked at data structures and algorithm implementations on both Rust and SPARK sides. Secondly, we tested the Rust official version of BBQueue for single-threading and multi-threading usage. Thirdly, we switched to the unofficial, FFI-safe, bbqueue\_ipc implementation, modifying stack-allocated data. 
 Finally, we proceeded to the \glsxtrshort{FFI} implementation with SPARK.
 
+The operations on BBQueue covered the following:
+\begin{itemize}
+    \item Defining structs to hold complex data types, respecting their layout and alignment.
+    \item Implementing methods for sending and accessing complex data types.
+    \item Verifying for type safety (by creating appropriate types), memory safety (with valgrind) and ownership (manual analysis).
+\end{itemize}
 
 \section{Additional tools for debugging and tracking memory usage}
 
-To assess for type safety, memory safety, and ownership, we ran mostly \texttt{valgrind} and \texttt{Rust-san}\footnote{https://github.com/japaric/rust-san}.
-When possible we used \texttt{gnatprove}, even if the tool is not designed for FFI as the prover works on SPARK code, not external code.
+To assess for memory safety, we use \texttt{valgrind} and \texttt{Rust-san}\footnote{https://github.com/japaric/rust-san}.
+When possible we used \texttt{gnatprove} and \texttt{miri}, even if the tools are not designed for FFI. The prover can only cover SPARK code, not external code, and \texttt{miri} is still limited for FFI.
 
-Other tools we tried were \texttt{FFI-checker}\cite{li_detecting_2022}, \texttt{rr}\footnote{https://rr-project.org/} and \texttt{memflow}\footnote{https://github.com/memflow/memflow}. In the end, the existing Rust sanitizers and \texttt{valgrind} proved to sufficient .
-For some types that are \gls{copy-type}, we used graphs generators to visualize control flow. To examine which memory areas were inaccessible, we used \texttt{objdump}.
+Other tools were considered: \texttt{FFI-checker}\cite{li_detecting_2022}, \texttt{rr}\footnote{https://rr-project.org/} and \texttt{memflow}\footnote{https://github.com/memflow/memflow} but \texttt{valgrind} is sufficient.
+For some types that are \gls{copy-type}, we used graph-generators to visualize the control flow. To examine which memory areas were inaccessible, we used \texttt{objdump}.
 
 
 \section{System documentation}
@@ -2034,15 +1925,21 @@ This chapter presents the experiments carried as control study, as well as the o
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
 
-The experiments (control study and more complex items passing) carried on during this thesis were useful to provide a set of recommendations for creating automated binding tools, for languages with richer types than C, while preserving type safety and ownership. Manual binding allows full control over layout and alignment, to explore safety issues.
+The experiments are useful to provide a set of recommendations and insights for creating automated binding tools, for languages with richer types than C, while preserving type safety and ownership. Manual binding allows full control over layout and alignment, to explore safety issues.
 
 %Secure languages have strong expectations and passing data structures is complicated.
 %The compiler behaviour is also crucial when passing data. To guarantee consistent behavior between Rust and SPARK, we recommend using the GNAT compiler. 
 %We came through guidelines an automated tool would need to implement.
 
-\section{Stack types}
+\section{Stack types behaviour}
+\label{stack-types-behaviour}
 
-\todoinline{type safety: for the stack types, the issue encountered could be mostly solved by finding the right types, and verifying the alignment was correct.  the issues can be solved by selection of the right type through the documentation or creation of the right type for nested types. memory type: no issue, ownership: no issue \gls{copy-type} types are taken care of by the compiler}
+Regarding type safety for stack types, the issues encountered can mostly be addressed by identifying the appropriate types and ensuring their size and alignment is correct. As for the process of passing and modifying by reference, it can be implemented seamlessly by using \texttt{\&mut T} or \texttt{\& T} on the Rust side, and \texttt{in out} on the Spark side. This process is considerably smoother than dealing with heap types, which necessitates pure pointer logic.
+
+The challenges regarding type selection can be resolved from the existing documentation (language and compiler) or by creating an appropriate zero-sized wrapper type for nested types. Both Rust and SPARK are well-behaved and previsible when it comes to \gls{copy-type}.
+When it comes to memory safety and ownership, there were no significant problems. Copy types are effectively managed by the compiler, thereby eliminating any potential issues. 
+
+
 \subsection{Numbers}
 \label{sec:numbers}
 Numbers are straightforward to work with, provided that the appropriate type is provided. As numbers are \gls{copy-type}, there is no need to ensure ownership. 
@@ -2052,13 +1949,7 @@ For instance, the GNAT reference manual states that the Integer type in Ada/SPAR
 
 Additionally, the programmer should avoid machine-dependent types when they are unnecessary: types like \texttt{usize} and \texttt{isize} in Rust are machine-dependent and used for indexing rather than counting. When interfacing with SPARK, these types should be replaced with appropriate, non-machine-dependent counterparts to ensure platform compatibility.
 
-Numbers are well-behaved and can be passed by copy or reference. Ownership for numbers is not a concern as those types are \gls{copy-type} in Rust. For Ada/SPARK, it is more nuanced as the compiler chooses to pass the data as it sees fit. We found that the GNAT compiler was reliable and appear to pass the numbers by copy.
-
-\todoinline{verify}
-
-For passing references from Ada/SPARK, it is recommended to use the modifiers \texttt{in out}. In combination with the \texttt{Import/Export} pragma, it guarantees a behaviour similar to C, which is \href{https://en.wikibooks.org/wiki/Ada_Programming/Types/access}{predictable}.
-
-%4. While SPARK verification (pragma and contract based) are lost when interfacing with Rust, we can still implement thick bindings.
+Numbers are well-behaved and can be passed by copy or reference. Ownership for numbers is not a concern as those types are \gls{copy-type} in Rust. For Ada/SPARK, it is more nuanced as the compiler chooses to pass the data as it sees fit. Even if passing by copy is not an issue (with the pragma \texttt{pass\_by\_copy}\footnote{\href{https://docs.adacore.com/live/wave/gnat_rm/pdf/gnat_rm/gnat_rm.pdf}{GNAT documentation, p33}}) it is expected to follow the C convention and pass by reference when bridging the two languages. It guarantees a behavior similar to C, which is \href{https://en.wikibooks.org/wiki/Ada_Programming/Types/access}{predictable}.
 
 \subsection{Enums}
 
@@ -2077,18 +1968,23 @@ type TwoEnum is (One, Two);
 \end{minted}
 \end{comment}
 
-It is recommended to not give fieldless enums sizes. this is unecessary and giving different sizes will end up in reading garbage.
+%It is recommended not to give fieldless enums sizes. this is unnecessary and giving different sizes will end up in reading garbage.
 
 \subsection{Arrays}
 
 Sized arrays can be passed by copy or reference. The size of the elements must be indicated on the side that is receiving the object, as described in \Cref{sec:numbers}.
 
-\section{Heap types and pointers}
+\section{Heap types behaviour}
 
+Regarding type safety, the encountered issues can be largely resolved by identifying the correct data-types documentation as per the previous section on stack types in \Cref{stack-types-behaviour}. However, the matter of memory safety is a bit more intricate. Both the Rust and Spark compilers have their memory safety mechanisms, but these safeguards fail at the FFI boundary as this is not what those mechanisms are there for -- they assume a single language. In the case of non-\gls{copy-type} types, the borrow-checker is not usable anymore and it makes not suitable to use references to existing objects. Instead, it is necessary to work with pure pointers. Nevertheless, some language guarantees can be maintained by separating pointer logic from language logic. Additionally, it's crucial to minimize the unsafe parts to limited parts of the code.
+For ownership concerns, as we default to pointers, we need to adhere to good FFI citizen principles. Once the data has been passed to the other language, we can rely on some language mechanics.
 
-\todoinline{type safety:  the issue encountered could be mostly solved by finding the right types, and verifying the alignment was correct. memory safety: while both compiler provide their own memory safety mechanism, we could not rely on those. It was important to firstly go back to working with pointers and separating pointer logic from language logic, and secondly to limit the unsafe parts to the minimum possible: ownership: we rely on the language as much as possible, we default to the pointer and good ffi citizen for ownership}
+%\todoinline{so the stuff not-null becomes unnecessary since we use pure pointers}
 
-Ada/SPARK access types and Rust references are fat pointers. They carry more information and have more assumptions than in the C language. This information must be conveyed appropriately throughout the FFI barrier. In those experiments, memory allocation for heap types was not an issue as both Rust\cite{santos_investigating_2022} and SPARK are using \texttt{malloc} on x86\_64, but we must also underline that some memory regions are inaccessible to \gls{FFI}.
+It is worth noting that Rust's borrowing behavior is both more flexible and complex compared to Spark's more restrictive approach. SPARK does not use life-times and all information about borrowing/observing must be statistically known\cite{moy_proof_2019}. For instance, Spark assumes ownership of an entire array when passed, prohibiting Rust's slicing. Additionally, memory management is more opaque in Rust than in Spark. Spark allows for the creation of storage pools for object allocation in memory– a feature absent in Rust. Although this allows Spark to make more guarantees and more fine-grained control of memory, we must default to the more restrictive model when bridging the two languages. Even though control studies and experiments with the BBQueue library have shown successful outcomes with the default storage pool and heap, we recommend deferring to the more restrictive model in a more complex experiment, for the sake of consistency and caution.
+
+\subsection{Fat pointers}
+Ada/SPARK access types and Rust references are fat pointers. They carry more information and have more assumptions than in the C language. This information must be conveyed appropriately throughout the FFI barrier. In those experiments, memory allocation for heap types was not an issue as both Rust\cite{santos_investigating_2022} and SPARK are using \texttt{malloc} on x86\_64. Still, we must also underline that some memory regions are inaccessible to \gls{FFI}.
 
 
 In SPARK, pointers have nominal equality instead of structural equality; thus, \inlinecode{type T1 is access Integer} will not be equal to \inlinecode{type T2 is access Integer}, even if both are pointers to Integers. In Ada/SPARK pointers cannot escape as they are protected by their types. Rust references are also protected by their types. In addition there is a guarantee of a single mutable reference \texttt{\&mut T} or several immutable references \texttt{\&T}. References carry several assumptions: \first they are never null and \Second they points always to valid data.
@@ -2209,7 +2105,7 @@ end record;
 \end{listing}
 \FloatBarrier
 
-Again, it was very important to get the types right. One of the unexpected results was that we could not rely on the \&mut T type, despite the apparent guarantees (single ownership, no aliasing). We instead choose a design with a unique owner. Borrowing is a short term solution and should not be passed across FFI borders. Instead we adopted the following design \Cref{tab:stringlogic}, with a Rust-like string facing the user, and a private String with unique pointers that managed communication across the FFI border.
+Again, it was very important to get the types right. One of the unexpected results was that we could not rely on the \texttt{\&mut T} type, despite the apparent guarantees (single ownership, no aliasing) it was providing. \texttt{\&mut T} and \texttt{\&T} should be used in a very limited scope, and in any case not be relied on when bridging two languages, as the life-time guarantees cover only Rust. We instead choose a design with a unique owner. Borrowing is a short term solution and should not be passed across FFI borders. Instead we adopted the following design \Cref{tab:stringlogic}, with a Rust-like string facing the user, and a private String with unique pointers that managed communication across the FFI border.
 
 
 \begin{table}[ht!]
@@ -2328,6 +2224,14 @@ package Not_Ok is
 \end{listing}
 \FloatBarrier
 
+\section{Undefined behavior}
+
+When working with \gls{FFI}, understanding the unique undefined behaviors of each programming language is necessary. In some control studies, errors were deliberately introduced, which sanitizers occasionally rectified. For instance, when reading out of bounds, sanitizers might initialize other memory locations to zero, but this is not always true.
+
+One important aspect to consider is reducing the unsafe segments in the code. Furthermore, it is essential that this code strictly adheres to the invariants for unsafe blocks to avoid introducing undefined behavior and avoid errors spreading to the rest of the code. In any case, sanitizers are not a solution to this issue.
+
+In this example, an automated tool should be utilized to check array sizes rigorously, but this is not exhaustive. An automated tool needs to ensure no instances of undefined behavior are overlooked. Interactions with unsafe code are limited to certain operations and should not be used otherwise \cite{miller_step_2018, noauthor_unsafe_nodate, noauthor_unsafety_nodate}. 
+%\todoinline{\href{https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=c9e4d27feaf842c54d9ffc2e5557b1f7}{link to enum stuff}}
 
 \section{Exception and panic management}
 
@@ -2343,12 +2247,6 @@ Rust has also recoverable errors as \inlinecode{Result<>} and unrecoverable erro
 \end{figure}
 \FloatBarrier
 
-
-\todoinline{learn rules for unsafe behaviour: unsafe behaviour has clear rules (refer to last book) that needs to be respected even more draconianly when working with FFI }
-
-\todoinline{learn undefined behavior for each language- do not rely on sanitizers - an automated tool should absolutely check the size of the array}
-
-\todoinline{\href{https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=c9e4d27feaf842c54d9ffc2e5557b1f7}{link to enum stuff}}
 
 
 \section{Passing BBqueue}
@@ -2608,32 +2506,122 @@ One of the most important results is that in a time where safe languages are rec
 \cleardoublepage
 \appendix
 \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
-\begin{comment}
-\chapter{Supporting materials}
-\label{sec:supportingMaterial}
 
-\section{More on Rust string}
-Rust strings are UTF-8 encoded, and even their length is not obvious as it depends on whether one is counting bytes, characters, or graphemes. Consider:
+\chapter{Regexes}
+\label{sec:regexes}
 
+This section covers Rust and SPARK regexes.
+\section{Rust regexes}
 
-\begin{listing}[!ht]
-\begin{minted}[fontsize=\footnotesize]{rust} 
-fn main(){
-let mut good_morning = String::from("おはよう");
-let mut good_morning2 = String::from("お早う");
-//prints 12    
-println!("Lenth of good_morning {}", good_morning.len());
-//prints 9  
-println!("Lenth of good_morning2 {}", good_morning2.len());
-let e = String::from("è");
-//prints 2  
-println!("Lenth of c {}", e.len());
-\end{minted}
-\caption[BBqueue header in Rust]{BBqueue header in Rust}
-\label{lst:grapheme}
-\end{listing}
-\end{comment}
+The Rust regex patterns are designed to match type declarations and literals, except for the number pattern. The number pattern focuses on matching numeric literals. Since the Rust compiler is generally efficient at deducing the types, writing a type declaration is generally omitted. The patterns cover the following constructs:
 
+\begin{enumerate}
+    \item Numbers (\verb|\b(?:\d+(?:\.\d\+)?\d+(?:\_\d\+)\+)\b|): 
+    
+    Matches integer and floating-point literals, including those with underscores. For example:
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let c = 3.14;
+    \end{minted}
+    \item Enums and Structs (\verb|struct| and \verb|enum|): both \texttt{struct}s and \texttt{enum}s are declared with a keyword. 
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    struct Point {
+        x: f32,
+        y: f32,
+    }
+    enum Color {
+        //...
+    }
+    \end{minted}
+    \item Arrays (\verb|\[(\s*\d+\s*(?:,\s*\d+\s*)*)\]|):
+    
+    Matches array literals, excluding array declarations to avoid double matching and overreporting the type. For example, this will be only one match:
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let a : [i32; 5] = [1, 2, 3, 4, 5];  
+    \end{minted}
+    \item References (\verb|&[mut\s]*\w+|): Matches mutable and immutable reference types. It will match \texttt{\&T} and \texttt{\&mut T}.
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let y = &mut x;  
+    \end{minted}
+    \item Heap Types (\verb|Box<[<>]+>| \verb|Rc<[<>]+>|\verb|Arc<[<>]+>|): Matches Box, Rc, and Arc heap-allocated type declarations. For example:
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let boxed_value: Box<i32>
+    \end{minted}
+    \item Dynamic Vectors (\verb|vec!|Vec::new|): 
+    
+    Matches dynamic vector types declaration in Rust and the vec![] macro.
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let v = Vec::new();
+    \end{minted}
+    \item Strings (\verb|String::|.to\_string|format!|): 
+    Matches String creation and manipulation through various methods and macros.
+    \begin{minted}[fontsize=\footnotesize]{rust}
+    let girl_name = "Mouneissa".to_string();
+    \end{minted}
+\end{enumerate}
+ 
+\section{SPARK regexes}
+
+These focus on type declarations.
+The patterns cover the following constructs:
+
+\begin{enumerate}
+    \item Numbers 
+(\verb|: Integer ||| \verb|range \d.. \d| || \verb|is digits|).
+
+This pattern uses Ada keywords for numbers (\texttt{Integer, Float, Modular...}) and matches various numeric types such as integer, float, fixed, decimal, modular, natural, positive, long, and range, but not an array declaration where the type is used for indexing or as the type contained in the array. We choose to proceed differently and list all possible types as SPARK requires initialization. It matches predefined types and custom declarations but not when array of numbers are declared
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    -- matches:
+    X : Integer := 42;
+    Y : Short_Integer := 5;
+    type My_Integer is range -100 .. 100;
+    -- does not match:
+    type Integer_Array is array (1 .. 5) of Integer;
+    \end{minted}
+
+    \item Structs (\verb|type\s\+\w\+\s\+is\s\+record|). This pattern matches record types, which are similar to structs in other languages.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    type Point is record
+        -- ...
+    end record;
+    \end{minted}
+
+    \item Enums: (\verb|type\s\+\w\+\s\+is\s\+\(|). Matches enumeration types in SPARK.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    type Color is (Red,Orange,Green);
+    \end{minted}
+
+    \item Arrays: (\verb|type\s+[a-zA-Z\_]+\s+is\s+array\s*(\d+)|). Matches array declarations.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    type Int_Array is array (1 .. 10) of Integer;
+    \end{minted}
+
+    \item Dynamic Vectors: (Combines \verb|range <>|, \verb|Containers.Vector| and \verb|Containers|).
+This pattern matches unconstrained arrays and instances of the Containers.Vector package.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    type Int_Vector is array (Integer range <>) of Integer;
+    \end{minted}
+
+    \item References: (Combines: \verb|type\s+\w+\s+is\s+access\s+\w+| and \verb|new\s+\w+)|). This pattern matches access types (pointers) and memory allocations using 'new'.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    type Int_Ptr is access Integer;
+    \end{minted}
+
+    \item Unbounded Strings: (\verb|Strings.Unbounded|). This matches unbounded strings from the Ada.Strings.Unbounded package.
+
+    \begin{minted}[fontsize=\footnotesize]{ada}
+    S : Unbounded_String;
+    begin
+    S := "Some string";
+    \end{minted}
+\end{enumerate}
+
+ 
 
 \chapter{Build systems to reproduce experiments}
 \label{sec:buildSystems}
